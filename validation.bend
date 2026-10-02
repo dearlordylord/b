@@ -1,6 +1,5 @@
 import Base
 import ./core.bend as Core
-import ./artwork.bend as Artwork
 
 # Finite exact checks of the concrete artwork, distinct from generic proofs.
 # All coordinates are bounded before conversion to U32. A determinant side
@@ -16,7 +15,7 @@ def sections_bounded(sections: List<&2, Core.Section>) -> Bool:
     case Nil{}:
       True{}
     case Con{+h, t}:
-      point_bounded(Core.boundary_left(h)) && point_bounded(Core.boundary_right(h)) && sections_bounded(t)
+      point_bounded(Core.boundary_left(h)) && (point_bounded(Core.boundary_right(h)) && sections_bounded(t))
 
 def point_equal(a: Core.Point, b: Core.Point) -> Bool:
   match a b:
@@ -91,7 +90,7 @@ def cell_transverse(+cell: Core.Cell) -> Bool:
   transverse_points(Core.seam_start(s), Core.seam_control(s), Core.seam_end(s))
 
 def cell_valid(+cell: Core.Cell) -> Bool:
-  cell_convex(cell) && cell_centroid_exact(cell) && cell_endpoints_exact(cell) && cell_transverse(cell) && section_width(Core.cell_start(cell)) && section_width(Core.cell_finish(cell))
+  cell_convex(cell) && (cell_centroid_exact(cell) && (cell_endpoints_exact(cell) && (cell_transverse(cell) && (section_width(Core.cell_start(cell)) && (section_width(Core.cell_finish(cell)))))))
 
 def cells_valid(sections: List<&2, Core.Section>, previous: Core.Section) -> Bool:
   match sections:
@@ -127,6 +126,3 @@ def section_count(sections: List<&2, Core.Section>) -> Nat:
 
 def expected_artwork(+sections: List<&2, Core.Section>) -> Bool:
   Nat.is_eq(section_count(sections), 33n) && validate(sections)
-
-def artwork_valid() -> Bool:
-  expected_artwork(Artwork.upper()) && expected_artwork(Artwork.lower()) && expected_artwork(Artwork.stem())

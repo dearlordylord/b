@@ -30,11 +30,11 @@ python3 check.py
 `generate.bend`, checks the emitted SVG, and replaces `b.svg` only on success.
 The generator itself refuses to emit an SVG if its Bend artwork validation fails.
 
-`check.py` runs the proof gate, 200 literal arithmetic checks, five compiling
-mutations that must fail their corresponding laws, two invalid artworks that
-must be rejected before SVG emission, and independent SVG checks with broken
-endpoint/control-point negative controls. Python orchestrates these commands
-and checks the output artifact; it does not verify the Bend language.
+`check.py` runs the 15-law proof gate, 200 literal arithmetic checks,
+seven concrete validator boundary checks, compiling mutations that must fail
+proofs, invalid artworks that must be rejected before SVG emission, and Bend
+and independent Python topology fixtures. Python checks the output artifact;
+it does not verify the Bend language.
 
 ## How the geometry works
 
@@ -88,8 +88,58 @@ manual-editing mistakes.
 
 Containment concerns the seam's mathematical centerline. Rendering uses butt
 caps, a 1.5 px seam stroke, and a 2.8 px closed outline with round joins drawn
-over the seams. Exact two-hole topology of the composed letter, global curvature
-smoothness and perceptual readability are not formal claims.
+over the seams. The topology checks below concern the closed **fill**, rather
+than the expanded strokes. Global curvature smoothness and perceptual
+readability are not formal claims.
+
+### Validator proofs
+
+`validation-laws.bend` and `validation-proof.bend` add six universal claims:
+validation is sound and complete relative to the explicit recursive conditions;
+the bounds gate rejects when closed; unbounded sections are rejected; and the
+artwork gate is sound and complete, including the exact 33-section count.
+These prove traversal and combination of predicates. They do not yet prove
+that the U32 geometric predicates implement their natural-number formulas
+without overflow. Bounds and overflow limits are documented in the code and
+checked on the concrete artifact.
+
+### Fill topology
+
+`topology.bend` builds the intersection graph of the 96 closed convex tiles.
+Each arm must be an embedded ribbon: consecutive tiles share a full edge
+with opposite interiors, and nonadjacent tiles do not intersect. The three
+ribbons must be connected through their intersections.
+
+Every triangle clique requires an exact common-intersection witness. Pairwise
+overlap alone is insufficient. Witness search uses vertices and rational
+points with denominator 64 along vertex-pair segments; unsuccessful search
+rejects conservatively. Coordinates must be divisible by four and at most
+16000 before scaling. Five-cliques are rejected, so the accepted nerve has
+no simplices beyond tetrahedra.
+
+The current nerve has **96 vertices, 146 edges, 64 triangles and 15
+tetrahedra**, giving Euler characteristic `96 - 146 + 64 - 15 = -1`.
+With one connected component this means **two holes**. Counts are computed
+from geometry, not supplied as acceptance constants.
+
+The mathematical bridge uses planar Helly's theorem (common intersection of
+every triple establishes the intersection of a larger convex family), the
+[finite closed convex nerve theorem](https://pmc.ncbi.nlm.nih.gov/articles/PMC6768430/),
+and the planar relation `holes = components - Euler characteristic`.
+Those general topology theorems and correctness of the intersection algorithm
+are **not formalized in Bend** here.
+
+`topology-laws.bend` and `topology-proof.bend` add four universal proofs:
+the report filter is sound and complete relative to its declared conditions,
+the input guard closes on failure, and connectivity of three ribbons matches
+the explicit eight-case specification. Together with the original five and
+six validator claims, BendTT checks 15 public laws.
+
+`topology_verify.py` independently clips polygons with exact rational arithmetic
+and counts actual intersections in every dimension. It confirms one component
+and two holes directly from the serialized SVG. Its fixtures include an empty
+triple despite pairwise overlap, a filled five-clique, point contact and a gap.
+The generator rejects an artwork unless both geometry and topology gates pass.
 
 ## Files
 
@@ -100,10 +150,15 @@ smoothness and perceptual readability are not formal claims.
 | `geometry.bend` | Homogeneous quadratic and corner-weight numerators |
 | `facts.bend` | Arithmetic and convex-weight supporting proofs |
 | `LAWS.bend`, `PROOF.bend` | Statements and their Bend proofs |
-| `validation.bend` | Finite artwork checks in Bend |
+| `validation.bend`, `artwork-validation.bend` | Generic checks and concrete generation gate |
+| `validation-laws.bend`, `validation-proof.bend` | Validator structural soundness and completeness |
+| `topology.bend` | Exact convex-cover topology checks |
+| `topology-laws.bend`, `topology-proof.bend` | Report and guard proofs |
+| `topology-report.bend` | Print the computed artwork certificate |
+| `topology-tests.bend`, `validation-tests.bend` | Topology and boundary fixtures |
 | `generate.bend` | Gated SVG generator and IO entry point |
 | `b.svg`, `preview.png` | Generated artwork and preview |
-| `regenerate.sh`, `check.py`, `verify.py` | Regeneration, checks and negative controls |
+| `regenerate.sh`, `check.py`, `verify.py`, `topology_verify.py` | Regeneration, checks and negative controls |
 
 ## License
 

@@ -10,6 +10,7 @@ from pathlib import Path
 
 sys.dont_write_bytecode = True
 from verify import verify
+from topology_verify import nerve, verify_topology
 
 HERE = Path(__file__).resolve().parent
 
@@ -37,6 +38,11 @@ def negative_controls(directory):
          "Nat.add(Nat.mul(Nat.mul(v, v), start), 1n)", "seam_inside_cell_coordinate"),
         ("geometry.bend", "F.weight_total(u, v)",
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
+    ]
+    controls += [
+        ("validation.bend", "bounded_valid(sections_bounded(sections), sections)", "True{}", "validator_sound"),
+        ("validation.bend", "Nat.is_eq(section_count(sections), 33n) && validate(sections)", "validate(sections)", "artwork_gate_sound"),
+        ("topology.bend", "connected && (witnessed && (no_five && (ribbons &&", "True{} && (witnessed && (no_five && (ribbons &&", "topology_report_sound"),
     ]
     for file, old, new, law in controls:
         path = directory / file
@@ -72,16 +78,18 @@ def literal_checks(directory):
 
 def svg_negative_controls(root):
     ns = "{http://www.w3.org/2000/svg}"
-    for edit in ("endpoint", "control"):
+    for edit in ("endpoint", "control", "transform"):
         mutant = copy.deepcopy(root)
         seam = next(e for e in mutant.iter(ns + "path") if "-seam-" in e.attrib.get("id", ""))
         data = seam.attrib["d"]
-        if edit == "endpoint":
+        if edit == "transform":
+            mutant.find(ns + "g").set("transform", "translate(20000 0)")
+        elif edit == "endpoint":
             seam.attrib["d"] = data.replace("M", "M1", 1)
         else:
             seam.attrib["d"] = data.replace("Q", "Q1", 1)
         try:
-            verify(mutant)
+            verify_topology(mutant)
         except ValueError:
             continue
         raise AssertionError(f"SVG validator accepted broken {edit}")
@@ -98,10 +106,21 @@ def bend_artwork_negative_controls(directory):
         original[first.start():].replace(first.group(0),
                                         f"Core.Section{{{first.group(1)}, {first.group(1)}}}", 1),
     ]
-    for text in controls:
+    start = original.index("def stem()")
+    moved = re.sub(r"Core.Pt\{(\d+)n,", lambda m: f"Core.Pt{{{int(m[1]) + 10000}n,", original[start:])
+    controls.append(original[:start] + moved)
+    for index, text in enumerate(controls):
         assert text != original
         path.write_text(text)
         try:
+            if index == 2:
+                (directory / "geometry-only.bend").write_text(
+                    "import Base\nimport ./artwork.bend as A\nimport ./validation.bend as V\n"
+                    "def main() -> IO(Unit):\n  do IO<Unit>:\n"
+                    '    IO.print(Bool.show(V.expected_artwork(A.stem())))\n')
+                probe = subprocess.run(["bend", "geometry-only.bend"], cwd=directory,
+                                       capture_output=True, text=True, timeout=5)
+                assert probe.returncode == 0 and "True" in probe.stdout, probe.stdout + probe.stderr
             bend(directory, "generate.bend", "--check-only")
             result = subprocess.run(["bend", "generate.bend"], cwd=directory,
                                     capture_output=True, text=True, timeout=5)
@@ -113,17 +132,36 @@ def bend_artwork_negative_controls(directory):
     return len(controls)
 
 
+def topology_reference_controls():
+    def box(x, y, u, v):
+        return [(x, y), (u, y), (u, v), (x, v)]
+    a, b = box(0, 0, 10, 2), box(0, 0, 2, 10)
+    c = [(0, 8), (8, 0), (10, 0), (0, 10)]
+    assert nerve([a, b, c]) == {"components": 1, "holes": 1, "euler": 0, "simplices": [3, 3]}
+    assert nerve([a] * 5) == {"components": 1, "holes": 0, "euler": 1, "simplices": [5, 10, 10, 5, 1]}
+    assert nerve([box(0, 0, 4, 4), box(4, 4, 8, 8)])["components"] == 1
+    assert nerve([box(0, 0, 4, 4), box(5, 5, 9, 9)])["components"] == 2
+    print("Independent topology controls: empty triple, filled K5, point contact and gap accepted")
+
+
 if __name__ == "__main__":
     with tempfile.TemporaryDirectory(prefix="bend-svg-check-") as temp:
         directory = Path(temp)
         for file in HERE.glob("*.bend"):
             shutil.copy2(file, directory / file.name)
         bend(directory, "PROOF.bend", "--verdict")
-        print("BendTT: all five geometry/serialization laws accepted")
+        print("BendTT: all 15 geometry, validator and topology-report laws accepted")
+        bend(directory, "validation-tests.bend", "--verdict")
+        print("Seven concrete validator boundary checks accepted")
+        result = subprocess.run(["bend", "topology-tests.bend"], cwd=directory, capture_output=True, text=True, timeout=5)
+        assert result.returncode == 0 and "topology-tests: True" in result.stdout, result.stdout + result.stderr
+        print("Bend topology fixtures accepted")
         print(f"Literal arithmetic checks: {literal_checks(directory)} accepted")
         print(f"Compiling mutations rejected by their laws: {negative_controls(directory)}")
         print(f"Invalid artworks rejected by Bend before SVG emission: {bend_artwork_negative_controls(directory)}")
     root = ET.parse(HERE / "b.svg").getroot()
     print("Independent exact SVG geometry:", verify(root))
+    print("Independent exact fill topology:", verify_topology(root))
+    topology_reference_controls()
     svg_negative_controls(root)
-    print("Broken SVG endpoint/control negative controls rejected")
+    print("Broken SVG endpoint/control/transform negative controls rejected")
