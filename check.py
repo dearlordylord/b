@@ -40,6 +40,8 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ("word-multiplication.bend", "Word.mul.go(n, m, a, b, acc)", "Word.mul.go(n, m, a, b, Word.zero(n))", "loop_exact"),
+        ("word-multiplication.bend", "Word.mul(n, a, b)", "Word.add(n, a, b)", "bounded_multiplication"),
         ("word-shift.bend", "W.Carry{c, WNil{}}", "W.Carry{False{}, WNil{}}", "shift_value"),
         ("word-conversion.bend", "Word.inc(n, from_nat(p, n))", "Word.zero(n)", "bounded_conversion"),
         ("word-arithmetic.bend", "case 0n: 1n", "case 0n: 0n", "high_carry_value"),
@@ -80,6 +82,20 @@ def literal_checks(directory):
     (directory / "samples.bend").write_text("\n".join(rows) + "\n")
     bend(directory, "samples.bend")
     return count
+
+
+def literal_validator_checks(directory):
+    # Independent examples should not share one reduction budget. Each
+    # individual theorem retains the five-second kernel gate.
+    source = (directory / "validation-tests.bend").read_text()
+    chunks = re.split(r"(?m)(?=^def )", source)
+    imports, cases = chunks[0], chunks[1:]
+    assert len(cases) == 7
+    for index, case in enumerate(cases):
+        name = f"validation-sample-{index}.bend"
+        (directory / name).write_text(imports + case)
+        bend(directory, name, "--verdict")
+    return len(cases)
 
 
 def svg_negative_controls(root):
@@ -156,7 +172,9 @@ if __name__ == "__main__":
         for file in HERE.glob("*.bend"):
             shutil.copy2(file, directory / file.name)
         bend(directory, "PROOF.bend", "--verdict")
-        print("BendTT: all 34 public laws accepted")
+        print("BendTT: all 38 public laws accepted")
+        bend(directory, "word-multiplication-tests.bend", "--verdict")
+        print("Actual shift-and-add loop and U32 arithmetic fixtures accepted")
         bend(directory, "word-shift-tests.bend", "--verdict")
         print("Shift, retained-bit and word-range fixtures accepted")
         bend(directory, "word-conversion-tests.bend", "--verdict")
@@ -167,8 +185,7 @@ if __name__ == "__main__":
         print("Word carry and exact-value fixtures accepted")
         bend(directory, "arithmetic-tests.bend", "--verdict")
         print("Four exact orientation fixtures accepted")
-        bend(directory, "validation-tests.bend", "--verdict")
-        print("Seven concrete validator boundary checks accepted")
+        print(f"Concrete validator boundary checks accepted: {literal_validator_checks(directory)}")
         result = subprocess.run(["bend", "topology-tests.bend"], cwd=directory, capture_output=True, text=True, timeout=5)
         assert result.returncode == 0 and "topology-tests: True" in result.stdout, result.stdout + result.stderr
         print("Bend topology fixtures accepted")

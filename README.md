@@ -30,7 +30,7 @@ python3 check.py
 `generate.bend`, checks the emitted SVG, and replaces `b.svg` only on success.
 The generator itself refuses to emit an SVG if its Bend artwork validation fails.
 
-`check.py` runs the 34-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 38-law proof gate, 200 literal arithmetic checks,
 seven concrete validator boundary checks, compiling mutations that must fail
 proofs, invalid artworks that must be rejected before SVG emission, and Bend
 and independent Python topology fixtures. Python checks the output artifact;
@@ -209,3 +209,14 @@ the double fits, and that every unsigned word lies below its capacity.
 The gate now checks 34 public laws, plus supporting arithmetic/order lemmas.
 Fixtures cover every three-bit value, bounded doubles and an overflowing shift
 whose retained full value remains exact. Multiplication remains outstanding.
+
+`word-multiplication-proof.bend` proves the exact invariant of Base's real
+shift-and-add loop under a bound on the complete mathematical result. It
+also proves bounded word multiplication and direct bounded `U32.mul` and
+`U32.add` results. The U32 laws quantify over their complete 32-bit constructor
+payloads to avoid an eager checker expansion; this covers every U32 value.
+The public gate now checks 38 laws. Tests include `1 * 7` in three bits: an
+unused shift overflows, but the bounded product remains exact. Conversion,
+addition, multiplication and bounded shifts now have universal proofs;
+comparison, subtraction/division and the geometry-expression bridge remain
+outstanding before stage 1 can be called complete.

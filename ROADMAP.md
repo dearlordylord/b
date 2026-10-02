@@ -54,7 +54,9 @@ are established. Partial milestones do not complete the objective.
 - Bounded Nat conversion is exact, including the actual Base U32 primitive.
 - Every word value is below capacity; retained shifts are exact, and a bounded
   double agrees with the standard shift.
+- Base shift-and-add loop, bounded multiplication and direct U32 addition
+  and multiplication agree with exact natural-number arithmetic.
 
-Still required for stage 1: prove multiplication,
+Still required for stage 1: prove comparison and subtraction/division,
 instantiate the arithmetic bounds for geometry, and connect each production
 geometric expression to its exact model. Stages 2–4 remain uncompleted.
