@@ -40,6 +40,7 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ("word-arithmetic.bend", "case 0n: 1n", "case 0n: 0n", "high_carry_value"),
         ("word-arithmetic.bend", "Carry{c, WNil{}}", "Carry{False{}, WNil{}}", "whole_word_value"),
         ("word-arithmetic.bend", "prepend(p, False{}, add_carry(p, at, bt, False{}))", "prepend(p, True{}, add_carry(p, at, bt, False{}))", "low_word_agrees"),
         ("exact-arithmetic.bend", "cyclic_sum(ax, by, bx, y, x, ay, d)", "Nat.add(cyclic_sum(ax, by, bx, y, x, ay, d), 1n)", "edge_reversal_left"),
@@ -153,7 +154,9 @@ if __name__ == "__main__":
         for file in HERE.glob("*.bend"):
             shutil.copy2(file, directory / file.name)
         bend(directory, "PROOF.bend", "--verdict")
-        print("BendTT: all 22 public laws accepted")
+        print("BendTT: all 25 public laws accepted")
+        bend(directory, "word-bounds-tests.bend", "--verdict")
+        print("Word capacity and strict-bound fixtures accepted")
         bend(directory, "word-tests.bend", "--verdict")
         print("Word carry and exact-value fixtures accepted")
         bend(directory, "arithmetic-tests.bend", "--verdict")

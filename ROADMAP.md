@@ -50,7 +50,8 @@ are established. Partial milestones do not complete the objective.
 - Retained-carry addition agrees with Base Word.adc on its low word.
 - Whole-word positional value, including high carry, equals the input sum.
 - Zero carry implies exact standard-word addition, at every word width.
+- A sum strictly below 2^n forces zero carry and exact standard addition.
 
-Still required for stage 1: derive zero carry from explicit bounds, prove
-Nat-to-word conversion and multiplication, and connect each production
+Still required for stage 1: prove Nat-to-word conversion and multiplication,
+instantiate the arithmetic bounds for geometry, and connect each production
 geometric expression to its exact model. Stages 2–4 remain uncompleted.

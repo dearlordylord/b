@@ -55,3 +55,9 @@ def carry_value(n: Nat, r: Carry<n>) -> Nat:
 def overflow(-n: Nat, r: Carry<n>) -> Bool:
   match r:
     case Carry{c, w}: c
+
+# One beyond the maximum representable unsigned value: exactly 2^n.
+def capacity(n: Nat) -> Nat:
+  match n:
+    case 0n: 1n
+    case 1n+p: Nat.double(capacity(p))
