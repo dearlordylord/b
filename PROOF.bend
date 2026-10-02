@@ -3,6 +3,7 @@ import ./core.bend as C
 import ./LAWS.bend as Laws
 import ./facts.bend as F
 import ./topology-proof.bend as TopologyProof
+import ./arithmetic-proof.bend as ArithmeticProof
 
 def Laws.seam_attaches_left(cell):
   {==}

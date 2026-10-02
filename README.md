@@ -30,7 +30,7 @@ python3 check.py
 `generate.bend`, checks the emitted SVG, and replaces `b.svg` only on success.
 The generator itself refuses to emit an SVG if its Bend artwork validation fails.
 
-`check.py` runs the 15-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 17-law proof gate, 200 literal arithmetic checks,
 seven concrete validator boundary checks, compiling mutations that must fail
 proofs, invalid artworks that must be rejected before SVG emission, and Bend
 and independent Python topology fixtures. Python checks the output artifact;
@@ -164,3 +164,14 @@ The generator rejects an artwork unless both geometry and topology gates pass.
 
 Apache-2.0. `facts.bend` includes an attributed subset of bend-mathlib arithmetic
 proofs; its original license is retained in `LICENSE.mathlib`. See [NOTICE](NOTICE).
+
+## Arithmetic programme (in progress)
+
+[ROADMAP.md](ROADMAP.md) records the autonomous four-stage programme.
+`exact-arithmetic.bend` defines an unbounded Nat model of homogeneous
+orientation. `arithmetic-laws.bend` and `arithmetic-proof.bend` prove that
+reversing an edge exchanges its two determinant sums, for every coordinate
+and denominator. These two additional public laws bring the current gate to
+17. The model is not yet connected to the U32 implementation: stage 1,
+intersection correctness, enumeration correctness and the formal topological
+bridge remain outstanding. No overflow or full-topology proof is claimed.

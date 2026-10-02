@@ -40,6 +40,7 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ("exact-arithmetic.bend", "cyclic_sum(ax, by, bx, y, x, ay, d)", "Nat.add(cyclic_sum(ax, by, bx, y, x, ay, d), 1n)", "edge_reversal_left"),
         ("validation.bend", "bounded_valid(sections_bounded(sections), sections)", "True{}", "validator_sound"),
         ("validation.bend", "Nat.is_eq(section_count(sections), 33n) && validate(sections)", "validate(sections)", "artwork_gate_sound"),
         ("topology.bend", "connected && (witnessed && (no_five && (ribbons &&", "True{} && (witnessed && (no_five && (ribbons &&", "topology_report_sound"),
@@ -150,7 +151,9 @@ if __name__ == "__main__":
         for file in HERE.glob("*.bend"):
             shutil.copy2(file, directory / file.name)
         bend(directory, "PROOF.bend", "--verdict")
-        print("BendTT: all 15 geometry, validator and topology-report laws accepted")
+        print("BendTT: all 17 geometry, validator, topology-report and arithmetic laws accepted")
+        bend(directory, "arithmetic-tests.bend", "--verdict")
+        print("Four exact orientation fixtures accepted")
         bend(directory, "validation-tests.bend", "--verdict")
         print("Seven concrete validator boundary checks accepted")
         result = subprocess.run(["bend", "topology-tests.bend"], cwd=directory, capture_output=True, text=True, timeout=5)
