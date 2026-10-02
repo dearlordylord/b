@@ -57,6 +57,9 @@ are established. Partial milestones do not complete the objective.
 - Base shift-and-add loop, bounded multiplication and direct U32 addition
   and multiplication agree with exact natural-number arithmetic.
 
-Still required for stage 1: prove comparison and subtraction/division,
+- Word/U32 comparison and geometry-used predicates agree with exact Nat
+  comparison; complements sum with their input to the representable maximum.
+
+Still required for stage 1: prove subtraction/division,
 instantiate the arithmetic bounds for geometry, and connect each production
 geometric expression to its exact model. Stages 2–4 remain uncompleted.

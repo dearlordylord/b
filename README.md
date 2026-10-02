@@ -30,7 +30,7 @@ python3 check.py
 `generate.bend`, checks the emitted SVG, and replaces `b.svg` only on success.
 The generator itself refuses to emit an SVG if its Bend artwork validation fails.
 
-`check.py` runs the 38-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 45-law proof gate, 200 literal arithmetic checks,
 seven concrete validator boundary checks, compiling mutations that must fail
 proofs, invalid artworks that must be rejected before SVG emission, and Bend
 and independent Python topology fixtures. Python checks the output artifact;
@@ -133,7 +133,7 @@ are **not formalized in Bend** here.
 the report filter is sound and complete relative to its declared conditions,
 the input guard closes on failure, and connectivity of three ribbons matches
 the explicit eight-case specification. Together with the original five and
-six validator claims, BendTT checks 15 public laws.
+six validator claims, these geometry and report modules contain 15 public laws.
 
 `topology_verify.py` independently clips polygons with exact rational arithmetic
 and counts actual intersections in every dimension. It confirms one component
@@ -167,56 +167,38 @@ proofs; its original license is retained in `LICENSE.mathlib`. See [NOTICE](NOTI
 
 ## Arithmetic programme (in progress)
 
-[ROADMAP.md](ROADMAP.md) records the autonomous four-stage programme.
-`exact-arithmetic.bend` defines an unbounded Nat model of homogeneous
-orientation. `arithmetic-laws.bend` and `arithmetic-proof.bend` prove that
-reversing an edge exchanges its two determinant sums, for every coordinate
-and denominator. These two additional public laws bring the current gate to
-17 at that milestone. The model is not yet connected to the U32 implementation: stage 1,
-intersection correctness, enumeration correctness and the formal topological
-bridge remain outstanding. No overflow or full-topology proof is claimed.
+[ROADMAP.md](ROADMAP.md) records the autonomous four-stage programme. The
+current BendTT gate checks **45 public laws**, plus supporting lemmas.
+Arithmetic results quantify over all inputs at arbitrary word widths; the U32
+operation laws cover every 32-bit constructor payload.
 
-`word-arithmetic.bend` adds a width-polymorphic adder retaining its carry.
-`word-laws.bend` and `word-proof.bend` prove exact value conservation for the
-full-adder bit cell and agreement of the retained-carry adder's low word with
-Base `Word.adc` at every width. These bring the public gate to 19 laws at that milestone.
+The proved arithmetic foundations are:
 
-`word-value-proof.bend` now establishes whole-word value conservation including
-the retained high carry, agreement of zero-carry interpretation with
-`Word.to_nat`, and exact standard word addition under a zero-carry premise.
-The current gate contains 22 public laws. Bounds implying that premise,
-conversion and multiplication agreement remain outstanding. The production
-generator still uses the existing U32 arithmetic.
+- Exact Nat orientation model: edge reversal exchanges its determinant sums.
+- Full-adder and whole-word value conservation, including the high carry.
+- A strict sum bound below `2^n` implies zero carry and exact Base addition.
+- Exact bounded Nat conversion, including Base `U32.from_nat` and its round trip.
+- Every word lies below capacity; retained shifts preserve full value and a
+  bounded double agrees with Base `Word.shl`.
+- The actual Base shift-and-add loop and bounded multiplication are exact;
+  unused overflowing trailing shifts need no extra premise.
+- Direct bounded `U32.add` and `U32.mul` agree with the natural-number formulas.
+- Word and U32 comparisons agree with Nat comparison, including the U32
+  equality, greater-than and less-or-equal predicates used by geometry.
+- Bitwise complement sums with its input to the representable maximum;
+  maximum plus one equals capacity.
 
-`word-bounds-proof.bend` proves that a high carry contributes exactly `2^n`,
-that a strict bound on the exact sum forces zero carry, and that standard word
-addition is exact under that bound. All statements quantify over arbitrary
-widths and inputs. The public gate now checks 25 laws. Concrete bounded-sum
-fixtures invoke the theorem, and the equality-at-capacity boundary is rejected.
-Conversion, multiplication and the production geometry bridge remain open.
+The `word-*.bend` modules define these models, laws, proofs and fixtures;
+`arithmetic-*-proof.bend` contains supporting order and product algebra.
+Fixtures invoke the theorems, cover all three-bit comparisons and complements,
+and include a bounded product whose unused shift overflows. Compiling mutations
+must fail the corresponding proof gate. Each kernel invocation has a five-second
+limit; the seven validator examples run individually to keep their independent
+reduction budgets bounded.
 
-`word-conversion-proof.bend` proves zero-word value, agreement of increment
-with standard addition, exact bounded conversion at arbitrary widths,
-agreement of that converter with Base `U32.from_nat`, and the actual U32
-round trip below `2^32`. The current gate checks 30 public laws. Fixture proofs
-invoke both the generic and U32 theorems; an explicit at-capacity case records
-wraparound outside the premise. Multiplication and geometry instantiation
-remain open.
-
-The shift and range modules prove low-word agreement with Base shifting,
-exact full value with the outgoing high bit retained, exact `Word.shl` when
-the double fits, and that every unsigned word lies below its capacity.
-The gate now checks 34 public laws, plus supporting arithmetic/order lemmas.
-Fixtures cover every three-bit value, bounded doubles and an overflowing shift
-whose retained full value remains exact. Multiplication remains outstanding.
-
-`word-multiplication-proof.bend` proves the exact invariant of Base's real
-shift-and-add loop under a bound on the complete mathematical result. It
-also proves bounded word multiplication and direct bounded `U32.mul` and
-`U32.add` results. The U32 laws quantify over their complete 32-bit constructor
-payloads to avoid an eager checker expansion; this covers every U32 value.
-The public gate now checks 38 laws. Tests include `1 * 7` in three bits: an
-unused shift overflows, but the bounded product remains exact. Conversion,
-addition, multiplication and bounded shifts now have universal proofs;
-comparison, subtraction/division and the geometry-expression bridge remain
-outstanding before stage 1 can be called complete.
+**Stage 1 remains incomplete:** ordered subtraction, division, instantiation of
+bounds for actual geometric expressions and their final exact-model agreement
+are outstanding. Intersection correctness, enumeration correctness and the
+formal topological bridge in stages 2–4 are also outstanding. Finite artwork
+checks and the externally justified topology certificate remain as described
+above; they are not substitutes for these universal proofs.

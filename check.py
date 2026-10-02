@@ -40,6 +40,9 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ("word-comparison.bend", "Word.cmp(n, a, b)", "EQ{}", "word_comparison_exact"),
+        ("word-comparison.bend", "Word.cmp(n, a, b)", "Word.cmp(n, b, a)", "word_comparison_exact"),
+        ("word-complement.bend", "Word.not(n, w)", "w", "complement_value"),
         ("word-multiplication.bend", "Word.mul.go(n, m, a, b, acc)", "Word.mul.go(n, m, a, b, Word.zero(n))", "loop_exact"),
         ("word-multiplication.bend", "Word.mul(n, a, b)", "Word.add(n, a, b)", "bounded_multiplication"),
         ("word-shift.bend", "W.Carry{c, WNil{}}", "W.Carry{False{}, WNil{}}", "shift_value"),
@@ -172,7 +175,9 @@ if __name__ == "__main__":
         for file in HERE.glob("*.bend"):
             shutil.copy2(file, directory / file.name)
         bend(directory, "PROOF.bend", "--verdict")
-        print("BendTT: all 38 public laws accepted")
+        print("BendTT: all 45 public laws accepted")
+        bend(directory, "word-comparison-tests.bend", "--verdict")
+        print("Comparison and complement fixtures accepted")
         bend(directory, "word-multiplication-tests.bend", "--verdict")
         print("Actual shift-and-add loop and U32 arithmetic fixtures accepted")
         bend(directory, "word-shift-tests.bend", "--verdict")
