@@ -60,6 +60,9 @@ are established. Partial milestones do not complete the objective.
 - Word/U32 comparison and geometry-used predicates agree with exact Nat
   comparison; complements sum with their input to the representable maximum.
 
-Still required for stage 1: prove subtraction/division,
+- Subtraction carry characterizes the borrow; ordered Word/U32 subtraction
+  agrees with exact Nat subtraction.
+
+Still required for stage 1: prove division,
 instantiate the arithmetic bounds for geometry, and connect each production
 geometric expression to its exact model. Stages 2–4 remain uncompleted.

@@ -30,8 +30,8 @@ python3 check.py
 `generate.bend`, checks the emitted SVG, and replaces `b.svg` only on success.
 The generator itself refuses to emit an SVG if its Bend artwork validation fails.
 
-`check.py` runs the 45-law proof gate, 200 literal arithmetic checks,
-seven concrete validator boundary checks, compiling mutations that must fail
+`check.py` runs the 49-law proof gate, 200 literal arithmetic checks,
+seven executed validator boundary checks, compiling mutations that must fail
 proofs, invalid artworks that must be rejected before SVG emission, and Bend
 and independent Python topology fixtures. Python checks the output artifact;
 it does not verify the Bend language.
@@ -168,7 +168,7 @@ proofs; its original license is retained in `LICENSE.mathlib`. See [NOTICE](NOTI
 ## Arithmetic programme (in progress)
 
 [ROADMAP.md](ROADMAP.md) records the autonomous four-stage programme. The
-current BendTT gate checks **45 public laws**, plus supporting lemmas.
+current BendTT gate checks **49 public laws**, plus supporting lemmas.
 Arithmetic results quantify over all inputs at arbitrary word widths; the U32
 operation laws cover every 32-bit constructor payload.
 
@@ -187,16 +187,19 @@ The proved arithmetic foundations are:
   equality, greater-than and less-or-equal predicates used by geometry.
 - Bitwise complement sums with its input to the representable maximum;
   maximum plus one equals capacity.
+- Subtraction carry characterizes borrowing, and actual Word/U32 subtraction
+  equals Nat subtraction whenever the minuend is at least the subtrahend.
 
 The `word-*.bend` modules define these models, laws, proofs and fixtures;
 `arithmetic-*-proof.bend` contains supporting order and product algebra.
 Fixtures invoke the theorems, cover all three-bit comparisons and complements,
 and include a bounded product whose unused shift overflows. Compiling mutations
-must fail the corresponding proof gate. Each kernel invocation has a five-second
-limit; the seven validator examples run individually to keep their independent
-reduction budgets bounded.
+must fail the corresponding proof gate. The subtraction comparison-selector
+mutant fails in the shared `carry_step` lemma, rather than its public law section. Each kernel invocation has a five-second
+limit. The seven concrete validator examples run as compiled native tests;
+they are finite executed checks, distinct from the universal BendTT laws.
 
-**Stage 1 remains incomplete:** ordered subtraction, division, instantiation of
+**Stage 1 remains incomplete:** division, instantiation of
 bounds for actual geometric expressions and their final exact-model agreement
 are outstanding. Intersection correctness, enumeration correctness and the
 formal topological bridge in stages 2–4 are also outstanding. Finite artwork

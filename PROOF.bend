@@ -4,7 +4,7 @@ import ./LAWS.bend as Laws
 import ./facts.bend as F
 import ./topology-proof.bend as TopologyProof
 import ./arithmetic-proof.bend as ArithmeticProof
-import ./word-complement-proof.bend as WordProof
+import ./word-subtraction-proof.bend as WordProof
 import ./arithmetic-order-proof.bend as ArithmeticOrder
 import ./arithmetic-product-proof.bend as ArithmeticProduct
 

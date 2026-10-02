@@ -4,3 +4,6 @@ Selected arithmetic proofs in facts.bend are derived from bendlib
 bend-mathlib/nat.bend (https://github.com/bendlib/bendlib).
 Copyright 2026 HigherOrderCO. Licensed under Apache License 2.0.
 The source license is retained in LICENSE.mathlib.
+
+subtraction-algebra-proof.bend contains additional selected cancellation
+facts derived from bendlib bend-mathlib/nat.bend, under LICENSE.mathlib.
