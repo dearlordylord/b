@@ -42,3 +42,15 @@ gaps and evidence in README. Review before publishing checked changes.
 
 The programme is complete only when all four intended mathematical results
 are established. Partial milestones do not complete the objective.
+
+## Verified stage-1 milestones
+
+- Exact homogeneous determinant model: edge reversal exchanges its sums.
+- Full-adder bit cell conserves its natural-number value.
+- Retained-carry addition agrees with Base Word.adc on its low word.
+- Whole-word positional value, including high carry, equals the input sum.
+- Zero carry implies exact standard-word addition, at every word width.
+
+Still required for stage 1: derive zero carry from explicit bounds, prove
+Nat-to-word conversion and multiplication, and connect each production
+geometric expression to its exact model. Stages 2–4 remain uncompleted.

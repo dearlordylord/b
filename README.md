@@ -30,7 +30,7 @@ python3 check.py
 `generate.bend`, checks the emitted SVG, and replaces `b.svg` only on success.
 The generator itself refuses to emit an SVG if its Bend artwork validation fails.
 
-`check.py` runs the 19-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 22-law proof gate, 200 literal arithmetic checks,
 seven concrete validator boundary checks, compiling mutations that must fail
 proofs, invalid artworks that must be rejected before SVG emission, and Bend
 and independent Python topology fixtures. Python checks the output artifact;
@@ -172,13 +172,18 @@ proofs; its original license is retained in `LICENSE.mathlib`. See [NOTICE](NOTI
 orientation. `arithmetic-laws.bend` and `arithmetic-proof.bend` prove that
 reversing an edge exchanges its two determinant sums, for every coordinate
 and denominator. These two additional public laws bring the current gate to
-17. The model is not yet connected to the U32 implementation: stage 1,
+17 at that milestone. The model is not yet connected to the U32 implementation: stage 1,
 intersection correctness, enumeration correctness and the formal topological
 bridge remain outstanding. No overflow or full-topology proof is claimed.
 
 `word-arithmetic.bend` adds a width-polymorphic adder retaining its carry.
 `word-laws.bend` and `word-proof.bend` prove exact value conservation for the
 full-adder bit cell and agreement of the retained-carry adder's low word with
-Base `Word.adc` at every width. These bring the public gate to 19 laws.
-Whole-word value conservation, bounds and multiplication agreement remain
-outstanding; the production generator still uses the existing U32 arithmetic.
+Base `Word.adc` at every width. These bring the public gate to 19 laws at that milestone.
+
+`word-value-proof.bend` now establishes whole-word value conservation including
+the retained high carry, agreement of zero-carry interpretation with
+`Word.to_nat`, and exact standard word addition under a zero-carry premise.
+The current gate contains 22 public laws. Bounds implying that premise,
+conversion and multiplication agreement remain outstanding. The production
+generator still uses the existing U32 arithmetic.

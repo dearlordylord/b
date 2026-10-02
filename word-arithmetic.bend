@@ -40,3 +40,18 @@ def add_carry(n: Nat, a: Word(n), b: Word(n), c: Bool) -> Carry<n>:
           prepend(p, False{}, add_carry(p, at, bt, True{}))
         case WCon{True{}, at} WCon{True{}, bt} True{}:
           prepend(p, True{}, add_carry(p, at, bt, True{}))
+
+# Positional value including the bit beyond the declared word width.
+def extended_value(n: Nat, c: Bool, w: Word(n)) -> Nat:
+  match n:
+    case 0n: bit_value(c)
+    case 1n+p:
+      match w:
+        case WCon{False{}, t}: Nat.double(extended_value(p, c, t))
+        case WCon{True{}, t}: 1n+Nat.double(extended_value(p, c, t))
+def carry_value(n: Nat, r: Carry<n>) -> Nat:
+  match r:
+    case Carry{c, w}: extended_value(n, c, w)
+def overflow(-n: Nat, r: Carry<n>) -> Bool:
+  match r:
+    case Carry{c, w}: c
