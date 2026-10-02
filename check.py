@@ -40,6 +40,7 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ("word-arithmetic.bend", "prepend(p, False{}, add_carry(p, at, bt, False{}))", "prepend(p, True{}, add_carry(p, at, bt, False{}))", "low_word_agrees"),
         ("exact-arithmetic.bend", "cyclic_sum(ax, by, bx, y, x, ay, d)", "Nat.add(cyclic_sum(ax, by, bx, y, x, ay, d), 1n)", "edge_reversal_left"),
         ("validation.bend", "bounded_valid(sections_bounded(sections), sections)", "True{}", "validator_sound"),
         ("validation.bend", "Nat.is_eq(section_count(sections), 33n) && validate(sections)", "validate(sections)", "artwork_gate_sound"),
@@ -151,7 +152,7 @@ if __name__ == "__main__":
         for file in HERE.glob("*.bend"):
             shutil.copy2(file, directory / file.name)
         bend(directory, "PROOF.bend", "--verdict")
-        print("BendTT: all 17 geometry, validator, topology-report and arithmetic laws accepted")
+        print("BendTT: all 19 public laws accepted")
         bend(directory, "arithmetic-tests.bend", "--verdict")
         print("Four exact orientation fixtures accepted")
         bend(directory, "validation-tests.bend", "--verdict")

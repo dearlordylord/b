@@ -4,6 +4,7 @@ import ./LAWS.bend as Laws
 import ./facts.bend as F
 import ./topology-proof.bend as TopologyProof
 import ./arithmetic-proof.bend as ArithmeticProof
+import ./word-proof.bend as WordProof
 
 def Laws.seam_attaches_left(cell):
   {==}
