@@ -30,7 +30,7 @@ python3 check.py
 `generate.bend`, checks the emitted SVG, and replaces `b.svg` only on success.
 The generator itself refuses to emit an SVG if its Bend artwork validation fails.
 
-`check.py` runs the 25-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 30-law proof gate, 200 literal arithmetic checks,
 seven concrete validator boundary checks, compiling mutations that must fail
 proofs, invalid artworks that must be rejected before SVG emission, and Bend
 and independent Python topology fixtures. Python checks the output artifact;
@@ -194,3 +194,11 @@ addition is exact under that bound. All statements quantify over arbitrary
 widths and inputs. The public gate now checks 25 laws. Concrete bounded-sum
 fixtures invoke the theorem, and the equality-at-capacity boundary is rejected.
 Conversion, multiplication and the production geometry bridge remain open.
+
+`word-conversion-proof.bend` proves zero-word value, agreement of increment
+with standard addition, exact bounded conversion at arbitrary widths,
+agreement of that converter with Base `U32.from_nat`, and the actual U32
+round trip below `2^32`. The current gate checks 30 public laws. Fixture proofs
+invoke both the generic and U32 theorems; an explicit at-capacity case records
+wraparound outside the premise. Multiplication and geometry instantiation
+remain open.

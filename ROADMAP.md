@@ -51,7 +51,8 @@ are established. Partial milestones do not complete the objective.
 - Whole-word positional value, including high carry, equals the input sum.
 - Zero carry implies exact standard-word addition, at every word width.
 - A sum strictly below 2^n forces zero carry and exact standard addition.
+- Bounded Nat conversion is exact, including the actual Base U32 primitive.
 
-Still required for stage 1: prove Nat-to-word conversion and multiplication,
+Still required for stage 1: prove multiplication,
 instantiate the arithmetic bounds for geometry, and connect each production
 geometric expression to its exact model. Stages 2–4 remain uncompleted.
