@@ -52,6 +52,8 @@ are established. Partial milestones do not complete the objective.
 - Zero carry implies exact standard-word addition, at every word width.
 - A sum strictly below 2^n forces zero carry and exact standard addition.
 - Bounded Nat conversion is exact, including the actual Base U32 primitive.
+- Every word value is below capacity; retained shifts are exact, and a bounded
+  double agrees with the standard shift.
 
 Still required for stage 1: prove multiplication,
 instantiate the arithmetic bounds for geometry, and connect each production
