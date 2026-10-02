@@ -111,4 +111,3 @@ def stem() -> List<&2, Core.Section>:
     Core.Section{Core.Pt{5388n, 2188n}, Core.Pt{3192n, 2128n}},
     Core.Section{Core.Pt{5400n, 1828n}, Core.Pt{3200n, 1772n}}
   ]
-
