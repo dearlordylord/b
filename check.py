@@ -52,6 +52,9 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ("homogeneous.bend", "Nat.add(Nat.add(Nat.mul(Nat.mul(a, b), d), Nat.mul(c, y)), Nat.mul(x, e))", "Nat.mul(8n, Nat.add(Nat.add(Nat.mul(Nat.mul(a, b), d), Nat.mul(c, y)), Nat.mul(x, e)))", "homogeneous_sum_bound"),
+        ("homogeneous.bend", "S.sum3(n, Word.mul(n, a, b), d, c, y, x, e)", "S.sum3(n, Word.add(n, a, b), d, c, y, x, e)", "word_homogeneous_exact"),
+        ("topology.bend", "ax * by * d + bx * y + x * ay", "ax * by + bx * y + x * ay", "guarded_side_exact"),
         ("core.bend", "Pt{Nat.div(x, 4n), Nat.div(y, 4n)}", "Pt{Nat.div(x, 3n), Nat.div(y, 3n)}", "cell_center_model"),
         ("centroid.bend", "Nat.div(sum(a, b, c, d), 4n)", "Nat.div(sum(a, b, c, d), 5n)", "mean_four_exact"),
         ("validation.bend", "point_equal(point_four(Core.cell_center(cell)), Core.point_add(Core.point_add(Core.boundary_left(a), Core.boundary_right(a)), Core.point_add(Core.boundary_left(b), Core.boundary_right(b))))", "True{}", "validated_centroid_mean"),
@@ -111,12 +114,16 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif law in {"homogeneous_sum_bound", "word_homogeneous_exact", "guarded_side_exact"}:
+                proof_root = "WITNESS_ARITHMETIC_PROOF.bend"
             elif file in {"word-division4.bend", "word-subtraction.bend", "word-complement.bend"}:
                 proof_root = "DIVISION_PROOF.bend"
             elif law in {"cell_center_model", "mean_four_exact", "validated_centroid_mean"}:
                 proof_root = "CENTROID_PROOF.bend"
             elif law in {"guarded_width_exact", "accepted_points_width"} or file in {"word-squares.bend", "natural-squares.bend"}:
                 proof_root = "WIDTH_PROOF.bend"
+            elif law in {"accepted_points_determinant", "guarded_determinant"}:
+                proof_root = "DOT_PROOF.bend"
             elif law == "guarded_dot_exact":
                 proof_root = "coordinate-dot-proof.bend"
             elif "absolute" in law or file.startswith("absolute-"):
@@ -242,6 +249,8 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        bend(directory, "witness-arithmetic-tests.bend", "--verdict")
+        print("Production homogeneous side fixtures accepted: denominators 1/64, positive/zero/negative")
         bend(directory, "centroid-tests.bend", "--verdict")
         print("Centroid exactness, bounds and rounding-rejection fixtures accepted")
         bend(directory, "word-squares-tests.bend", "--verdict")

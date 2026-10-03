@@ -7,7 +7,7 @@ import ./word-comparison-laws.bend as Comparison
 import ./word-subtraction-laws.bend as Sub
 import ./word-subtraction-proof.bend as Existing
 import ./order-facts.bend as Order
-import ./coordinate-runtime-proof.bend as Coordinate
+import ./coordinate-support.bend as Coordinate
 import ./word-conversion.bend as C
 import ./word-conversion-laws.bend as Conversion
 

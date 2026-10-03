@@ -5,7 +5,7 @@ import ./coordinate-sum.bend as S
 import ./coordinate-sum4.bend as Four
 import ./coordinate-dot-pair-laws.bend as Pair
 import ./coordinate-dot-pair-proof.bend as Existing
-import ./coordinate-runtime-proof.bend as Runtime
+import ./coordinate-support.bend as Runtime
 import ./boolean-reflection.bend as ValidationProof
 import ./core.bend as Core
 import ./validation.bend as V

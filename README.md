@@ -30,7 +30,7 @@ python3 check.py
 `generate.bend`, checks the emitted SVG, and replaces `b.svg` only on success.
 The generator itself refuses to emit an SVG if its Bend artwork validation fails.
 
-`check.py` runs the 82-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 85-law proof gate, 200 literal arithmetic checks,
 seven executed validator boundary checks, three executed transverse cases,
 compiling mutations that must fail
 proofs, invalid artworks that must be rejected before SVG emission, and Bend
@@ -169,7 +169,7 @@ proofs; its original license is retained in `LICENSE.mathlib`. See [NOTICE](NOTI
 ## Arithmetic programme (in progress)
 
 [ROADMAP.md](ROADMAP.md) records the autonomous four-stage programme. The
-current BendTT gate checks **82 unique public laws**, plus supporting lemmas.
+current BendTT gate checks **85 unique public laws**, plus supporting lemmas.
 Arithmetic results quantify over all inputs at arbitrary word widths; the U32
 operation laws cover every 32-bit constructor payload.
 
@@ -271,10 +271,10 @@ model must give the independently specified Boolean result, with all point
 guards satisfied.
 
 `proof-roots.txt` lists the structural, arithmetic, transverse and absolute
-difference, squared-width, centroid and division proof roots.
+difference, squared-width, centroid, division, dot and witness-arithmetic proof roots.
 Both `check.py` and `regenerate.sh` audit that every public law module is
 reachable, then check every root, with five seconds per kernel invocation.
-The roots share supporting proofs; the 82-law total counts
+The roots share supporting proofs; the 85-law total counts
 each public law once. Dependency-only imports of unrelated proof groups have
 been removed; a dedicated division root explicitly retains division and its
 subtraction/complement prerequisites. No previously checked law is omitted. The absolute-difference root proves
@@ -283,6 +283,10 @@ transverse compositions. Shared Boolean reflection lives in
 `boolean-reflection.bend`; arithmetic proofs import these helpers directly,
 without checking unrelated structural validation laws. The validation proof
 keeps forwarding functions for its existing consumers.
+Coordinate bounds and comparison transport live in `coordinate-support.bend`.
+Width, absolute-difference and transverse proofs consume that support directly,
+without importing production determinant proofs. The latter remain checked
+through the dedicated dot root; dependency auditing retains every public law.
 
 The centroid root proves that the production center equals the independent
 four-corner mean, that averaging preserves any common coordinate bound, and
@@ -291,7 +295,7 @@ equals the corner sum. Six fixtures include a rounded, non-exact center that
 the predicate must reject. Three compiling mutations change the divisor,
 change the model divisor, or bypass centroid acceptance; all must fail proofs.
 
-Validation of this milestone: `regenerate.sh` passed all seven proof roots
+Validation of the centroid milestone: `regenerate.sh` passed all seven proof roots
 and preserved the SVG byte for byte. The remaining `check.py` gates passed
 in a separate driver that omitted only those already-checked roots, including
 all six centroid fixtures and all 42 compiling mutations. Ordinary complete
@@ -300,8 +304,34 @@ existing arithmetic, transverse and width roots. Those runs are failures,
 not passing checks; the time limit has not been increased. Consolidated-run
 timing remains a reproducibility issue.
 
-**Stage 1 remains incomplete:** homogeneous topology witnesses
-still require their exact-model agreement and applicable bounds. Intersection
+The witness-arithmetic root adds three public laws. The exact homogeneous
+sum `((a*b)*d + c*y) + x*e` is strictly below `2^(2*width+8)` when point
+coordinates are at most `2^width`, numerators at most `64*2^width`, and the
+denominator at most 64. This includes the envelope boundaries and `d=0`.
+At width 12 the complete sum fits U32. A generic word theorem establishes
+that the actual nested multiplication and additions agree with this model
+when the first product and final sum fit; all other intermediate bounds
+follow from the final sum. The production `topology.side` comparison then
+agrees with the exact Nat comparison under those coordinate envelopes,
+with no separately supplied overflow premise. Four theorem fixtures cover
+positive, zero and negative signs, denominators 1 and 64, and simultaneous
+envelope boundaries. Three compiling mutations multiply the exact sum by
+eight, change the word product, or change the actual
+production denominator term; each is rejected by the proof gate.
+
+Validation of the witness milestone: all 85 laws across nine roots passed
+the real BendTT gate. The remaining gates passed in a separate driver omitting
+only those already-checked roots, including all 45 compiling mutations.
+The final four witness fixtures and three witness mutations also passed a
+focused recheck; the eightfold sum mutant is falsified at width0 with all
+envelope limits attained together. A complete `check.py` invocation reached
+and accepted every proof root but timed out on the existing squared-width
+fixture group. Thus consolidated-run timing remains unresolved; no timeout
+is reported as a passing check.
+
+**Stage 1 remains incomplete:** scaling original guarded points and generating
+sampled witnesses still need exact-model agreement and proofs that their
+outputs satisfy the envelopes used above. Intersection
 correctness, enumeration correctness and the formal topological bridge in stages 2–4 are also outstanding. Finite artwork
 checks and the externally justified topology certificate remain as described
 above; they are not substitutes for these universal proofs.

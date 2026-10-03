@@ -9,7 +9,7 @@ import ./word-sum4-proof.bend as Existing
 import ./word-arithmetic.bend as W
 import ./word-conversion.bend as C
 import ./word-conversion-laws.bend as V
-import ./coordinate-runtime-proof.bend as Runtime
+import ./coordinate-support.bend as Runtime
 
 law exact_values:
   for +n: Nat

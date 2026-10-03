@@ -99,6 +99,12 @@ are established. Partial milestones do not complete the objective.
   preserves a common coordinate bound, and the exact-centroid acceptance
   predicate establishes the unrounded four-corner sum equation.
 
-Still required for stage 1: connect homogeneous topology witnesses to their
-exact models and establish applicable bounds.
+- Homogeneous sums have a strict bit-width bound including denominator 64.
+  The actual production side comparison agrees with the exact Nat model
+  under coordinate/numerator envelopes. The complete sum bound also proves
+  every intermediate multiplication/addition fits, with the first coordinate
+  product bounded by the same envelopes.
+
+Still required for stage 1: prove exact scaling of guarded source points,
+exact generation of sampled witnesses and their output envelopes.
 Stages 2–4 remain uncompleted.
