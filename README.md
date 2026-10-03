@@ -1551,3 +1551,83 @@ need the explicitly missing true-decision-to-common-point direction.
 `taskset -c 7,11 ./regenerate.sh` also passed all proof roots, native compilation,
 generation and independent geometry/topology checks under the existing limits.
 `git diff --exit-code -- b.svg` confirmed byte-identical output.
+
+### Stage 2: exact segment/line cut
+
+[Cut model](segment-cut.bend), [six laws](segment-cut-laws.bend) and
+[proof root](SEGMENT_CUT_PROOF.bend) construct a rational point where an endpoint
+pair crosses a line. For a point `p` on the closed left side and `q` strictly on
+the negative side, let `gp = positive(p)-negative(p)` and
+`gq = negative(q)-positive(q)`, using the existing homogeneous determinant sums.
+The actual construction is `join(p,q,gq,gp)`: the opposite endpoint's gap is
+its weight. `gp` may be zero at a boundary endpoint; `gq` is strictly positive.
+
+`negative_gap_positive` and `crossing_total_positive` prove this positive gap
+and nonzero total. `crossing_on_line` proves the constructed point's two
+orientation sums exactly equal. It reuses guarded area reconstruction for p,
+ordered subtraction cancellation for q and the existing linear-form owner.
+The balance identity is
+`positive(p)*gq + positive(q)*gp = negative(p)*gq + negative(q)*gp`.
+The proof distributes products, swaps the matching `gp*gq` terms and regroups
+addition; it introduces no division, floating-point rounding or geometric
+existence axiom.
+
+`crossing_denominator_positive` requires positive denominators at both
+endpoints and proves the result valid. `InSegment` carries actual nonnegative
+weights with nonzero total, validity of both endpoints and result, and exact
+cross-product equivalence to their homogeneous join. `crossing_in_segment`
+constructs that witness with the actual computed gap weights.
+`crossing_region_preserved` proves the result remains in any other closed
+half-plane region containing both endpoints. This last algebraic preservation
+law does not need the line-crossing premises.
+
+The homogeneous gaps already include endpoint denominators, so the cut uses
+`join`, not the ordinary weighted-mean `mix` with these same weights. For line
+`(0,2)->(6,2)` and endpoints `(1,4,1),(5,1,1)`, the gaps are `(12,6)` and the
+constructed point is `(66,36,18)`, representing `(11/3,2)`. Replacing the
+endpoint representations by `(2,8,2),(15,3,3)` produces `(396,216,108)`, the
+same point, without assuming equal denominators. A boundary endpoint `(3,2,1)`
+gets all the weight and reconstructs as `(18,12,6)`.
+
+[Fourteen fixture judgments/constructions](segment-cut-tests.bend) cover the
+asymmetric gaps, actual point, line equality, denominator validity, region
+preservation and explicit segment witness; unequal denominators, a boundary
+endpoint and reversed orientation; and the same-side/invalid-endpoint guards.
+The invalid homogeneous endpoint `(0,0,0)` can give an algebraic on-line result
+with zero denominator. Thus line equality alone is not fraction validity, and
+the segment witness does not admit it.
+
+Six compiling controls reverse negative-gap subtraction, use q's positive gap,
+swap the two weights, drop the second weight, classify equality as strict
+negativity, or replace the join by the ordinary weighted mean. Their first
+failures are public `negative_gap_positive` and `crossing_total_positive`,
+shared `cut_crossing_equal` and shared `cut_on_line_equation`. Each also has a
+checked literal false public-law instance with the original closed/strict-side
+and positive-endpoint premises still true. The positive-gap control uses a
+boundary p; the weighted-mean control uses unequal endpoint denominators.
+These are handwritten compiling proof controls, not a bend-falsify report.
+
+This cut is a construction needed by the missing
+`meets=true -> CommonPoint` direction. It does not yet select which edge pair
+supplies a point satisfying all eight sides, or prove that such a selection
+succeeds whenever `meets` is true. Triple-search completeness, independent
+complex enumeration and the actual SVG-fill/topological bridge remain open.
+Stages 2–4 are unfinished.
+
+Validation: the complete retry of `taskset -c 7,11 python3 -u check.py` passed
+all 256 public laws across 39 proof roots, the fourteen new fixture
+judgments/constructions and existing groups, 184 compiling mutation controls,
+all six new literal counterexamples and independent artifact checks. The first
+complete attempt stopped when native compilation of the existing
+`search-witness-tests.bend` exceeded its five-second limit; it was a failed run,
+not a pass. The retry retained the same limits and passed every check.
+Implementer self-review found no violations of the stated contracts: it traced
+both guarded determinant differences, positive total, opposite-gap weighting,
+exact determinant balance, endpoint/result denominator validity, the actual
+segment weights and preservation of a containing region. Existing area,
+linear-form, order, equality-reflection and convex-join owners are reused.
+The future selection/clipping consumer must still prove the missing common-point
+existence direction; this cut does not assume that result.
+`taskset -c 7,11 ./regenerate.sh` passed all proof roots, native compilation,
+generation and independent geometry/topology checks under the existing limits.
+`git diff --exit-code -- b.svg` confirmed byte-identical output.

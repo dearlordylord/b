@@ -109,6 +109,27 @@ def intersection_counter(directory, original, replacement):
     bend(directory, "intersection-counter.bend", "--verdict")
 
 
+def segment_cut_counter(directory, original, replacement):
+    """Check a false public cut contract while its original premises remain true."""
+    a, b = "N.P{0n, 2n}", "N.P{6n, 2n}"
+    p, q = "G.P{1n, 4n, 1n}", "G.P{5n, 1n, 1n}"
+    if original.startswith("Nat.sub"):
+        wrong = f"Nat.is_gt(M.negative_gap({a}, {b}, {q}), 0n)"
+    elif original == "negative_gap(a, b, q)":
+        p = "G.P{3n, 2n, 1n}"
+        wrong = f"Nat.is_gt(Nat.add(M.first_weight({a}, {b}, {q}), M.second_weight({a}, {b}, {p})), 0n)"
+    else:
+        if replacement.startswith("C.mix"):
+            p, q = "G.P{2n, 8n, 2n}", "G.P{15n, 3n, 3n}"
+        wrong = f"M.on_line({a}, {b}, M.point({a}, {b}, {p}, {q}))"
+    (directory / "segment-cut-counter.bend").write_text(
+        "import Base\nimport ./segment-cut.bend as M\nimport ./natural-cover.bend as N\n"
+        "import ./homogeneous-geometry.bend as G\nimport ./halfplane-region.bend as Region\nimport ./strict-halfplane.bend as S\n"
+        f"def premises() -> {{Region.edge({a}, {b}, {p}) && S.negative({a}, {b}, {q}) && G.positive_denominator({p}) && G.positive_denominator({q}) == True{{}} : Bool}}:\n  {{==}}\n"
+        f"def broken_public_contract() -> {{{wrong} == False{{}} : Bool}}:\n  {{==}}\n")
+    bend(directory, "segment-cut-counter.bend", "--verdict")
+
+
 def negative_controls(directory):
     controls = [
         ("core.bend", "Seam{boundary_left(cell_start(cell)),",
@@ -121,6 +142,14 @@ def negative_controls(directory):
          "Nat.add(Nat.mul(Nat.mul(v, v), start), 1n)", "seam_inside_cell_coordinate"),
         ("geometry.bend", "F.weight_total(u, v)",
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
+    ]
+    controls += [
+        ('segment-cut.bend', 'Nat.sub(A.negative(a, b, p), A.positive(a, b, p))', 'Nat.sub(A.positive(a, b, p), A.negative(a, b, p))', 'negative_gap_positive'),
+        ('segment-cut.bend', 'negative_gap(a, b, q)', 'A.area(a, b, q)', 'crossing_total_positive'),
+        ('segment-cut.bend', 'C.join(p, q, first_weight(a, b, q), second_weight(a, b, p))', 'C.join(p, q, second_weight(a, b, p), first_weight(a, b, q))', 'cut_crossing_equal'),
+        ('segment-cut.bend', 'C.join(p, q, first_weight(a, b, q), second_weight(a, b, p))', 'C.join(p, q, first_weight(a, b, q), 0n)', 'cut_crossing_equal'),
+        ('segment-cut.bend', 'Cmp.is_eq(G.side(ax, ay, bx, by, p))', 'Cmp.is_lt(G.side(ax, ay, bx, by, p))', 'cut_on_line_equation'),
+        ('segment-cut.bend', 'C.join(p, q, first_weight(a, b, q), second_weight(a, b, p))', 'C.mix(p, q, first_weight(a, b, q), second_weight(a, b, p))', 'cut_crossing_equal'),
     ]
     controls += [
         ('quad-intersection.bend', 'S.separated(a, b, r) || S.separated(b, c, r) || S.separated(c, d, r) || S.separated(d, a, r)', 'S.separated(a, b, r) || S.separated(b, c, r) || S.separated(c, d, r)', 'outside_decoded'),
@@ -326,6 +355,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif file == "segment-cut.bend":
+                proof_root = "SEGMENT_CUT_PROOF.bend"
             elif file == "quad-intersection.bend":
                 proof_root = "QUAD_INTERSECTION_PROOF.bend"
             elif file == "strict-halfplane.bend":
@@ -409,6 +440,8 @@ def negative_controls(directory):
             except AssertionError as error:
                 raise AssertionError(f"Mutation {file}: {law} did not produce a proof diagnostic\n{error}") from error
             assert law in output, output
+            if file == "segment-cut.bend":
+                segment_cut_counter(directory, old, new)
             if file == "quad-intersection.bend":
                 intersection_counter(directory, old, new)
             if file == "strict-halfplane.bend":
@@ -560,6 +593,8 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        bend(directory, "segment-cut-tests.bend", "--verdict")
+        print("Exact segment cut fixtures accepted: unequal gaps, unequal denominators, boundary endpoint, containment and valid membership")
         bend(directory, "quad-intersection-tests.bend", "--verdict")
         print("Global intersection fixtures accepted: one-sided separation, common points, edge/corner contact, native rejection and symmetry")
         bend(directory, "strict-halfplane-tests.bend", "--verdict")
