@@ -355,8 +355,81 @@ def interval_clip_counter(directory, original, replacement):
     bend(directory, "interval-clip-counter.bend", "--verdict")
 
 
+def interval_walk_counter(directory, original, replacement):
+    """Checked refutations of literal instances of the walk's public laws."""
+    prelude = (
+        "import Base\nimport ./interval-walk.bend as M\nimport ./interval-clip.bend as Clip\n"
+        "import ./natural-cover.bend as N\nimport ./homogeneous-geometry.bend as G\n"
+        "import ./halfplane-region.bend as Region\nimport ./boolean-reflection.bend as B\n"
+        "def edge() -> M.Edge: M.Halfplane{N.P{1n,3n},N.P{1n,1n}}\n"
+        "def pass_edge() -> M.Edge: M.Halfplane{N.P{0n,0n},N.P{4n,0n}}\n"
+        "def p() -> G.Point: G.P{0n,2n,1n}\ndef q() -> G.Point: G.P{0n,3n,1n}\n"
+        "def span() -> Clip.ClipResult: Clip.Span{p(),q()}\n"
+        "def box() -> N.Quad: N.Q{N.P{1n,1n},N.P{3n,1n},N.P{3n,3n},N.P{1n,3n}}\n")
+    result_type = "Bool"
+    reporter = "x => x"
+    if original == "case []: result":
+        actual, expected = "M.run([],span())", "span()"
+        result_type, reporter = "Clip.ClipResult", "x => Clip.present(x)"
+    elif original == "run(rest,step(edge,result))":
+        if replacement == "run(rest,result)":
+            actual, expected = "M.run([edge()],span())", "M.run([],M.step(edge(),span()))"
+        else:
+            actual, expected = "M.run([pass_edge(),edge()],span())", "M.run([edge()],M.step(pass_edge(),span()))"
+        result_type, reporter = "Clip.ClipResult", "x => Clip.present(x)"
+    elif original.startswith("case Halfplane{a,b} Clip.Gone"):
+        actual, expected = "M.step(edge(),Clip.Gone{})", "Clip.Gone{}"
+        result_type, reporter = "Clip.ClipResult", "x => Clip.present(x)"
+    elif original.startswith("case Halfplane{a,b} Clip.Span"):
+        actual, expected = "M.step(edge(),span())", "Clip.Gone{}"
+        result_type, reporter = "Clip.ClipResult", "x => Clip.present(x)"
+    elif original == "case Halfplane{a,b}: Region.edge(a,b,p)":
+        actual, expected = "M.accepts(edge(),p())", "Region.edge(N.P{1n,3n},N.P{1n,1n},p())"
+    elif original == "accepts(edge,p) && inside(p,rest)":
+        point = "p()" if replacement == "True{}" else "G.P{2n,2n,1n}"
+        actual, expected = f"M.inside({point},[edge()])", f"Region.edge(N.P{{1n,3n}},N.P{{1n,1n}},{point}) && True{{}}"
+    elif original == "G.positive_denominator(p) && G.positive_denominator(q)":
+        point = "G.P{0n,1n,0n}" if replacement == "True{}" else "p()"
+        actual = f"M.valid(Clip.Span{{{point},q()}})"
+        expected = f"G.positive_denominator({point}) && G.positive_denominator(q())"
+    elif original == "inside(p,edges) && inside(q,edges)":
+        actual = "M.closed([edge()],span())"
+        expected = "Region.edge(N.P{1n,3n},N.P{1n,1n},p()) && Region.edge(N.P{1n,3n},N.P{1n,1n},q())"
+    elif original.startswith("[Halfplane{a,b}"):
+        actual, expected = "M.inside(p(),M.quad_edges(box()))", "Region.contains(p(),box())"
+    elif original == "run(quad_edges(q),Clip.Span{p,r})":
+        actual, expected = "M.clip_quad(box(),p(),q())", "M.run(M.quad_edges(box()),span())"
+        result_type, reporter = "Clip.ClipResult", "x => Clip.present(x)"
+    else:
+        raise AssertionError((original, replacement))
+    # The true/false orientation is checked by Bend, not guessed by Python.
+    forward = original == "case []: result" or (original == "accepts(edge,p) && inside(p,rest)" and replacement == "False{}") or (original == "G.positive_denominator(p) && G.positive_denominator(q)" and replacement == "False{}")
+    false_true = f"Equal.cong({result_type},Bool,{reporter},{actual},{expected},h)"
+    if not forward:
+        false_true = f"Equal.sym(Bool,True{{}},False{{}},{false_true})"
+    body = (
+        f"def refutes_public_literal(h:{{{actual} == {expected} : {result_type}}}) -> Empty:\n"
+        f"  B.false_impossible({false_true})\n")
+    (directory / "interval-walk-counter.bend").write_text(prelude + body)
+    bend(directory, "interval-walk-counter.bend", "--verdict")
+
+
 def negative_controls(directory):
     controls = [
+        ('interval-walk.bend', 'case []: result', 'case []: Clip.Gone{}', 'run_nil'),
+        ('interval-walk.bend', 'run(rest,step(edge,result))', 'run(rest,result)', 'run_cons'),
+        ('interval-walk.bend', 'run(rest,step(edge,result))', 'step(edge,result)', 'run_cons'),
+        ('interval-walk.bend', 'case Halfplane{a,b} Clip.Gone{}: Clip.Gone{}', 'case Halfplane{a,b} Clip.Gone{}: Clip.Span{G.P{0n,0n,1n},G.P{0n,0n,1n}}', 'step_exact'),
+        ('interval-walk.bend', 'case Halfplane{a,b} Clip.Span{p,q}: Clip.clip(a,b,p,q)', 'case Halfplane{a,b} Clip.Span{p,q}: Clip.Span{p,q}', 'step_exact'),
+        ('interval-walk.bend', 'case Halfplane{a,b}: Region.edge(a,b,p)', 'case Halfplane{a,b}: Region.edge(b,a,p)', 'accepts_exact'),
+        ('interval-walk.bend', 'accepts(edge,p) && inside(p,rest)', 'True{}', 'inside_exact'),
+        ('interval-walk.bend', 'accepts(edge,p) && inside(p,rest)', 'False{}', 'inside_exact'),
+        ('interval-walk.bend', 'G.positive_denominator(p) && G.positive_denominator(q)', 'True{}', 'valid_exact'),
+        ('interval-walk.bend', 'G.positive_denominator(p) && G.positive_denominator(q)', 'False{}', 'valid_exact'),
+        ('interval-walk.bend', 'inside(p,edges) && inside(q,edges)', 'True{}', 'closed_exact'),
+        ('interval-walk.bend', '[Halfplane{a,b},Halfplane{b,c},Halfplane{c,d},Halfplane{d,a}]', '[Halfplane{a,b},Halfplane{b,c},Halfplane{c,d}]', 'quad_membership_exact'),
+        ('interval-walk.bend', 'run(quad_edges(q),Clip.Span{p,r})', 'Clip.Span{p,r}', 'clip_quad_exact'),
+
         ("core.bend", "Seam{boundary_left(cell_start(cell)),",
          "Seam{boundary_right(cell_start(cell)),", "seam_attaches_left"),
         ("core.bend", "cell_center(cell), boundary_right(cell_start(cell))}",
@@ -630,6 +703,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif file == "interval-walk.bend":
+                proof_root = "INTERVAL_WALK_PROOF.bend"
             elif file == "interval-clip.bend":
                 proof_root = "INTERVAL_CLIP_PROOF.bend"
             elif file == "segment-boundary.bend":
@@ -733,6 +808,8 @@ def negative_controls(directory):
             except AssertionError as error:
                 raise AssertionError(f"Mutation {file}: {law} did not produce a proof diagnostic\n{error}") from error
             assert law in output, output
+            if file == "interval-walk.bend":
+                interval_walk_counter(directory, old, new)
             if file == "interval-clip.bend":
                 interval_clip_counter(directory, old, new)
             if file == "segment-boundary.bend":
@@ -900,6 +977,10 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        bend(directory, "interval-walk-raw-tests.bend", "--verdict")
+        bend(directory, "interval-walk-valid-tests.bend", "--verdict")
+        bend(directory, "interval-walk-member-tests.bend", "--verdict")
+        print("Interval walk fixtures accepted: four sides, both cut directions, late rejection, corner contact, prior constraints, fractions and retained interior/boundary points")
         bend(directory, "interval-clip-raw-tests.bend", "--verdict")
         bend(directory, "interval-clip-valid-tests.bend", "--verdict")
         bend(directory, "interval-clip-member-tests.bend", "--verdict")

@@ -2190,3 +2190,74 @@ native compilation, execution and independent artifact verification.
 `git diff --exit-code -- b.svg` confirms byte-for-byte preservation.
 Self-review found no additional violations in this clipping slice; complete
 iteration, provenance selection and the stages 2–4 bridges remain outstanding.
+
+
+### Iterated closed-halfplane clipping
+
+`interval-walk.bend` executes the interval clip over an arbitrary list of
+directed halfplanes. `clip_quad` uses all four directed sides, in their
+declared order. Nineteen public laws constrain the exact step, empty/cons
+iteration, side list, wrapper and physical acceptance/validity/closure
+predicates. They prove valid final endpoints, compliance with every processed
+halfplane, and preservation of any supplied list of earlier constraints.
+
+The constructive nonemptiness theorem starts with a valid `InSegment` witness
+for a point accepted by every requested halfplane. At each step the proof uses
+that witness's actual nonnegative weights, transports the remaining side tests
+to the equivalent homogeneous combination, and obtains a witness for the
+actual selected interval. Recursion proves the actual final result is present.
+This includes closed boundary contacts and arbitrary equivalent point
+representations with positive denominators. It proves forward existence
+preservation; it does not yet return the original point's membership in the
+final interval or label the final endpoints on the original source segment.
+
+Fifteen fixture assertions cover two successive cuts, reversal, rejection at
+the third side, corner-only contact, an empty side list, an extra/repeated side,
+validity, all final constraints, a prior constraint, unequal denominators,
+exact quad membership and retained interior/boundary points. Thirteen compiling
+mutations cover forgotten sides, early termination, endpoint loss or creation,
+reversed halfplanes, constant predicates and a bypassed quad wrapper. Each
+failed a public-law proof and has a real BendTT-checked literal refutation of
+that law. These are handwritten controls, not external `bend-falsify`.
+
+Implementer self-review: the iterator owns traversal only; the existing clip
+owner owns selection/cuts, and the region and homogeneous-combination owners
+supply geometry and representation transport. The later source-provenance
+consumer still needs endpoint coefficients and boundary labels, including
+metadata swaps in reversed mixed cases. No source-provenance, complete search,
+enumeration or topology theorem is inferred from this traversal. Full
+integrated validation and regeneration are pending for this checkpoint.
+Stages 2–4 remain open; the trusted Base/compiler boundary is unchanged.
+The production generator and intersection search do not yet consume this
+iterator; source-provenance and candidate-completeness bridges are still needed.
+
+
+Walk validation attempt: the first complete run timed out at the unchanged
+five-second limit in existing `TRIANGLE_AREA_PROOF.bend`; that run failed.
+The exact separate repeat passed real BendTT at the same limit. The complete
+retry is pending. The new walk root, all three new fixture groups and all
+thirteen new compiling mutants/literal refutations passed locally beforehand.
+
+
+The next complete walk run accepted all 331 laws across 49 roots and the new
+walk fixtures, then timed out in existing `quad-intersection-common-tests.bend`.
+That full run failed. The unchanged-limit separate fixture repeat passed real
+BendTT. Another complete same-limit retry is pending; no assertion, public law
+or mutation was removed and no deadline was increased.
+
+
+Verified walk integrated check: the subsequent complete `python3 -u check.py`
+exited 0 with 331 unique root-level public laws across 49 roots, all fixture
+groups and 247 compiling mutation controls. Invalid-artwork, SVG corruption
+and independent topology controls passed. Exact finite artifact checks still
+report 3 tubes, 96 convex cells, 24 seams, one component, two holes and Euler
+-1 (simplex counts [96,146,64,15]). Regeneration is pending. The two earlier
+failed integrated attempts remain recorded as failed attempts. These checks
+cover the root-level B generator and proof core, not the separate alphabet
+work added concurrently in commit `921c842`.
+
+Publication checkpoint: the walk proof root and all three walk fixture groups
+were rechecked successfully with the unchanged five-second limit. All thirteen
+walk mutants compiled, failed their public-law proof, and passed the literal
+refutation check. Complete integrated validation remains pending as recorded
+above; publication of this checkpoint does not claim a full-suite pass.
