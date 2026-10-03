@@ -56,6 +56,30 @@ def barycentric_counter(directory, mutation_source):
     bend(directory, "barycentric-counter.bend", "--verdict")
 
 
+def strict_halfplane_counter(directory, replacement):
+    """Falsify unconditional complement/decoder contracts, including contact."""
+    imports = ("import Base\nimport ./strict-halfplane.bend as M\nimport ./natural-cover.bend as N\n"
+               "import ./homogeneous-geometry.bend as G\nimport ./halfplane-region.bend as Region\n"
+               "import ./sat-arithmetic.bend as Sat\nimport ./topology.bend as T\n")
+    if "Cmp.is_gt" in replacement:
+        boundary = "Bool.not" in replacement
+        point = "G.P{3n, 2n, 1n}" if boundary else "G.P{3n, 1n, 1n}"
+        value = "True{}" if boundary else "False{}"
+        body = (f"def wrong_negative() -> {{M.negative(N.P{{0n, 2n}}, N.P{{6n, 2n}}, {point}) == {value} : Bool}}:\n  {{==}}\n"
+                f"def closed_side() -> {{Region.edge(N.P{{0n, 2n}}, N.P{{6n, 2n}}, {point}) == {value} : Bool}}:\n  {{==}}\n")
+    else:
+        corners = [(1, 0), (4, 0), (4, 1), (1, 1)]
+        omitted = (1 if " || " in replacement or "Q.embed(q)" not in replacement
+                   else 2 if "Q.embed(r)" not in replacement else 3)
+        corners[omitted] = (corners[omitted][0], 3)
+        natural = "N.Q{" + ", ".join(f"N.P{{{x}n, {y}n}}" for x, y in corners) + "}"
+        native = "T.Q{" + ", ".join(f"T.P{{{x}, {y}}}" for x, y in corners) + "}"
+        body = (f"def reference_rejects() -> {{Sat.separated(T.P{{0, 2}}, T.P{{6, 2}}, {native}) == False{{}} : Bool}}:\n  {{==}}\n"
+                f"def mutant_admits() -> {{M.separated(N.P{{0n, 2n}}, N.P{{6n, 2n}}, {natural}) == True{{}} : Bool}}:\n  {{==}}\n")
+    (directory / "strict-halfplane-counter.bend").write_text(imports + body)
+    bend(directory, "strict-halfplane-counter.bend", "--verdict")
+
+
 def negative_controls(directory):
     controls = [
         ("core.bend", "Seam{boundary_left(cell_start(cell)),",
@@ -68,6 +92,14 @@ def negative_controls(directory):
          "Nat.add(Nat.mul(Nat.mul(v, v), start), 1n)", "seam_inside_cell_coordinate"),
         ("geometry.bend", "F.weight_total(u, v)",
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
+    ]
+    controls += [
+        ('strict-halfplane.bend', 'Cmp.is_lt(G.side(ax, ay, bx, by, p))', 'Cmp.is_gt(G.side(ax, ay, bx, by, p))', 'negative_closed_complement'),
+        ('strict-halfplane.bend', 'Cmp.is_lt(G.side(ax, ay, bx, by, p))', 'Bool.not(Cmp.is_gt(G.side(ax, ay, bx, by, p)))', 'negative_closed_complement'),
+        ('strict-halfplane.bend', 'negative(a, b, Q.embed(p)) && negative(a, b, Q.embed(q)) && negative(a, b, Q.embed(r)) && negative(a, b, Q.embed(s))', 'negative(a, b, Q.embed(p)) && negative(a, b, Q.embed(q)) && negative(a, b, Q.embed(r))', 'separated_weighted_quad'),
+        ('strict-halfplane.bend', 'negative(a, b, Q.embed(p)) && negative(a, b, Q.embed(q)) && negative(a, b, Q.embed(r)) && negative(a, b, Q.embed(s))', 'negative(a, b, Q.embed(p)) && negative(a, b, Q.embed(r)) && negative(a, b, Q.embed(s))', 'separated_weighted_quad'),
+        ('strict-halfplane.bend', 'negative(a, b, Q.embed(p)) && negative(a, b, Q.embed(q)) && negative(a, b, Q.embed(r)) && negative(a, b, Q.embed(s))', 'negative(a, b, Q.embed(p)) && negative(a, b, Q.embed(q)) && negative(a, b, Q.embed(s))', 'separated_weighted_quad'),
+        ('strict-halfplane.bend', 'negative(a, b, Q.embed(p)) && negative(a, b, Q.embed(q)) && negative(a, b, Q.embed(r)) && negative(a, b, Q.embed(s))', 'negative(a, b, Q.embed(p)) || negative(a, b, Q.embed(q)) || negative(a, b, Q.embed(r)) || negative(a, b, Q.embed(s))', 'separated_weighted_quad'),
     ]
     controls += [
         ('quad-barycentric.bend', 'W{A.area(b, c, p), A.area(c, a, p), A.area(a, b, p), 0n}', 'W{A.area(b, c, p), A.area(c, a, p), A.area(a, b, p), 1n}', 'bary_abc_fields'),
@@ -257,6 +289,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif file == "strict-halfplane.bend":
+                proof_root = "STRICT_HALFPLANE_PROOF.bend"
             elif file == "quad-barycentric.bend":
                 proof_root = "QUAD_BARYCENTRIC_PROOF.bend"
             elif law in {"coord_x_positive_fields", "coord_x_negative_fields", "coord_sum_reconstruct", "coord_reconstruct_fields"}:
@@ -336,6 +370,8 @@ def negative_controls(directory):
             except AssertionError as error:
                 raise AssertionError(f"Mutation {file}: {law} did not produce a proof diagnostic\n{error}") from error
             assert law in output, output
+            if file == "strict-halfplane.bend":
+                strict_halfplane_counter(directory, new)
             if file == "quad-barycentric.bend":
                 barycentric_counter(directory, old)
             if law == "accepted_side_exact":
@@ -483,6 +519,8 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        bend(directory, "strict-halfplane-tests.bend", "--verdict")
+        print("Strict separation fixtures accepted: contact, zero pairs, alternate fractions, hull exclusion and native bridge")
         bend(directory, "quad-barycentric-tests.bend", "--verdict")
         print("Barycentric hull fixtures accepted: both branches, distinct areas, fractions, bidirectional membership and native triple witness")
         bend(directory, "triangle-coordinate-tests.bend", "--verdict")

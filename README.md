@@ -1400,3 +1400,75 @@ artifact evidence, not the unfinished universal topological bridge.
 `taskset -c 7,11 ./regenerate.sh` passed every proof root, native compilation,
 generation and independent geometry/topology checks with the existing limits.
 `git diff --exit-code -- b.svg` confirmed byte-identical output.
+
+### Stage 2: strict separators exclude hull points
+
+[Strict-side model](strict-halfplane.bend), [eight laws](strict-halfplane-laws.bend)
+and [proof root](STRICT_HALFPLANE_PROOF.bend) connect the production separator
+to geometric exclusion. `negative(a,b,p)` is the exact complement of the
+closed left half-plane. `separated(a,b,q)` requires all four embedded corners
+strictly on the negative side; contact with the line is not separation.
+
+`negative_weighted_join` proves strict negativity is preserved by a nonnegative
+two-point homogeneous weighted sum when its total weight is nonzero.
+`separated_weighted_quad` extends this to the actual four-corner hull point.
+The proof handles all four choices of a first nonzero weight. Either pair of
+weights may be entirely zero; no intermediate pair is assumed to have a
+positive denominator. Both determinant forms distribute through the existing
+join owner, and existing order facts show that one strictly smaller positive
+weighted term plus the remaining weak inequalities gives a strict total.
+The all-zero case contradicts the explicit positive-total premise.
+
+`separated_hull_point` transfers the result to any actual `InHull` witness,
+using its positive point denominator, nonzero weight total and exact
+cross-product equivalence. `separated_region_exclusion` produces a function
+from supposed hull membership of a point on the closed side to `Empty`.
+This is a checked impossibility proof, not an empty search result. These
+theorems require no convexity assumption on the four input vertices: their
+convex hull is defined by the existing nonnegative weight witnesses.
+
+`separated_decoded` proves the exact native-coordinate reference tests those
+same four geometric sides. `production_separated_exact` reuses the proved
+width-12 U32 arithmetic bridge, and `production_separated_region_exclusion`
+turns a true bounded production separator into the same hull-exclusion
+function. Endpoint and quad arithmetic envelopes remain explicit. The point
+being excluded is a homogeneous natural-coordinate rational point; actual
+hull membership supplies its fraction validity.
+
+[Seventeen fixture judgments/constructions](strict-halfplane-tests.bend)
+exercise contact versus strict separation, unequal fraction denominators,
+a zero join weight, each single nonzero corner weight, all four weights,
+an alternate fraction for a hull point, direct and native exclusion functions,
+the decoded native separator, a blocking fourth corner, zero total and
+reversed line orientation.
+
+Six compiling controls flip the strict comparison, include boundary equality,
+omit the second, third or fourth corner, or replace conjunction by disjunction.
+Comparison controls fail in public `negative_closed_complement`; the four
+corner-composition controls first fail in public `separated_weighted_quad`.
+Each also has an independently checked literal counterexample to an
+unconditional public complement or decoded-separator equation. Omission and
+disjunction controls newly admit invalid separators: their examples are not
+claimed to satisfy the original strict-separator premise. These are handwritten
+compiling proof controls, not a bend-falsify report.
+
+This establishes the exclusion meaning of one production separating side.
+The full `meets` characterization still needs to assemble both quads' side
+tests and prove the converse existence of a common point when no side separates
+them. Finite triple-search completeness, independent complex enumeration and
+the actual SVG-fill/topological bridge remain open. Stages 2–4 are unfinished.
+
+Validation: `taskset -c 7,11 python3 -u check.py` passed all 240 public laws
+across 37 proof roots, the seventeen new fixture judgments/constructions and
+existing groups, 172 compiling mutation controls, six new literal counterexamples
+and independent artifact checks. Implementer self-review found no violations of
+the stated contracts: it traced strict versus closed boundary behavior, the
+positive-total condition, all four first-nonzero branches, zero intermediate
+pairs, both distributed determinant forms, alternate fraction validity,
+contradiction construction and the bounded native separator bridge. Existing
+linear-form, order, hull and arithmetic owners are reused. The next consumer
+must assemble all separating sides into a global intersection theorem; this
+milestone does not claim SAT completeness or the unfinished topological link.
+`taskset -c 7,11 ./regenerate.sh` passed all proof roots, native compilation,
+generation and independent geometry/topology checks under the existing limits.
+`git diff --exit-code -- b.svg` confirmed byte-identical output.
