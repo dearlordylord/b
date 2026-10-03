@@ -11,6 +11,7 @@ import ./word-conversion.bend as C
 import ./word-conversion-laws.bend as V
 import ./word-sum3.bend as M
 import ./word-sum3-laws.bend as A
+import ./word-sum3-proof.bend as SumProof
 import ./word-comparison-laws.bend as Compare
 import ./word-comparison-proof.bend as ComparisonProof
 import ./validation-proof.bend as ValidationProof

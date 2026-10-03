@@ -52,6 +52,8 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ("validation.bend", "U32.sub(U32.max(a, b), U32.min(a, b))", "U32.sub(U32.min(a, b), U32.max(a, b))", "u32_absolute_exact"),
+        ("absolute-difference.bend", "Bool.pick(Nat, less, Nat.sub(b, a), Nat.sub(a, b))", "Bool.pick(Nat, less, Nat.sub(a, b), Nat.sub(b, a))", "choice_value"),
         ("validation.bend", "U32.is_gt((dot(right, right) + dot(control, left) : U32), (dot(right, left) + dot(control, right) : U32))", "U32.is_le((dot(right, right) + dot(control, left) : U32), (dot(right, left) + dot(control, right) : U32))", "guarded_transverse_exact"),
         ("coordinate-transverse.bend", "Nat.is_gt(S.exact(cx, rx, cy, ry, lx, lx, ly, ly), S.exact(cx, lx, cy, ly, lx, rx, ly, ry))", "Nat.is_le(S.exact(cx, rx, cy, ry, lx, lx, ly, ly), S.exact(cx, lx, cy, ly, lx, rx, ly, ry))", "transverse_finish"),
         ("validation.bend", "U32.is_gt((dot(control, right) + dot(left, left) : U32), (dot(control, left) + dot(left, right) : U32))", "U32.is_le((dot(control, right) + dot(left, left) : U32), (dot(control, left) + dot(left, right) : U32))", "guarded_transverse_exact"),
@@ -104,6 +106,10 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif law == "guarded_dot_exact":
+                proof_root = "coordinate-dot-proof.bend"
+            elif "absolute" in law or file.startswith("absolute-"):
+                proof_root = "ABSOLUTE_PROOF.bend"
             elif "transverse" in law:
                 proof_root = "TRANSVERSE_PROOF.bend"
             elif file in {"core.bend", "geometry.bend", "topology.bend"} or law in {"validator_sound", "artwork_gate_sound"}:
@@ -225,6 +231,8 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        bend(directory, "absolute-difference-tests.bend", "--verdict")
+        print("Absolute difference, symmetry and coordinate-bound fixtures accepted")
         print(f"Concrete transverse checks accepted: {literal_transverse_checks(directory)}")
         bend(directory, "word-sum4-tests.bend", "--verdict")
         print("Composed four-product word sum fixtures accepted")

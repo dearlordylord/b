@@ -6,7 +6,7 @@ TASK_TMP=$(mktemp -d)
 trap 'find "$TASK_TMP" -type f -delete; rmdir "$TASK_TMP"' EXIT HUP INT TERM
 cd "$TASK_DIR"
 PYTHONDONTWRITEBYTECODE=1 python3 proof_scope.py
-while IFS= read -r proof_root; do
+while IFS= read -r proof_root || [ -n "$proof_root" ]; do
   timeout 5 bend "$proof_root" --verdict
 done < proof-roots.txt
 timeout 5 bend generate.bend -o "$TASK_TMP/generate"

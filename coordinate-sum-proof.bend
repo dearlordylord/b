@@ -5,7 +5,6 @@ import ./coordinate-sum-laws.bend as L
 import ./coordinate-facts.bend as C
 import ./capacity-facts.bend as Capacity
 import ./order-facts.bend as O
-import ./word-sum3-proof.bend as Existing
 
 law sum_width_bound:
   for +width: Nat

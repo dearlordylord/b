@@ -87,6 +87,10 @@ are established. Partial milestones do not complete the objective.
   filter. Proof groups now have explicit roots with the same five-second
   per-invocation limit; all earlier laws remain in the full gate.
 
+- Production absolute difference is exact for all U32 inputs. Its natural
+  model is symmetric, respects a common coordinate bound and agrees with
+  the actual guarded source conversions. Squared-width composition remains.
+
 Still required for stage 1: connect the other production geometric expressions
 (squared widths, centroids and homogeneous
 topology witnesses) to their exact models. Stages 2–4 remain uncompleted.

@@ -30,7 +30,7 @@ python3 check.py
 `generate.bend`, checks the emitted SVG, and replaces `b.svg` only on success.
 The generator itself refuses to emit an SVG if its Bend artwork validation fails.
 
-`check.py` runs the 69-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 73-law proof gate, 200 literal arithmetic checks,
 seven executed validator boundary checks, three executed transverse cases,
 compiling mutations that must fail
 proofs, invalid artworks that must be rejected before SVG emission, and Bend
@@ -169,7 +169,7 @@ proofs; its original license is retained in `LICENSE.mathlib`. See [NOTICE](NOTI
 ## Arithmetic programme (in progress)
 
 [ROADMAP.md](ROADMAP.md) records the autonomous four-stage programme. The
-current BendTT gate checks **69 unique public laws**, plus supporting lemmas.
+current BendTT gate checks **73 unique public laws**, plus supporting lemmas.
 Arithmetic results quantify over all inputs at arbitrary word widths; the U32
 operation laws cover every 32-bit constructor payload.
 
@@ -218,6 +218,12 @@ The proved arithmetic foundations are:
   follow. Source conversions connect this result to the production sum of two
   dots under the coordinate guards, without an extra overflow premise.
 
+- Production `absolute_difference` agrees with exact natural-coordinate
+  distance for every pair of U32 values; max/min selection supplies the order
+  required by subtraction. The natural model is symmetric and bounded by
+  any common input bound. Guarded source conversions preserve that distance.
+  Squaring and adding the distances for actual widths remain outstanding.
+
 The `word-*.bend` modules define these models, laws, proofs and fixtures;
 `arithmetic-*-proof.bend` contains supporting order and product algebra.
 The coordinate sum, runtime, dot and dot-pair modules prove the source
@@ -235,6 +241,9 @@ point-range filter is rejected in `accepted_points_determinant`. Changing
 either production transverse comparator to less-or-equal, or
 changing the exact model comparator, is rejected by the transverse proof
 root. Substituting a wrong coordinate in the production dot expression fails `guarded_dot_exact`.
+Reversing max/min in the production absolute difference is rejected in
+`u32_absolute_exact`; swapping the natural model branches is rejected in
+the supporting `choice_value` lemma.
 The coordinate-sum mutant multiplies the sum by eight, making its bound
 false at the maximum coordinates; it fails in `sum_width_bound`. The analogous
 four-product mutant is rejected in `width_bound`. Changing a multiplication
@@ -252,12 +261,16 @@ start tangent and backward end tangent. Both the actual predicate and exact
 model must give the independently specified Boolean result, with all point
 guards satisfied.
 
-`proof-roots.txt` lists the structural, arithmetic and transverse proof roots.
+`proof-roots.txt` lists the structural, arithmetic, transverse and absolute
+difference proof roots.
 Both `check.py` and `regenerate.sh` audit that every public law module is
-reachable, then check every root, with five seconds per kernel invocation. The roots share supporting proofs; the 69-law total counts
+reachable, then check every root, with five seconds per kernel invocation.
+The roots share supporting proofs; the 73-law total counts
 each public law once. Dependency-only imports of unrelated proof groups have
 been removed; arithmetic aggregation explicitly retains division and its
-subtraction/complement prerequisites. No previously checked law is omitted.
+subtraction/complement prerequisites. No previously checked law is omitted. The absolute-difference root proves
+subtraction and coordinate conversion without importing the width or
+transverse compositions.
 
 **Stage 1 remains incomplete:** the other production expressions (squared
 widths, centroids and homogeneous topology witnesses) still require their

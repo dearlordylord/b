@@ -13,3 +13,6 @@ from bendlib bend-mathlib/nat.bend, under LICENSE.mathlib.
 
 order-facts.bend contains selected order and product-monotonicity facts
 derived from bendlib bend-mathlib/nat.bend, under LICENSE.mathlib.
+
+absolute-order-proof.bend adapts selected order and subtraction bounds
+from bendlib bend-mathlib/nat.bend, under LICENSE.mathlib.

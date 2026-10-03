@@ -1,7 +1,6 @@
 import Base
 import ./coordinate-sum4.bend as S
 import ./coordinate-sum4-laws.bend as L
-import ./coordinate-dot-proof.bend as Existing
 import ./coordinate-sum-proof.bend as Three
 import ./coordinate-facts.bend as C
 import ./capacity-facts.bend as Capacity
