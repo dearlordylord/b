@@ -109,6 +109,10 @@ are established. Partial milestones do not complete the objective.
   12-bit envelope. Actual U32 conversion/division and production point scaling
   agree with those quotients, including rounded inputs.
 
-Still required for stage 1: prove that the grid filter implies unrounded
-rational scaling; prove exact sampled-witness generation and its envelopes.
+- Zero remainder proves an exact division round trip. The actual production
+  grid filter entails unrounded scaling and the accepted scaled-point
+  envelopes used by homogeneous comparison proofs.
+
+Still required for stage 1: prove exact sampled-witness generation and its
+output envelopes.
 Stages 2–4 remain uncompleted.

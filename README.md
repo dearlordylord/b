@@ -30,7 +30,7 @@ python3 check.py
 `generate.bend`, checks the emitted SVG, and replaces `b.svg` only on success.
 The generator itself refuses to emit an SVG if its Bend artwork validation fails.
 
-`check.py` runs the 88-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 91-law proof gate, 200 literal arithmetic checks,
 seven executed validator boundary checks, three executed transverse cases,
 compiling mutations that must fail
 proofs, invalid artworks that must be rejected before SVG emission, and Bend
@@ -169,7 +169,7 @@ proofs; its original license is retained in `LICENSE.mathlib`. See [NOTICE](NOTI
 ## Arithmetic programme (in progress)
 
 [ROADMAP.md](ROADMAP.md) records the autonomous four-stage programme. The
-current BendTT gate checks **88 unique public laws**, plus supporting lemmas.
+current BendTT gate checks **91 unique public laws**, plus supporting lemmas.
 Arithmetic results quantify over all inputs at arbitrary word widths; the U32
 operation laws cover every 32-bit constructor payload.
 
@@ -271,10 +271,10 @@ model must give the independently specified Boolean result, with all point
 guards satisfied.
 
 `proof-roots.txt` lists the structural, arithmetic, transverse and absolute
-difference, squared-width, centroid, division, dot, witness-arithmetic and scaled-coordinate proof roots.
+difference, squared-width, centroid, division, dot, witness-arithmetic scaled-coordinate and grid-scaling proof roots.
 Both `check.py` and `regenerate.sh` audit that every public law module is
 reachable, then check every root, with five seconds per kernel invocation.
-The roots share supporting proofs; the 88-law total counts
+The roots share supporting proofs; the 91-law total counts
 each public law once. Dependency-only imports of unrelated proof groups have
 been removed; a dedicated division root explicitly retains division and its
 subtraction/complement prerequisites. No previously checked law is omitted. The absolute-difference root proves
@@ -302,7 +302,7 @@ all six centroid fixtures and all 42 compiling mutations. Ordinary complete
 `check.py` invocations also encountered five-second wall-time failures in
 existing arithmetic, transverse and width roots. Those runs are failures,
 not passing checks; the time limit has not been increased. Consolidated-run
-timing remains a reproducibility issue.
+timing was a reproducibility issue at that milestone.
 
 The witness-arithmetic root adds three public laws. The exact homogeneous
 sum `((a*b)*d + c*y) + x*e` is strictly below `2^(2*width+8)` when point
@@ -345,8 +345,27 @@ a complete successful run. `regenerate.sh` also passed all ten roots and
 preserved the SVG byte for byte. The earlier timing failures remain historical
 failed runs and are not counted as passing evidence.
 
-**Stage 1 remains incomplete:** the grid filter still needs a bridge to exact
-unrounded rational scaling. Generation of sampled witnesses also needs
+The grid-scaling root adds three public laws. Zero natural remainder implies
+`(x/4)*4 == x`. For every point accepted by the actual `topology.point_guard`,
+restoring both coordinates returned by `topology.scaled` recovers the original
+point exactly; this proves that accepted scaling has no rounding error. The
+accepted production point also satisfies the 12-bit coordinate envelope used
+by homogeneous side proofs. The proof uses the actual four filter conditions,
+rather than assuming divisibility separately. Six fixtures cover exact
+multiples, round trips, the origin, output bounds, and rejection of a
+nonmultiple in either coordinate. Three compiling mutations bypass the x-grid
+filter, change the restoration multiplier, or shrink the output envelope.
+The filter mutant is additionally falsified by the accepted point `(3,0)`,
+whose scaled/restored value loses its x-coordinate.
+
+Validation of the grid-scaling milestone: the ordinary complete
+`python3 check.py` passed all 91 unique laws across eleven roots, every fixture
+group, all 49 compiling mutations and the independent SVG checks. Every
+kernel invocation retained its five-second limit. The filter counterexample
+was checked by the real BendTT kernel in the mutated source tree.
+`regenerate.sh` also passed every root and preserved the SVG byte for byte.
+
+**Stage 1 remains incomplete:** sampled-witness generation still needs
 exact-model agreement and proof of its output envelopes. Intersection
 correctness, enumeration correctness and the formal topological bridge in stages 2–4 are also outstanding. Finite artwork
 checks and the externally justified topology certificate remain as described

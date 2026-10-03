@@ -19,3 +19,6 @@ from bendlib bend-mathlib/nat.bend, under LICENSE.mathlib.
 
 division-order-proof.bend adapts selected division-monotonicity and
 quotient-shift facts from bendlib bend-mathlib/nat.bend, under LICENSE.mathlib.
+
+division-partition-proof.bend adapts the selected positive-divisor partition
+proof from bendlib bend-mathlib/nat.bend, under LICENSE.mathlib.

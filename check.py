@@ -52,6 +52,9 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ("topology.bend", "Nat.is_eq(Nat.mod(x, 4n), 0n)", "True{}", "accepted_point_unrounded"),
+        ("grid-scaling.bend", "Nat.mul(U32.to_nat(x), 4n)", "Nat.mul(U32.to_nat(x), 3n)", "unrounded_point"),
+        ("grid-scaling.bend", "Nat.is_le(U32.to_nat(x), W.capacity(width)) && Nat.is_le(U32.to_nat(y), W.capacity(width))", "Nat.is_le(U32.to_nat(x), W.capacity(0n)) && Nat.is_le(U32.to_nat(y), W.capacity(0n))", "scaled_envelope"),
         ("topology.bend", "P{U32.div(U32.from_nat(x), 4), U32.div(U32.from_nat(y), 4)}", "P{U32.div(U32.from_nat(x), 3), U32.div(U32.from_nat(y), 3)}", "topology_scaled_exact"),
         ("homogeneous.bend", "Nat.add(Nat.add(Nat.mul(Nat.mul(a, b), d), Nat.mul(c, y)), Nat.mul(x, e))", "Nat.mul(8n, Nat.add(Nat.add(Nat.mul(Nat.mul(a, b), d), Nat.mul(c, y)), Nat.mul(x, e)))", "homogeneous_sum_bound"),
         ("homogeneous.bend", "S.sum3(n, Word.mul(n, a, b), d, c, y, x, e)", "S.sum3(n, Word.add(n, a, b), d, c, y, x, e)", "word_homogeneous_exact"),
@@ -115,6 +118,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif law in {"accepted_point_unrounded", "unrounded_point", "scaled_envelope"}:
+                proof_root = "GRID_SCALING_PROOF.bend"
             elif law == "topology_scaled_exact":
                 proof_root = "SCALED_COORDINATE_PROOF.bend"
             elif law in {"homogeneous_sum_bound", "word_homogeneous_exact", "guarded_side_exact"}:
@@ -139,6 +144,13 @@ def negative_controls(directory):
                 proof_root = "ARITHMETIC_PROOF.bend"
             output = bend(directory, proof_root, success=False)
             assert law in output, output
+            if law == "accepted_point_unrounded":
+                (directory / "grid-counter.bend").write_text(
+                    "import Base\nimport ./topology.bend as T\nimport ./core.bend as C\n"
+                    "import ./grid-scaling.bend as G\nimport ./validation.bend as V\n"
+                    "def admitted() -> {T.point_guard(C.Pt{3n, 0n}) == True{} : Bool}:\n  {==}\n"
+                    "def loses_coordinate() -> {V.point_equal(G.restore(T.scaled(C.Pt{3n, 0n})), C.Pt{3n, 0n}) == False{} : Bool}:\n  {==}\n")
+                bend(directory, "grid-counter.bend", "--verdict")
         finally:
             path.write_text(original)
     return len(controls)
@@ -252,6 +264,8 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        bend(directory, "grid-scaling-tests.bend", "--verdict")
+        print("Production grid filter, exact round-trip and envelope fixtures accepted")
         bend(directory, "scaled-coordinate-tests.bend", "--verdict")
         print("Production scaled coordinate exactness and envelope fixtures accepted")
         bend(directory, "witness-arithmetic-tests.bend", "--verdict")
