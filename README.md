@@ -34,7 +34,7 @@ commands; this avoids an expensive combined optimization step on shared
 machines. Other platforms retain Bend's native build command. Proof checks
 use the same five-second BendTT gate on every platform.
 
-`check.py` runs the 122-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 127-law proof gate, 200 literal arithmetic checks,
 seven executed validator boundary checks, three executed transverse cases,
 four executed cell-transverse cases and rejection beyond each source-coordinate limit,
 compiling mutations that must fail
@@ -522,8 +522,9 @@ and preserved the SVG byte for byte. Every kernel invocation retained its
 five-second limit. Implementer self-review found no weakened arithmetic
 preconditions; geometric interpretation and the later stages remain open.
 
-**Stage 1 remains incomplete:** connect the remaining separation, outside,
-intersection and convexity arithmetic compositions, then audit all production callers. Full
+**Stage 1 remains incomplete:** audit all production callers and connect
+any remaining arithmetic paths. The composition laws below now cover
+separation, outside, intersection and convexity arithmetic. Full
 intersection/search soundness remains part of stage 2. Intersection
 correctness, enumeration correctness and the formal topological bridge in stages 2–4 are also outstanding. Finite artwork
 checks and the externally justified topology certificate remain as described
@@ -545,3 +546,25 @@ Implementer self-review covered the new natural comparison owner, its
 existing vertex-side dependency, root registration and mutation routing;
 no weakened preconditions or production changes were found. Composed
 separation/convexity and their geometric meaning remain unproved.
+
+The strict-side bridge now composes into five additional public arithmetic
+agreement laws: `separated`, `outside`, `meets`, `strictly_convex`, and
+`orientation`. Their premises are the existing point/quad coordinate
+envelopes; no caller-supplied overflow assumption was added. The independent
+natural formulas use exact vertex-side comparisons and Boolean composition.
+This proves agreement with those formulas, not yet the separating-axis
+theorem or the geometric interpretation of convexity. Native fixtures cover
+edge/point contact, a gap, reversed winding and degeneracy. Five compiling
+mutations omit a tested side, invert the intersection result or reverse
+orientation; they are rejected in `separated_fields`, `outside_bounds`,
+`meets_arithmetic_exact`, `strictly_convex_bounds`, and `orientation_fields`.
+
+Validation of the composed arithmetic milestone:
+`taskset -c 7,11 python3 -u check.py` passed 127 unique public laws across
+eighteen roots, all fixture groups and 81 compiling mutations.
+`taskset -c 7,11 ./regenerate.sh` passed with every kernel invocation limited
+to five seconds; `b.svg` remained byte-identical. Implementer self-review
+covered the five public contracts, their existing bounded vertex-side
+dependency, Boolean composition helpers, native fixture integration and
+mutation routing. No production behavior or arithmetic premise changed.
+The caller audit and geometric proofs remain open.

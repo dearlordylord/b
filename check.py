@@ -52,6 +52,11 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ('topology.bend', 'negative(side(a, b, witness(s)))', 'True{}', 'separated_fields'),
+        ('topology.bend', 'separated(d, a, r)', 'False{}', 'outside_bounds'),
+        ('topology.bend', 'Bool.not(outside(q, r) || outside(r, q))', 'outside(q, r) || outside(r, q)', 'meets_arithmetic_exact'),
+        ('topology.bend', 'positive(side(d, a, witness(b)))', 'True{}', 'strictly_convex_bounds'),
+        ('topology.bend', 'case Q{a, b, c, d}: positive(side(a, b, witness(c)))', 'case Q{a, b, c, d}: negative(side(a, b, witness(c)))', 'orientation_fields'),
         ("topology.bend", "def negative(c: Cmp) -> Bool:\n  match c:\n    case LT{}: True{}\n    case EQ{}: False{}\n    case GT{}: False{}", "def negative(c: Cmp) -> Bool:\n  match c:\n    case LT{}: True{}\n    case EQ{}: True{}\n    case GT{}: False{}", "negative_cmp_exact"),
         ("topology.bend", "def positive(c: Cmp) -> Bool:\n  match c:\n    case LT{}: False{}\n    case EQ{}: False{}\n    case GT{}: True{}", "def positive(c: Cmp) -> Bool:\n  match c:\n    case LT{}: False{}\n    case EQ{}: True{}\n    case GT{}: True{}", "positive_cmp_exact"),
         ("topology.bend", "def nonnegative(c: Cmp) -> Bool:\n  match c:\n    case LT{}: False{}\n    case EQ{}: True{}\n    case GT{}: True{}", "def nonnegative(c: Cmp) -> Bool:\n  match c:\n    case LT{}: False{}\n    case EQ{}: False{}\n    case GT{}: True{}", "nonnegative_exact"),
@@ -145,7 +150,7 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
-            elif law in {"negative_cmp_exact", "positive_cmp_exact"}:
+            elif law in {"negative_cmp_exact", "positive_cmp_exact", "separated_fields", "outside_bounds", "meets_arithmetic_exact", "strictly_convex_bounds", "orientation_fields"}:
                 proof_root = "SAT_ARITHMETIC_PROOF.bend"
             elif law in {"nonnegative_exact", "inside_bounds", "common_arithmetic_exact", "natural_ready"}:
                 proof_root = "INSIDE_ARITHMETIC_PROOF.bend"
