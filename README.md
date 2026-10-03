@@ -893,3 +893,57 @@ self-review covered zero-denominator rejection, positive scaling, both cross
 products, equal common-denominator construction, the two side-polynomial
 operands, and honest proof/mutation scope. No findings; the remaining geometric
 and topological bridges are explicitly outside this increment.
+
+### Stage 2: production witnesses in half-plane regions
+
+[Half-plane region model](halfplane-region.bend), [seven laws](halfplane-region-laws.bend)
+and [proof root](HALFPLANE_REGION_PROOF.bend) connect the production validator
+to the natural-coordinate cover. A region is the intersection of the four
+closed left half-planes of its ordered sides. `contains` is a conjunction of
+all four predicates, including the closing side; it accepts boundary points.
+This model uses `natural-cover`'s point/quad owners and the previously proved
+homogeneous side predicates rather than duplicating arithmetic or word guards.
+
+Natural `inside` and `common` calculations equal membership in the decoded
+regions for every input. Production `inside` equals that membership under the
+actual 12-bit quad envelope and witness envelope. No positive-denominator or
+convexity premise is needed for the polynomial equality itself. The two
+representation-invariance laws cover positive rescaling and equivalent
+positive-denominator points in an arbitrary ordered four-side region.
+
+Most importantly, `triangle_halfplane_witness` constructs an existential point
+with a positive denominator and membership in **all three** decoded regions
+whenever the real production triangle-witness search accepts three bounded
+quads. It obtains the witness from the previously proved search/Nat bridge;
+it does not invent a point or assume successful search. Its result omits the
+implementation-specific envelope while retaining geometric positivity and
+all three membership judgments. This proves successful-search soundness for
+the half-plane regions, not completeness of the conservative search.
+
+The remaining interpretation gap is important: the intersection of these four
+half-planes has not yet been proved equal to the filled convex quad for every
+accepted source cell. Nor has the separating-axis decision been proved to
+characterize intersection. These bridges, independent complex enumeration,
+and the topological theorem remain required by stages 2–4.
+
+Three compiling mutation controls swap decoded witness x/y, omit the closing
+half-plane, and omit the third region. They fail at `edge_values`,
+`inside_halfplanes_decoded`, and `common_halfplanes_decoded`; the first is a
+shared support lemma, while the latter two are public contracts. Each changes
+actual membership behavior, rather than merely renaming a proof expression.
+
+Validation: `taskset -c 7,11 python3 -u check.py` passed 190 public laws
+across 29 roots, the existing fixture groups, 134 compiling mutation controls
+and independent SVG checks. Additional temporary literal proof instances
+confirmed closing-side rejection and boundary inclusion for the square
+`[(1,1),(3,1),(3,3),(1,3)]`, asymmetric witness decoding, and rejection by a
+disjoint third region. Those finite examples supplement the universal laws.
+Implementer self-review found no violations of the stated contracts: it traced
+the decoded coordinate order, all four ordered sides, all three regions,
+production envelope premises, actual search witness, positive denominator,
+and existential result through their existing owners. Later convex-quad and
+intersection proofs can consume the natural region and its existential point;
+no speculative polygon or topology theorem was introduced.
+`taskset -c 7,11 ./regenerate.sh` also passed; `git diff --exit-code -- b.svg`
+confirmed byte-identical output. Stage 2 remains open at the geometric bridges
+listed above, and stages 3–4 remain open.

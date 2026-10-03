@@ -52,6 +52,9 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ('halfplane-region.bend', 'H.P{U32.to_nat(x), U32.to_nat(y), U32.to_nat(d)}', 'H.P{U32.to_nat(y), U32.to_nat(x), U32.to_nat(d)}', 'edge_values'),
+        ('halfplane-region.bend', '&& edge(d, a, p)', '&& True{}', 'inside_halfplanes_decoded'),
+        ('halfplane-region.bend', '&& contains(p, c)', '&& True{}', 'common_halfplanes_decoded'),
         ('homogeneous-geometry.bend', 'Nat.mul(d, 1n+k)}', 'd}', 'scaled_side'),
         ('homogeneous-geometry.bend', 'Nat.is_gt(d, 0n)', 'True{}', 'denominator_scale'),
         ('homogeneous-geometry.bend', '&& Nat.is_eq(Nat.mul(y, e), Nat.mul(v, d))', '&& True{}', 'equivalent_scaled'),
@@ -200,6 +203,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif law in {"edge_values", "inside_halfplanes_decoded", "common_halfplanes_decoded"}:
+                proof_root = "HALFPLANE_REGION_PROOF.bend"
             elif law in {"scaled_side", "denominator_scale", "equivalent_scaled"}:
                 proof_root = "HOMOGENEOUS_GEOMETRY_PROOF.bend"
             elif law in {"scaled_fields", "raw_cell_decoded", "orientation_decoded", "cells_walk_decoded", "cells_tail_decoded", "cells_decoded"}:
