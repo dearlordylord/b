@@ -34,7 +34,7 @@ commands; this avoids an expensive combined optimization step on shared
 machines. Other platforms retain Bend's native build command. Proof checks
 use the same five-second BendTT gate on every platform.
 
-`check.py` runs the 130-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 133-law proof gate, 200 literal arithmetic checks,
 seven executed validator boundary checks, three executed transverse cases,
 four executed cell-transverse cases and rejection beyond each source-coordinate limit,
 compiling mutations that must fail
@@ -592,3 +592,24 @@ Implementer self-review covered equality conversion, reversed-edge ordering,
 the four candidate edges, proof dependencies, root/mutation registration
 and the entry-point coverage audit. No production behavior or coordinate
 restriction was added. The caller audit identifies further required work.
+
+Unscaled source convexity arithmetic: three public laws now connect
+`validation.positive_quad`, `convex_quad`, and `cell_convex` with independent
+natural determinant formulas. Actual point-bounded guards suffice, without
+an additional overflow premise. Both winding directions are represented
+and the cell's corner ordering is explicit. This is arithmetic agreement;
+the geometric characterization of strict convexity remains stage 2 work.
+Native fixtures exercise both windings, repeated corners, a concave corner,
+cell corner ordering and coordinates at the accepted envelope boundary.
+Three compiling controls omit the last turn or reverse-winding branch, or
+exchange cell corners; the corresponding public law sections reject them.
+
+Validation of unscaled convexity composition:
+`taskset -c 7,11 python3 -u check.py` passed 133 unique public laws across
+twenty roots, all fixture groups, 87 compiling mutations and independent
+artifact checks. `taskset -c 7,11 ./regenerate.sh` passed, retaining the
+five-second kernel limit and preserving `b.svg` byte for byte. Implementer
+self-review covered source-point guards, determinant reuse, both winding
+branches, actual cell corner order, fixtures and mutation/root registration.
+No production behavior changed; geometric interpretation and the remaining
+caller obligations recorded in the audit are still open.
