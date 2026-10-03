@@ -15,6 +15,7 @@ Open `index.html` directly, or inspect `specimen.svg` and `specimen.png`.
 The page includes `BENDER`, `Bender`, `minimum`, size adjustment, seam toggle
 and light/dark backgrounds. Each glyph also has a standalone SVG in `glyphs/`.
 The revised `a/e` also appear in `made a name` and `revision-02/comparison.svg`.
+The latest `e` join is shown in `revision-03/comparison.svg`.
 
 Optional PNG regeneration (CairoSVG installed outside the project by uv):
 
@@ -36,5 +37,11 @@ crossbar appeared behind the arch; the two ribbons now share one contour,
 the bar is painted last and the arch is higher for a larger eye. Neither
 letter has separate end-cap outlines or seams through its junction. Original
 glyphs are preserved in `revision-02/before-a.svg` and `before-e.svg`.
+
+Revision 03 preserves the accepted `a` and replaces `e`'s two joined arms
+with one continuous centerline. The crossbar turns smoothly into the upper
+arch, removing the stepped silhouette and discontinuous shadow on the right.
+`revision-03/before-e.svg` preserves the rejected join; the comparison includes
+the revised letter at large size and in `Bender` / `made a name`.
 
 Preserved on `design/soft-industrial-alphabet`, outside `main`.

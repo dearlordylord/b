@@ -155,8 +155,12 @@ def glyphs():
         'b': (107, [(bowl(57), 20, 29, True), small(stem(25))]),
         'd': (107, [(bowl(), 20, 29, True), small(stem(86))]),
         'e': (105, [
-            (bezier((85, 102), ((86, 62), (32, 58), (23, 87)), ((6, 132), (60, 152), (86, 126))), 18, 29, False),
-            (line((24, 102), (85, 102)), 18, 29, False),
+            # A continuous ribbon: the crossbar turns into the arch without caps.
+            (bezier((24, 102), ((40, 102), (61, 102), (70, 102)),
+                    ((80, 102), (84, 98), (84, 89)),
+                    ((84, 66), (37, 62), (24, 85)),
+                    ((4, 119), (36, 146), (66, 134)),
+                    ((73, 131), (80, 127), (85, 123))), 18, 29, False),
         ]),
         'n': (108, [small(arch(25)), small(stem(25, 74))]),
         'g': (108, [small(bezier((86, 75), ((86, 106), (86, 140), (86, 156)), ((86, 180), (51, 183), (31, 165)))), (bowl(), 20, 29, True)]),
@@ -234,7 +238,21 @@ def main():
         comparison.append(f'<use href="#glyph-{ord(char)}" transform="translate(560 {y}) scale(1.7)"/>')
     comparison.append(label('READING CHECK / made a name', 55, 585, 16))
     comparison.append(word('made a name', 55, 603, .70)[0])
-    (HERE/'revision-02'/'comparison.svg').write_text(svg(''.join(comparison), 1040, 770))
+    if not (HERE/'revision-02'/'comparison.svg').exists():
+        (HERE/'revision-02'/'comparison.svg').write_text(svg(''.join(comparison), 1040, 770))
+    previous = ET.parse(HERE/'revision-03'/'before-e.svg').getroot()
+    for element in previous.iter():
+        if element.get('id'):
+            element.set('id', 'previous-'+element.get('id'))
+        for key, value in list(element.attrib.items()):
+            element.set(key, value.replace('url(#', 'url(#previous-'))
+    previous_body = ''.join(ET.tostring(element, encoding='unicode') for element in previous)
+    smooth_join = ['<rect width="1040" height="690" fill="#e0e6e9"/>',
+                   label('BEFORE', 55, 45, 18), label('AFTER / CONTINUOUS RIBBON', 540, 45, 18),
+                   f'<g transform="translate(65 20) scale(2.3)">{previous_body}</g>',
+                   '<use href="#glyph-101" transform="translate(550 20) scale(2.3)"/>',
+                   word('Bender', 55, 390, .78)[0], word('made a name', 55, 530, .64)[0]]
+    (HERE/'revision-03'/'comparison.svg').write_text(svg(''.join(smooth_join), 1040, 690))
     rows = []
     for title, text in [('Прописные', 'BHORS'), ('Строчные', 'aengi'), ('Проверка новых a/e', 'made a name'), ('В словах', 'BENDER'), ('Смешанный регистр', 'Bender'), ('Ритм штрихов', 'minimum')]:
         element, width = word(text)
@@ -251,7 +269,7 @@ document.getElementById('seams').addEventListener('click',e=>{const off=document
 document.getElementById('background').addEventListener('click',e=>{const dark=document.body.classList.toggle('dark');e.target.textContent=dark?'Светлый фон':'Тёмный фон'});
 </script></html>'''
     page = page.replace('<main>', '<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute" aria-hidden="true">'+DEFS+'</svg><main>', 1)
-    page = page.replace('Скачать лист SVG</a>', 'Скачать лист SVG</a> · <a href="revision-02/comparison.png">a/e: до и после</a>', 1)
+    page = page.replace('Скачать лист SVG</a>', 'Скачать лист SVG</a> · <a href="revision-03/comparison.png">e: плавный стык</a> · <a href="revision-02/comparison.png">a/e: первая переделка</a>', 1)
     (HERE/'index.html').write_text(page)
     print(f'Generated {len(FORMS)} glyphs, specimen.svg and index.html in {HERE}')
 
