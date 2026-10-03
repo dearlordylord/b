@@ -52,6 +52,11 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ('cover-arithmetic.bend', 'T.keep(Sat.meets(q, h), h, neighbors(q, t))', 'T.keep(False{}, h, neighbors(q, t))', 'neighbors_arithmetic_exact'),
+        ('cover-arithmetic.bend', 'T.connected_edges(overlaps(a, b), overlaps(a, c), overlaps(b, c))', 'T.connected_edges(overlaps(a, b), False{}, overlaps(b, c))', 'connected_arithmetic_exact'),
+        ('cover-arithmetic.bend', 'ribbon(a) && ribbon(b) && ribbon(c)', 'ribbon(a) && ribbon(b) && True{}', 'ribbons_arithmetic_exact'),
+        ('cover-arithmetic.bend', 'case T.Counts{v, e, t, q, connected, witnessed, no_five, ribbons}: connected', 'case T.Counts{v, e, t, q, connected, witnessed, no_five, ribbons}: witnessed', 'assembled_connected'),
+        ('cover-arithmetic.bend', 'case T.Counts{v, e, t, q, connected, witnessed, no_five, ribbons}: ribbons', 'case T.Counts{v, e, t, q, connected, witnessed, no_five, ribbons}: no_five', 'assembled_ribbons'),
         ('cover-arithmetic.bend', 'Bool.not(Sat.meets(q, h)) && disjoint_all(q, t)', 'True{} && disjoint_all(q, t)', 'disjoint_all_arithmetic_exact'),
         ('cover-arithmetic.bend', 'case Con{h, t}: disjoint_all(q, t)', 'case Con{h, t}: disjoint_all(q, Con{h, t})', 'disjoint_nonadjacent_arithmetic_exact'),
         ('cover-arithmetic.bend', 'Sat.meets(q, h) || overlaps_one(q, t)', 'Sat.meets(q, h) || False{}', 'overlaps_one_arithmetic_exact'),
@@ -170,7 +175,7 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
-            elif law in {"disjoint_all_arithmetic_exact", "disjoint_nonadjacent_arithmetic_exact", "overlaps_one_arithmetic_exact", "overlaps_arithmetic_exact", "adjacent_arithmetic_exact", "ribbon_walk_arithmetic_exact", "ribbon_arithmetic_exact"}:
+            elif law in {"disjoint_all_arithmetic_exact", "disjoint_nonadjacent_arithmetic_exact", "overlaps_one_arithmetic_exact", "overlaps_arithmetic_exact", "adjacent_arithmetic_exact", "ribbon_walk_arithmetic_exact", "ribbon_arithmetic_exact", "neighbors_arithmetic_exact", "connected_arithmetic_exact", "ribbons_arithmetic_exact", "assembled_connected", "assembled_ribbons"}:
                 proof_root = "COVER_ARITHMETIC_PROOF.bend"
             elif law in {"bounded_cell_arithmetic_exact", "bounded_cells_arithmetic_exact", "bounded_nonempty_arithmetic_exact", "gate_exact"}:
                 proof_root = "VALIDATOR_NATURAL_PROOF.bend"

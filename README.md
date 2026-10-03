@@ -34,7 +34,7 @@ commands; this avoids an expensive combined optimization step on shared
 machines. Other platforms retain Bend's native build command. Proof checks
 use the same five-second BendTT gate on every platform.
 
-`check.py` runs the 147-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 153-law proof gate, 200 literal arithmetic checks,
 seven executed validator boundary checks, three executed transverse cases,
 four executed cell-transverse cases and rejection beyond each source-coordinate limit,
 compiling mutations that must fail
@@ -697,3 +697,32 @@ conservative closed-contact comparisons, the immediate-neighbor exclusion,
 shared-edge identity, empty-list branches and mutation/root registration.
 No production behavior or bound was changed. Filtering/inspection assembly
 and the geometric, enumeration and topological bridges remain open.
+
+Natural neighbor filtering and inspection flags: six public laws prove
+exact list equality for bounded `neighbors`, carry the list envelope through
+the natural filter, compose the three-cover connected/ribbon flags, and
+identify those two fields of the actual `inspect_cells` report with the
+natural folds. The reference reuses the structural `keep` constructor and
+Boolean three-cover graph policy; their word-dependent inputs are replaced
+with natural comparisons. Head/tail bounds come from actual list envelopes.
+The report-field proofs work for arbitrary clique-count payloads and do not
+prove the correctness of those payloads. The filter envelope law reuses the
+existing separately mutated preservation contract. Five additional compiling
+controls drop all filter hits, omit a cross-cover overlap, ignore one ribbon,
+or read the wrong report field. The first three fail in
+their public law sections; the field controls in shared `assembled_connected`
+and `assembled_ribbons`. Native fixtures cover self/edge/point hits, a gap,
+filter bounds, connected/disconnected reports and an empty ribbon. Search
+Boolean composition, count traversal, guarded source inspection and later
+geometric/topological interpretation remain open.
+
+Validation of filtering and inspection flags:
+`taskset -c 7,11 python3 -u check.py` passed 153 unique public laws across
+twenty-three roots, every fixture group, 106 compiling mutations and
+independent artifact checks. `taskset -c 7,11 ./regenerate.sh` passed with
+the five-second limit on each kernel invocation and preserved `b.svg` byte
+for byte. Implementer self-review covered exact list equality, inherited
+filter envelopes, cross-cover flag composition, field ordering and the
+distinction between arbitrary count payloads and proved enumeration. No
+production behavior or coordinate premise changed. Search/count arithmetic
+composition, guarded inspection and stages 2–4 remain open.

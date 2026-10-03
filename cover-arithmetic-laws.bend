@@ -58,3 +58,65 @@ law ribbon_arithmetic_exact:
   for +xs: List<&2, T.Quad>
   for +hx: {Cells.envelope(width, xs) == True{} : Bool}
   {T.ribbon(xs) == M.ribbon(xs) : Bool}
+
+law neighbors_arithmetic_exact:
+  for +width: Nat
+  for +hw: {width == 12n : Nat}
+  for +q: T.Quad
+  for +xs: List<&2, T.Quad>
+  for +hq: {Search.quad_envelope(width, q) == True{} : Bool}
+  for +hx: {Cells.envelope(width, xs) == True{} : Bool}
+  {T.neighbors(q, xs) == M.neighbors(q, xs) : List<&2, T.Quad>}
+
+law natural_neighbors_envelope:
+  for +width: Nat
+  for +hw: {width == 12n : Nat}
+  for +q: T.Quad
+  for +xs: List<&2, T.Quad>
+  for +hq: {Search.quad_envelope(width, q) == True{} : Bool}
+  for +hx: {Cells.envelope(width, xs) == True{} : Bool}
+  {Cells.envelope(width, M.neighbors(q, xs)) == True{} : Bool}
+
+law connected_arithmetic_exact:
+  for +width: Nat
+  for +hw: {width == 12n : Nat}
+  for +a: List<&2, T.Quad>
+  for +b: List<&2, T.Quad>
+  for +c: List<&2, T.Quad>
+  for +ha: {Cells.envelope(width, a) == True{} : Bool}
+  for +hb: {Cells.envelope(width, b) == True{} : Bool}
+  for +hc: {Cells.envelope(width, c) == True{} : Bool}
+  {T.connected_edges(T.overlaps(a, b), T.overlaps(a, c), T.overlaps(b, c)) == M.connected(a, b, c) : Bool}
+
+law ribbons_arithmetic_exact:
+  for +width: Nat
+  for +hw: {width == 12n : Nat}
+  for +a: List<&2, T.Quad>
+  for +b: List<&2, T.Quad>
+  for +c: List<&2, T.Quad>
+  for +ha: {Cells.envelope(width, a) == True{} : Bool}
+  for +hb: {Cells.envelope(width, b) == True{} : Bool}
+  for +hc: {Cells.envelope(width, c) == True{} : Bool}
+  {T.ribbon(a) && T.ribbon(b) && T.ribbon(c) == M.ribbons(a, b, c) : Bool}
+
+law inspect_connected_arithmetic_exact:
+  for +width: Nat
+  for +hw: {width == 12n : Nat}
+  for +a: List<&2, T.Quad>
+  for +b: List<&2, T.Quad>
+  for +c: List<&2, T.Quad>
+  for +ha: {Cells.envelope(width, a) == True{} : Bool}
+  for +hb: {Cells.envelope(width, b) == True{} : Bool}
+  for +hc: {Cells.envelope(width, c) == True{} : Bool}
+  {M.report_connected(T.inspect_cells(a, b, c)) == M.connected(a, b, c) : Bool}
+
+law inspect_ribbons_arithmetic_exact:
+  for +width: Nat
+  for +hw: {width == 12n : Nat}
+  for +a: List<&2, T.Quad>
+  for +b: List<&2, T.Quad>
+  for +c: List<&2, T.Quad>
+  for +ha: {Cells.envelope(width, a) == True{} : Bool}
+  for +hb: {Cells.envelope(width, b) == True{} : Bool}
+  for +hc: {Cells.envelope(width, c) == True{} : Bool}
+  {M.report_ribbons(T.inspect_cells(a, b, c)) == M.ribbons(a, b, c) : Bool}
