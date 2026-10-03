@@ -20,13 +20,13 @@ production behavior.
 | `validation.width_squared` | `accepted_points_width` in `coordinate-width-laws.bend` | `width-range-laws.bend` now composes `width_in_range`/`section_width` with natural bounds; `validator-natural-laws.bend` now connects accepted section traversal |
 | `validation.dot`, `cell_transverse` | Accepted point dot law and `source_corners_transverse_exact` | `validator-natural-laws.bend` now composes into the full cell validator and source traversal |
 | `topology.scaled` | Grid round-trip, scaled coordinate exactness and envelopes | Geometric scale correspondence belongs to stage 2 |
-| `topology.cells`, append, selected cells and neighbors | `source-cells-laws.bend` envelope preservation | Natural filter equality and envelope propagation now compose; connect the guarded source entry and remaining count traversal |
+| `topology.cells`, append, selected cells and neighbors | `source-cells-laws.bend` envelope preservation | Natural filter equality and envelope propagation now compose; connect the guarded source entry and remaining guarded source inspection |
 | `topology.sample`, vertex witnesses and search weights | Sample arithmetic, denominator, bounds and search-hit laws | Full bounded search Boolean agreement now appears in `search-arithmetic-laws.bend`; geometric interpretation of found witnesses belongs to stage 2 |
 | `topology.side`, `inside`, `common` | Side bridge and natural inside/common agreements | Half-plane/convex-polygon membership interpretation belongs to stage 2 |
 | `topology.separated`, `outside`, `meets`, `strictly_convex`, `orientation` | Five composition laws in `sat-arithmetic-laws.bend` | Geometric separation and convexity theorems belong to stage 2 |
 | `topology.point_equal`, `reverse_edge`, `shared_edge` | Three universal agreements in `edge-arithmetic-laws.bend` | Shared-edge geometric meaning and ribbon connectivity remain open |
 | `topology.disjoint_all`, nonadjacent disjointness, overlaps and ribbons | Seven `cover-arithmetic-laws.bend` fold agreements | Connected/ribbon report fields now compose through inspection assembly; geometric sufficiency and connectivity remain stage 2 |
-| `topology.sum_counts`, list length and Euler equation | Nat operations, report condition laws | Enumeration of the intended complex is stage 3, not established by arithmetic exactness |
+| `topology.sum_counts`, list length and Euler equation | Nat operations, report condition laws and full bounded `count-arithmetic-laws.bend` traversal/report agreement | Enumeration of the intended complex is stage 3, not established by arithmetic exactness |
 
 ## Boundaries of the evidence
 
@@ -35,8 +35,8 @@ they do not prove that a production caller supplies their premises. Source
 and filter envelope laws supply part of that missing bridge. A full audit
 must connect the actual accepted input, recursive traversal and each called
 arithmetic predicate. The unscaled validator now has full arithmetic agreement via
-`validator_arithmetic_exact`; the topology traversal still needs its
-composed bridge. Stage 1 is therefore still incomplete.
+`validator_arithmetic_exact`; the bounded topology cell inspection now has full arithmetic agreement,
+but its guarded source entry still needs a composed bridge. Stage 1 is therefore still incomplete.
 
 The search is intentionally conservative. A successful search now carries a
 bounded witness with positive denominator and exact natural half-plane

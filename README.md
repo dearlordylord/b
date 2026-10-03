@@ -34,7 +34,7 @@ commands; this avoids an expensive combined optimization step on shared
 machines. Other platforms retain Bend's native build command. Proof checks
 use the same five-second BendTT gate on every platform.
 
-`check.py` runs the 161-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 166-law proof gate, 200 literal arithmetic checks,
 seven executed validator boundary checks, three executed transverse cases,
 four executed cell-transverse cases and rejection beyond each source-coordinate limit,
 compiling mutations that must fail
@@ -756,3 +756,29 @@ envelopes, fuel decrement, empty searches, vertex/pair choice and the actual
 concatenated candidate list. No production behavior or arithmetic premise
 changed. Enumeration/count composition, guarded source inspection and the
 geometric/topological bridges remain open.
+
+Bounded count traversal arithmetic: five public laws now connect `fourth`,
+`third`, `second`, `first` and the complete `inspect_cells` report with
+`count-arithmetic.bend`. The reference retains the existing Nat-only count
+constructors, addition and report assembly, replacing word-dependent
+filters, witness search and cover flags with their natural models. Filtered
+list envelopes are propagated at every nesting level. This establishes
+arithmetic agreement for all count and certificate fields, not yet
+independent correctness of clique enumeration or its geometric meaning.
+Native fixtures exercise empty/disjoint lists and full cliques of sizes
+3/4/5, including the K5 rejection flag and repeated equal cells as distinct
+list positions. Five compiling controls create an empty tetrahedron, omit
+the triangle witness, zero an edge contribution, drop the outer tail, or
+zero the report's vertex count. Their public composition law sections
+reject them. Guarded source inspection and stages 2–4 remain open.
+
+Validation of bounded count/report arithmetic:
+`taskset -c 7,11 python3 -u check.py` passed 166 unique public laws across
+twenty-five roots, all fixture groups, 119 compiling mutations and independent
+artifact checks. `taskset -c 7,11 ./regenerate.sh` passed with the five-second
+limit on each kernel invocation and preserved `b.svg` byte for byte.
+Implementer self-review covered nested filtered-list envelopes, fixed-cell
+bounds at the third/second levels, triangle-witness agreement, Nat-only
+constructor/addition reuse, all report fields and positional fixture semantics.
+No production behavior changed. Guarded source inspection and the geometric,
+independent enumeration and topological bridges remain open.
