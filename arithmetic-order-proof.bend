@@ -1,5 +1,5 @@
 import Base
-import ./validation-proof.bend as V
+import ./boolean-reflection.bend as V
 
 # Supporting order facts for deriving bounds on intermediates from total sums.
 law not_lt_zero:

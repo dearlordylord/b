@@ -14,7 +14,7 @@ import ./word-sum3-laws.bend as A
 import ./word-sum3-proof.bend as SumProof
 import ./word-comparison-laws.bend as Compare
 import ./word-comparison-proof.bend as ComparisonProof
-import ./validation-proof.bend as ValidationProof
+import ./boolean-reflection.bend as ValidationProof
 
 def coordinate32(+a: Nat, h: {Nat.is_le(a, 16000n) == True{} : Bool}) -> {Nat.is_lt(a, W.capacity(32n)) == True{} : Bool}:
   O.lt_of_le_of_lt(a, W.capacity(14n), W.capacity(32n), F.coordinate14(a, h), Capacity.capacity_grows(14n, 17n))

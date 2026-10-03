@@ -3,7 +3,7 @@
 # Copyright 2026 HigherOrderCO; original license retained in LICENSE.mathlib.
 import Base
 import ./order-facts.bend as Order
-import ./validation-proof.bend as V
+import ./boolean-reflection.bend as V
 
 law not_lt_ge:
   for +a: Nat

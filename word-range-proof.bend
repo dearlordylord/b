@@ -2,7 +2,7 @@ import Base
 import ./word-arithmetic.bend as W
 import ./word-range-laws.bend as L
 import ./word-shift-proof.bend as Shift
-import ./validation-proof.bend as V
+import ./boolean-reflection.bend as V
 
 law double_comparison:
   for +a: Nat

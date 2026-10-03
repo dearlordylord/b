@@ -13,7 +13,7 @@ import ./word-laws.bend as Addition
 import ./word-complement.bend as Not
 import ./word-complement-laws.bend as NotLaws
 import ./subtraction-algebra-proof.bend as A
-import ./validation-proof.bend as V
+import ./boolean-reflection.bend as V
 import ./facts.bend as F
 
 law adc_complement:

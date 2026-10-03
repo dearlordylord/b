@@ -16,3 +16,6 @@ derived from bendlib bend-mathlib/nat.bend, under LICENSE.mathlib.
 
 absolute-order-proof.bend adapts selected order and subtraction bounds
 from bendlib bend-mathlib/nat.bend, under LICENSE.mathlib.
+
+division-order-proof.bend adapts selected division-monotonicity and
+quotient-shift facts from bendlib bend-mathlib/nat.bend, under LICENSE.mathlib.

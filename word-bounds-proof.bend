@@ -4,7 +4,7 @@ import ./word-laws.bend as L
 import ./word-bounds-laws.bend as B
 import ./word-value-proof.bend as P
 import ./facts.bend as F
-import ./validation-proof.bend as V
+import ./boolean-reflection.bend as V
 
 def B.high_carry_value(n, w):
   match n:

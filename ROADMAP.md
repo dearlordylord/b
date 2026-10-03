@@ -95,6 +95,10 @@ are established. Partial milestones do not complete the objective.
   every intermediate bound. Bounded squared sums are exact at every word
   width.
 
-Still required for stage 1: connect the other production geometric expressions
-(centroids and homogeneous topology witnesses) to their exact models.
+- The production centroid equals the four-corner natural mean. Averaging
+  preserves a common coordinate bound, and the exact-centroid acceptance
+  predicate establishes the unrounded four-corner sum equation.
+
+Still required for stage 1: connect homogeneous topology witnesses to their
+exact models and establish applicable bounds.
 Stages 2–4 remain uncompleted.

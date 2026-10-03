@@ -52,6 +52,9 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ("core.bend", "Pt{Nat.div(x, 4n), Nat.div(y, 4n)}", "Pt{Nat.div(x, 3n), Nat.div(y, 3n)}", "cell_center_model"),
+        ("centroid.bend", "Nat.div(sum(a, b, c, d), 4n)", "Nat.div(sum(a, b, c, d), 5n)", "mean_four_exact"),
+        ("validation.bend", "point_equal(point_four(Core.cell_center(cell)), Core.point_add(Core.point_add(Core.boundary_left(a), Core.boundary_right(a)), Core.point_add(Core.boundary_left(b), Core.boundary_right(b))))", "True{}", "validated_centroid_mean"),
         ("word-squares.bend", "Word.mul(n, b, b)", "Word.add(n, b, b)", "bounded_squares_exact"),
         ("validation.bend", "(dx * dx + dy * dy : U32)", "(dx * dx + dx * dy : U32)", "guarded_width_exact"),
         ("validation.bend", "U32.sub(U32.max(a, b), U32.min(a, b))", "U32.sub(U32.min(a, b), U32.max(a, b))", "u32_absolute_exact"),
@@ -108,6 +111,10 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif file in {"word-division4.bend", "word-subtraction.bend", "word-complement.bend"}:
+                proof_root = "DIVISION_PROOF.bend"
+            elif law in {"cell_center_model", "mean_four_exact", "validated_centroid_mean"}:
+                proof_root = "CENTROID_PROOF.bend"
             elif law in {"guarded_width_exact", "accepted_points_width"} or file in {"word-squares.bend", "natural-squares.bend"}:
                 proof_root = "WIDTH_PROOF.bend"
             elif law == "guarded_dot_exact":
@@ -235,6 +242,8 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        bend(directory, "centroid-tests.bend", "--verdict")
+        print("Centroid exactness, bounds and rounding-rejection fixtures accepted")
         bend(directory, "word-squares-tests.bend", "--verdict")
         print("Bounded squared-sum fixtures accepted")
         bend(directory, "coordinate-width-tests.bend", "--verdict")

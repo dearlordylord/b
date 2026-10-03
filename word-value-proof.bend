@@ -3,7 +3,7 @@ import ./word-arithmetic.bend as W
 import ./word-laws.bend as L
 import ./facts.bend as F
 import ./word-proof.bend as Existing
-import ./validation-proof.bend as V
+import ./boolean-reflection.bend as V
 
 law double_add:
   for +a: Nat

@@ -5,7 +5,7 @@ import ./word-conversion-laws.bend as L
 import ./word-bounds-laws.bend as B
 import ./word-bounds-proof.bend as Bounds
 import ./facts.bend as F
-import ./validation-proof.bend as V
+import ./boolean-reflection.bend as V
 
 def L.zero_word_value(n):
   match n:

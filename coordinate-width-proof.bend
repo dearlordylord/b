@@ -15,7 +15,7 @@ import ./word-conversion.bend as C
 import ./word-conversion-laws.bend as Conversion
 import ./word-arithmetic.bend as W
 import ./validation.bend as V
-import ./validation-proof.bend as ValidationProof
+import ./boolean-reflection.bend as ValidationProof
 
 # Push max/min selection inside the U32 constructor, retaining its payload.
 def payload(+a: Word(32n), +b: Word(32n), +less: Bool) -> Word(32n):

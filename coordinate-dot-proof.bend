@@ -8,7 +8,7 @@ import ./validation.bend as V
 import ./word-sum3.bend as M
 import ./facts.bend as F
 import ./coordinate-sum.bend as S
-import ./validation-proof.bend as ValidationProof
+import ./boolean-reflection.bend as ValidationProof
 
 # The production two-product expression is the shared three-product helper
 # with a zero final product. Removing that final addition preserves the word.

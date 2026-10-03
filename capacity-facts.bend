@@ -1,7 +1,7 @@
 import Base
 import ./word-arithmetic.bend as W
 import ./word-range-proof.bend as Range
-import ./validation-proof.bend as V
+import ./boolean-reflection.bend as V
 import ./arithmetic-product-proof.bend as A
 import ./facts.bend as F
 
