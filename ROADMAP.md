@@ -72,5 +72,10 @@ are established. Partial milestones do not complete the objective.
 - Coordinate guards at 16000 imply a strict 32-bit bound for a three-product
   sum; the universal proof avoids enumerating coordinate values.
 
-Still required for stage 1: connect the guard-derived bounds and each production
-geometric expression to its exact model. Stages 2–4 remain uncompleted.
+- Guarded source coordinates now connect through the actual U32 converter
+  and three-product helper to the exact Nat sum. The production determinant
+  comparison agrees with the exact orientation for every guarded input.
+
+Still required for stage 1: connect the other production geometric expressions
+(squared widths, centroids, transverse dot comparisons and homogeneous
+topology witnesses) to their exact models. Stages 2–4 remain uncompleted.

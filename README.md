@@ -30,7 +30,7 @@ python3 check.py
 `generate.bend`, checks the emitted SVG, and replaces `b.svg` only on success.
 The generator itself refuses to emit an SVG if its Bend artwork validation fails.
 
-`check.py` runs the 59-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 62-law proof gate, 200 literal arithmetic checks,
 seven executed validator boundary checks, compiling mutations that must fail
 proofs, invalid artworks that must be rejected before SVG emission, and Bend
 and independent Python topology fixtures. Python checks the output artifact;
@@ -168,7 +168,7 @@ proofs; its original license is retained in `LICENSE.mathlib`. See [NOTICE](NOTI
 ## Arithmetic programme (in progress)
 
 [ROADMAP.md](ROADMAP.md) records the autonomous four-stage programme. The
-current BendTT gate checks **59 public laws**, plus supporting lemmas.
+current BendTT gate checks **62 public laws**, plus supporting lemmas.
 Arithmetic results quantify over all inputs at arbitrary word widths; the U32
 operation laws cover every 32-bit constructor payload.
 
@@ -198,14 +198,25 @@ The proved arithmetic foundations are:
 - Six natural coordinates bounded by 16000 imply that their three-product
   sum is strictly below `2^32`, without an additional overflow premise.
   The proof uses the 14-bit coordinate envelope and symbolic capacity algebra.
+- With those source guards, the actual six `U32.from_nat` conversions and
+  production three-product helper equal the exact Nat formula. The actual
+  `validation.determinant_positive` predicate agrees with comparison of the
+  exact determinant sums, including positive, negative and zero orientations.
+  A further law derives its premises directly from acceptance by the actual
+  `point_bounded` filter for the three source points.
 
 The `word-*.bend` modules define these models, laws, proofs and fixtures;
 `arithmetic-*-proof.bend` contains supporting order and product algebra.
+The `coordinate-sum-*` and `coordinate-runtime-*` modules prove the source
+guards and their connection to the production determinant.
 Fixtures invoke the theorems, cover all three-bit comparisons and complements,
 and include a bounded product whose unused shift overflows. Compiling mutations
 must fail the corresponding proof gate. The subtraction comparison-selector
 mutant fails in the shared `carry_step` lemma; the division remainder mutant
 fails in `bit_division_step`; the product-operation mutant fails in `sum3_finish`.
+Changing the production determinant comparator from greater-than to
+less-or-equal is rejected in `guarded_determinant`; bypassing the actual
+point-range filter is rejected in `accepted_points_determinant`.
 The coordinate-sum mutant multiplies the sum by eight, making its bound
 false at the maximum coordinates; it fails in `sum_width_bound`.
 These are shared-lemma rejections, rather than
@@ -216,9 +227,9 @@ That printer crash is not counted as a passing mutation check. Each kernel invoc
 limit. The seven concrete validator examples run as compiled native tests;
 they are finite executed checks, distinct from the universal BendTT laws.
 
-**Stage 1 remains incomplete:** instantiation of
-bounds for actual geometric expressions and their final exact-model agreement
-are outstanding. Intersection correctness, enumeration correctness and the
+**Stage 1 remains incomplete:** the other production expressions (squared
+widths, centroids, transverse dot comparisons and homogeneous topology
+witnesses) still require their exact-model agreement and applicable bounds. Intersection correctness, enumeration correctness and the
 formal topological bridge in stages 2–4 are also outstanding. Finite artwork
 checks and the externally justified topology certificate remain as described
 above; they are not substitutes for these universal proofs.
