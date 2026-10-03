@@ -52,6 +52,10 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ('homogeneous-combination.bend', 'Nat.mul(u, l)', 'Nat.mul(u, k)', 'weighted_fields'),
+        ('homogeneous-combination.bend', 'Nat.add(Nat.mul(y, k), Nat.mul(v, l))', 'Nat.mul(y, k)', 'weighted_fields'),
+        ('homogeneous-combination.bend', 'Nat.add(Nat.mul(d, k), Nat.mul(e, l))', 'Nat.mul(d, k)', 'weighted_fields'),
+        ('homogeneous-combination.bend', 'Nat.mul(l, d))', 'Nat.mul(l, e))', 'mixture_denominator_exact'),
         ('halfplane-region.bend', 'H.P{U32.to_nat(x), U32.to_nat(y), U32.to_nat(d)}', 'H.P{U32.to_nat(y), U32.to_nat(x), U32.to_nat(d)}', 'edge_values'),
         ('halfplane-region.bend', '&& edge(d, a, p)', '&& True{}', 'inside_halfplanes_decoded'),
         ('halfplane-region.bend', '&& contains(p, c)', '&& True{}', 'common_halfplanes_decoded'),
@@ -203,6 +207,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif law in {"weighted_fields", "mixture_denominator_exact"}:
+                proof_root = "HOMOGENEOUS_COMBINATION_PROOF.bend"
             elif law in {"edge_values", "inside_halfplanes_decoded", "common_halfplanes_decoded"}:
                 proof_root = "HALFPLANE_REGION_PROOF.bend"
             elif law in {"scaled_side", "denominator_scale", "equivalent_scaled"}:
@@ -413,6 +419,8 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        bend(directory, "homogeneous-combination-tests.bend", "--verdict")
+        print("Homogeneous combination fixtures accepted: unequal denominators, boundary, zero weights and affine mean")
         executable = directory / "search-witness-tests"
         build = subprocess.run(["bend", "search-witness-tests.bend", "-o", str(executable)], cwd=directory, capture_output=True, text=True, timeout=5)
         assert build.returncode == 0, build.stdout + build.stderr

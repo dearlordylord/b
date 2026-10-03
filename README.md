@@ -947,3 +947,64 @@ no speculative polygon or topology theorem was introduced.
 `taskset -c 7,11 ./regenerate.sh` also passed; `git diff --exit-code -- b.svg`
 confirmed byte-identical output. Stage 2 remains open at the geometric bridges
 listed above, and stages 3–4 remain open.
+
+### Stage 2: rational convexity of half-plane regions
+
+[Combination model](homogeneous-combination.bend), [six laws](homogeneous-combination-laws.bend)
+and [proof root](HOMOGENEOUS_COMBINATION_PROOF.bend) prove closure of the
+previously connected half-plane regions under rational weighted means.
+The model retains the existing homogeneous point owner; no signed-coordinate,
+real-number, polygon-fill, or topology axiom is introduced.
+
+`join(p, q, k, l)` adds the three homogeneous fields with nonnegative Nat
+weights k/l. Every linear form of those fields is exactly the corresponding
+weighted sum. Its two side polynomials therefore retain a nonnegative signed
+comparison if both input points pass the closed half-plane predicate. Applying
+that fact to each of the four sides proves `region_weighted_join` for any
+ordered quad, including degenerate or empty regions. A separate theorem proves
+that positive input denominators and `k + l > 0` give a positive output
+denominator. The polynomial predicate alone does not exclude zero denominators.
+
+For ordinary affine weights, `mix(p, q, k, l)` calls `join` with weights
+`k * denominator(q)` and `l * denominator(p)`. Its denominator is proved equal
+to `denominator(p) * denominator(q) * (k + l)`. Thus its fraction coordinates
+represent `(k * p + l * q) / (k + l)`. `region_convex_mixture` proves both
+positive denominator and region membership under the explicit positive-input,
+nonzero-weight and two-membership premises. This is rational convexity in the
+nonnegative-coordinate domain; it is not a theorem about real-number convexity
+or equality with the SVG fill.
+
+[Eleven literal fixtures](homogeneous-combination-tests.bend) cover unequal
+denominators, both one-zero-weight cases, boundary inclusion, positive output,
+and zero total weight. The asymmetric unequal-denominator case distinguishes
+the two operations: joining `(2,4,2)` and `(9,3,3)` with weights 2/1 gives
+`(13,11,7)`, whereas their ordinary affine mixture gives `(30,30,18)`.
+The zero/zero case has denominator zero even though the polynomial region
+predicate accepts it, demonstrating why the positivity contract is necessary.
+
+Four compiling mutations use the wrong x weight, omit the second y term,
+omit the second denominator term, and use the wrong denominator when forming
+the affine weights. The first three violate linear-form exactness and fail at
+the shared `weighted_fields` helper; the last violates the public
+`mixture_denominator_exact` contract itself. Distribution and order arguments
+reuse the existing attributed `facts.bend` / `order-facts.bend` proofs.
+
+The remaining stage-2 bridges are still required: source quad corners must be
+shown to inhabit these regions, the regions must be identified with the filled
+convex quads, and the separating-axis decision must characterize geometric
+intersection. Independent enumeration and the real topological bridge remain
+open in stages 3–4.
+
+Validation: `taskset -c 7,11 python3 -u check.py` passed all 196 public
+laws across 30 proof roots, the eleven new literal fixtures and existing fixture
+groups, 138 compiling mutations, and independent SVG checks. Implementer
+self-review found no violations of the stated contracts: it checked coefficient
+and coordinate order in both side polynomials, distribution/regrouping,
+nonnegative comparison reflection, all four region sides, zero-weight branches,
+positive input denominators, unequal-denominator affine weights and the
+existential-witness consumer boundary. This adds a Nat geometry model and proof
+root; production search/generation policies and word arithmetic owners are
+unchanged. No real-number convexity or polygon/topology theorem is claimed.
+`taskset -c 7,11 ./regenerate.sh` passed with the five-second kernel limits;
+`git diff --exit-code -- b.svg` confirmed byte-identical output. Stages 2–4
+remain unfinished at the geometric and topological bridges described above.
