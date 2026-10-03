@@ -1238,7 +1238,7 @@ term. They fail at the public `area_reconstruct` law, shared
 arithmetic/geometry contract into a false one; noncompiling mutations are
 excluded from the gate.
 
-The area weights have not yet been proved to reconstruct the point's x/y
+At this milestone, the area weights had not yet been proved to reconstruct the point's x/y
 coordinates. Those two identities are required to turn the weights into the
 `InHull` witness and finish region-to-hull inclusion. Intersection
 characterization, independent enumeration and the real topological bridge
@@ -1256,5 +1256,64 @@ owners are reused. The future coordinate-reconstruction proof can consume the
 exact total and nonzero result without assuming either x/y identity.
 `taskset -c 7,11 ./regenerate.sh` passed with the existing five-second kernel
 limits; `git diff --exit-code -- b.svg` confirmed byte-identical output.
-Stages 2–4 remain open at x/y reconstruction, reverse inclusion, intersection,
+At this milestone, stages 2–4 remained open at x/y reconstruction, reverse inclusion, intersection,
 independent enumeration and the actual topological bridge.
+
+### Stage 2: exact triangle coordinate reconstruction
+
+[Coordinate model](triangle-coordinate.bend), [five laws](triangle-coordinate-laws.bend)
+and [proof root](TRIANGLE_COORDINATE_PROOF.bend) complete the coordinate identities
+for the previously constructed area weights. If `A,B,C` have a strict positive
+turn and `p=(x,y,d)` passes their three closed half-planes, the checker proves
+`Ax*wA + Bx*wB + Cx*wC = x*area(A,B,C)` and the corresponding identity for y.
+Together with the proved total-weight identity, reconstruction is exactly
+`(x*area, y*area, d*area)`. With `d>0`, its denominator is positive and its
+cross-products equal those of the original point.
+
+The positive and negative coordinate cycles are proved for arbitrary natural
+coordinates and either axis. Explicit distribution, matrix transposition,
+monomial rotations and addition regrouping give the same common part on both
+sides. The guarded result then uses exact area reconstruction and the existing
+Nat cancellation owner. The proof does not introduce signed arithmetic, an
+unchecked polynomial normalizer or a new geometric axiom. The temporary host
+script used to write repeated proof terms is outside the trusted boundary:
+every emitted equality is checked by BendTT.
+
+[Ten fixtures](triangle-coordinate-tests.bend) exercise distinct x/y values,
+an unreduced fraction, a vertex, a zero coordinate, public validity, and the
+outside/zero-denominator guards. In the triangle `(1,1),(5,1),(1,5)`, the point
+`(3,2,1)` reconstructs as `(48,32,16)` and `(6,4,2)` as `(96,64,32)`. Outside
+point `(6,6,1)` is not equivalent to its saturated-weight reconstruction;
+the zero-denominator reconstruction is invalid.
+
+Five compiling controls swap the corner axis, change the third negative-cycle
+coefficient, change the third area-weight coefficient, swap the reconstructed
+x/y fields and zero its denominator. Their first failures are in shared
+`coord_x_positive_fields`, `coord_x_negative_fields`, `coord_sum_reconstruct`
+and `coord_reconstruct_fields` (the last two controls), rather than distinct
+public law sections. Each corrupts a stated law on valid literal inputs; these
+are handwritten compiling proof controls, not a bend-falsify report.
+
+Reverse region-to-hull inclusion can now consume both the exact coordinates and
+the positive total. It still needs to construct four-corner `InHull` witnesses
+for the selected diagonal triangle. Intersection characterization, independent
+enumeration and the actual topological bridge remain open. Stages 2–4 are
+unfinished.
+
+Validation of coordinate reconstruction: `taskset -c 7,11 python3 -u check.py`
+passed all 224 public laws across 35 roots, the ten new fixtures and existing
+groups, 160 compiling mutation controls and the independent SVG checks.
+Five additional literal mutant probes checked the strict-turn, triangle-inside
+and positive-denominator premises before confirming a false coordinate-cycle,
+weighted-coordinate, point-equivalence or reconstructed-denominator result.
+These probes were run separately; they are not counted as fixtures in `check.py`.
+Implementer self-review found no violations of the stated contracts: it traced
+both axis conventions, all three weight/corner pairings, positive and negative
+coefficient rotations, subtraction guards, coordinate cancellation, denominator
+normalization and the distinction between algebraic equivalence and fraction
+validity. Existing determinant, distribution, reflection and cancellation
+owners are reused. The next consumer is reverse region-to-hull inclusion;
+the current laws do not claim that this witness has already been constructed.
+`taskset -c 7,11 ./regenerate.sh` also passed every proof root under the existing
+five-second kernel limit, native generation and independent geometry/topology
+checks. `git diff --exit-code -- b.svg` confirmed byte-identical output.

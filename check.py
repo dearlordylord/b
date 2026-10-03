@@ -52,6 +52,13 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ('triangle-coordinate.bend', 'def corner_coordinate(p: N.Point, axis: Bool) -> Nat:\n  match p:\n    case N.P{x, y}: Bool.pick(Nat, axis, y, x)', 'def corner_coordinate(p: N.Point, axis: Bool) -> Nat:\n  match p:\n    case N.P{x, y}: Bool.pick(Nat, axis, x, y)', 'coord_x_positive_fields'),
+        ('triangle-coordinate.bend', 'Nat.mul(corner_coordinate(c, axis), A.negative(a, b, p))', 'Nat.mul(corner_coordinate(a, axis), A.negative(a, b, p))', 'coord_x_negative_fields'),
+        ('triangle-coordinate.bend', 'Nat.mul(corner_coordinate(c, axis), A.area(a, b, p))', 'Nat.mul(corner_coordinate(a, axis), A.area(a, b, p))', 'coord_sum_reconstruct'),
+        ('triangle-coordinate.bend', 'G.P{weighted(a, b, c, p, False{}), weighted(a, b, c, p, True{}), A.weights_total(a, b, c, p)}', 'G.P{weighted(a, b, c, p, True{}), weighted(a, b, c, p, False{}), A.weights_total(a, b, c, p)}', 'coord_reconstruct_fields'),
+        ('triangle-coordinate.bend', 'G.P{weighted(a, b, c, p, False{}), weighted(a, b, c, p, True{}), A.weights_total(a, b, c, p)}', 'G.P{weighted(a, b, c, p, False{}), weighted(a, b, c, p, True{}), 0n}', 'coord_reconstruct_fields'),
+    ]
+    controls += [
         ('triangle-area.bend', 'Nat.sub(positive(a, b, p), negative(a, b, p))', 'Nat.sub(negative(a, b, p), positive(a, b, p))', 'area_reconstruct'),
         ('triangle-area.bend', '), area(a, b, p))', '), area(b, a, p))', 'area_sum_reconstruct'),
         ('triangle-area.bend', 'area(a, b, Q.embed(c))', 'area(b, a, Q.embed(c))', 'triangle_area_positive'),
@@ -224,6 +231,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif law in {"coord_x_positive_fields", "coord_x_negative_fields", "coord_sum_reconstruct", "coord_reconstruct_fields"}:
+                proof_root = "TRIANGLE_COORDINATE_PROOF.bend"
             elif law in {"area_reconstruct", "area_sum_reconstruct", "triangle_area_positive", "area_positive_cycle_fields"}:
                 proof_root = "TRIANGLE_AREA_PROOF.bend"
             elif law in {"diagonal_split_choice", "diagonal_strict_fields"}:
@@ -444,6 +453,8 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        bend(directory, "triangle-coordinate-tests.bend", "--verdict")
+        print("Exact triangle coordinate reconstruction, fraction validity and guard fixtures accepted")
         bend(directory, "triangle-area-tests.bend", "--verdict")
         print("Triangle area fixtures accepted: interior, vertex, fraction, outside saturation and zero denominator")
         bend(directory, "quad-diagonal-tests.bend", "--verdict")
