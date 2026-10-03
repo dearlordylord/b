@@ -34,7 +34,7 @@ commands; this avoids an expensive combined optimization step on shared
 machines. Other platforms retain Bend's native build command. Proof checks
 use the same five-second BendTT gate on every platform.
 
-`check.py` runs the 153-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 161-law proof gate, 200 literal arithmetic checks,
 seven executed validator boundary checks, three executed transverse cases,
 four executed cell-transverse cases and rejection beyond each source-coordinate limit,
 compiling mutations that must fail
@@ -726,3 +726,33 @@ filter envelopes, cross-cover flag composition, field ordering and the
 distinction between arbitrary count payloads and proved enumeration. No
 production behavior or coordinate premise changed. Search/count arithmetic
 composition, guarded inspection and stages 2–4 remain open.
+
+Complete bounded witness-search arithmetic: eight public laws connect vertex
+and sampled common-point classification, the segment/pair/all-pairs/vertex
+folds, triangle search and the actual triangle-witness entry point to
+`search-arithmetic.bend`. The reference uses Nat weights and numerators with
+exact homogeneous side comparisons. The proof establishes exact weight
+conversion and bounds before invoking the sample laws; list and quad
+envelopes supply the remaining premises recursively. The Boolean agreement
+covers both successful and unsuccessful searches, with segment fuel at most
+63. It does not establish geometric membership or universal search
+completeness. Native fixtures cover a boundary sample, a failed third-cell
+classification, zero fuel, empty folds, a vertex-only hit, full segment fuel
+and successful/failed triple searches. Eight compiling controls change the
+denominator, omit the third cell, accept empty search cases, replace the
+triangle OR with AND, or omit the third cell's candidates. The first two
+fail in shared `word_sample_values` and `common_coords_values`; the
+remaining six in their public fold laws. Guarded source inspection, count
+arithmetic composition and stages 2–4 remain open.
+
+Validation of full bounded witness-search arithmetic:
+`taskset -c 7,11 python3 -u check.py` passed 161 unique public laws across
+twenty-four roots, every fixture group, 114 compiling mutations and
+independent artifact checks. `taskset -c 7,11 ./regenerate.sh` passed with
+the five-second limit on each kernel invocation and preserved `b.svg` byte
+for byte. Implementer self-review covered exact natural weight conversion,
+sample denominators, all three classified cells, recursive point/quad
+envelopes, fuel decrement, empty searches, vertex/pair choice and the actual
+concatenated candidate list. No production behavior or arithmetic premise
+changed. Enumeration/count composition, guarded source inspection and the
+geometric/topological bridges remain open.

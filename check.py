@@ -52,6 +52,14 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ('search-arithmetic.bend', 'S.numerator(U32.to_nat(y), U32.to_nat(v), n), 64n', 'S.numerator(U32.to_nat(y), U32.to_nat(v), n), 63n', 'word_sample_values'),
+        ('search-arithmetic.bend', 'inside_coords(x, y, d, a) && inside_coords(x, y, d, b) && inside_coords(x, y, d, c)', 'inside_coords(x, y, d, a) && inside_coords(x, y, d, b) && True{}', 'common_coords_values'),
+        ('search-arithmetic.bend', 'case Zero{}: False{}', 'case Zero{}: True{}', 'segment_search_arithmetic_exact'),
+        ('search-arithmetic.bend', 'def pair_search(xs: List<&2, T.Point>, +p: T.Point, +a: T.Quad, +b: T.Quad, +c: T.Quad) -> Bool:\n  match xs:\n    case Nil{}: False{}', 'def pair_search(xs: List<&2, T.Point>, +p: T.Point, +a: T.Quad, +b: T.Quad, +c: T.Quad) -> Bool:\n  match xs:\n    case Nil{}: True{}', 'pair_search_arithmetic_exact'),
+        ('search-arithmetic.bend', 'def all_pairs(xs: List<&2, T.Point>, +a: T.Quad, +b: T.Quad, +c: T.Quad) -> Bool:\n  match xs:\n    case Nil{}: False{}', 'def all_pairs(xs: List<&2, T.Point>, +a: T.Quad, +b: T.Quad, +c: T.Quad) -> Bool:\n  match xs:\n    case Nil{}: True{}', 'all_pairs_arithmetic_exact'),
+        ('search-arithmetic.bend', 'def vertex_search(xs: List<&2, T.Point>, +a: T.Quad, +b: T.Quad, +c: T.Quad) -> Bool:\n  match xs:\n    case Nil{}: False{}', 'def vertex_search(xs: List<&2, T.Point>, +a: T.Quad, +b: T.Quad, +c: T.Quad) -> Bool:\n  match xs:\n    case Nil{}: True{}', 'vertex_search_arithmetic_exact'),
+        ('search-arithmetic.bend', 'vertex_search(xs, a, b, c) || all_pairs(xs, a, b, c)', 'vertex_search(xs, a, b, c) && all_pairs(xs, a, b, c)', 'triangle_search_arithmetic_exact'),
+        ('search-arithmetic.bend', 'List.append(&2, T.Point, T.vertices(b), T.vertices(c))', 'List.append(&2, T.Point, T.vertices(b), [])', 'triangle_witness_arithmetic_exact'),
         ('cover-arithmetic.bend', 'T.keep(Sat.meets(q, h), h, neighbors(q, t))', 'T.keep(False{}, h, neighbors(q, t))', 'neighbors_arithmetic_exact'),
         ('cover-arithmetic.bend', 'T.connected_edges(overlaps(a, b), overlaps(a, c), overlaps(b, c))', 'T.connected_edges(overlaps(a, b), False{}, overlaps(b, c))', 'connected_arithmetic_exact'),
         ('cover-arithmetic.bend', 'ribbon(a) && ribbon(b) && ribbon(c)', 'ribbon(a) && ribbon(b) && True{}', 'ribbons_arithmetic_exact'),
@@ -175,6 +183,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif law in {"word_sample_values", "common_coords_values", "segment_search_arithmetic_exact", "pair_search_arithmetic_exact", "all_pairs_arithmetic_exact", "vertex_search_arithmetic_exact", "triangle_search_arithmetic_exact", "triangle_witness_arithmetic_exact"}:
+                proof_root = "SEARCH_ARITHMETIC_PROOF.bend"
             elif law in {"disjoint_all_arithmetic_exact", "disjoint_nonadjacent_arithmetic_exact", "overlaps_one_arithmetic_exact", "overlaps_arithmetic_exact", "adjacent_arithmetic_exact", "ribbon_walk_arithmetic_exact", "ribbon_arithmetic_exact", "neighbors_arithmetic_exact", "connected_arithmetic_exact", "ribbons_arithmetic_exact", "assembled_connected", "assembled_ribbons"}:
                 proof_root = "COVER_ARITHMETIC_PROOF.bend"
             elif law in {"bounded_cell_arithmetic_exact", "bounded_cells_arithmetic_exact", "bounded_nonempty_arithmetic_exact", "gate_exact"}:
