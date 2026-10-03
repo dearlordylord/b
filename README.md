@@ -30,8 +30,9 @@ python3 check.py
 `generate.bend`, checks the emitted SVG, and replaces `b.svg` only on success.
 The generator itself refuses to emit an SVG if its Bend artwork validation fails.
 
-`check.py` runs the 67-law proof gate, 200 literal arithmetic checks,
-seven executed validator boundary checks, compiling mutations that must fail
+`check.py` runs the 69-law proof gate, 200 literal arithmetic checks,
+seven executed validator boundary checks, three executed transverse cases,
+compiling mutations that must fail
 proofs, invalid artworks that must be rejected before SVG emission, and Bend
 and independent Python topology fixtures. Python checks the output artifact;
 it does not verify the Bend language.
@@ -168,7 +169,7 @@ proofs; its original license is retained in `LICENSE.mathlib`. See [NOTICE](NOTI
 ## Arithmetic programme (in progress)
 
 [ROADMAP.md](ROADMAP.md) records the autonomous four-stage programme. The
-current BendTT gate checks **67 public laws**, plus supporting lemmas.
+current BendTT gate checks **69 unique public laws**, plus supporting lemmas.
 Arithmetic results quantify over all inputs at arbitrary word widths; the U32
 operation laws cover every 32-bit constructor payload.
 
@@ -208,7 +209,9 @@ The proved arithmetic foundations are:
   Nat dot product for every guarded pair of points. Its guard can likewise
   be supplied as acceptance by the production point filter.
   The production sum of two dots is also exact under the coordinate guards.
-  The final transversality comparisons remain outstanding.
+  Both production transversality comparisons and their conjunction agree
+  with the exact Nat formula for all guarded points. Acceptance by the
+  production point filter suffices to establish those coordinate guards.
 - Eight coordinates bounded by 16000 imply a strict U32 bound for the paired
   sum of four products. The actual paired Word products and additions equal
   that exact formula whenever its complete sum fits; all intermediate bounds
@@ -219,31 +222,47 @@ The `word-*.bend` modules define these models, laws, proofs and fixtures;
 `arithmetic-*-proof.bend` contains supporting order and product algebra.
 The coordinate sum, runtime, dot and dot-pair modules prove the source
 guards and their connection to the production determinant, dot expression
-and sum of two dots.
-Fixtures invoke the theorems, cover all three-bit comparisons and complements,
+and sum of two dots. The transverse modules connect both production
+comparisons to their exact model.
+Arithmetic fixtures invoke the theorems, cover all three-bit comparisons and complements,
 and include a bounded product whose unused shift overflows. Compiling mutations
 must fail the corresponding proof gate. The subtraction comparison-selector
 mutant fails in the shared `carry_step` lemma; the division remainder mutant
 fails in `bit_division_step`; the product-operation mutant fails in `sum3_finish`.
 Changing the production determinant comparator from greater-than to
 less-or-equal is rejected in `guarded_determinant`; bypassing the actual
-point-range filter is rejected in `accepted_points_determinant`. Substituting
-a wrong coordinate in the production dot expression fails `guarded_dot_exact`.
+point-range filter is rejected in `accepted_points_determinant`. Changing
+either production transverse comparator to less-or-equal, or
+changing the exact model comparator, is rejected by the transverse proof
+root. Substituting a wrong coordinate in the production dot expression fails `guarded_dot_exact`.
 The coordinate-sum mutant multiplies the sum by eight, making its bound
 false at the maximum coordinates; it fails in `sum_width_bound`. The analogous
 four-product mutant is rejected in `width_bound`. Changing a multiplication
 to addition in the paired Word sum is rejected in the shared `finish` lemma.
-These are shared-lemma rejections, rather than
-failures in the public law sections. The U32 sum-wrapper mutant is checked
+The named carry, bit-division and sum helpers are supporting-lemma
+rejections. The comparator and filter controls reject the corresponding public
+laws. The U32 sum-wrapper mutant is checked
 against a literal instance of its law, with the premise independently accepted;
 Bend overflows its diagnostic printer on the full generic mutant mismatch.
-That printer crash is not counted as a passing mutation check. Each kernel invocation has a five-second
-limit. The seven concrete validator examples run as compiled native tests;
+That printer crash is not counted as a passing mutation check. Each kernel
+invocation has a five-second limit. The seven concrete validator examples run as compiled native tests;
 they are finite executed checks, distinct from the universal BendTT laws.
+The three transverse examples also run natively: forward control, backward
+start tangent and backward end tangent. Both the actual predicate and exact
+model must give the independently specified Boolean result, with all point
+guards satisfied.
+
+`proof-roots.txt` lists the structural, arithmetic and transverse proof roots.
+Both `check.py` and `regenerate.sh` audit that every public law module is
+reachable, then check every root, with five seconds per kernel invocation. The roots share supporting proofs; the 69-law total counts
+each public law once. Dependency-only imports of unrelated proof groups have
+been removed; arithmetic aggregation explicitly retains division and its
+subtraction/complement prerequisites. No previously checked law is omitted.
 
 **Stage 1 remains incomplete:** the other production expressions (squared
-widths, centroids, transverse dot comparisons and homogeneous topology
-witnesses) still require their exact-model agreement and applicable bounds. Intersection correctness, enumeration correctness and the
+widths, centroids and homogeneous topology witnesses) still require their
+exact-model agreement and applicable bounds. Intersection correctness,
+enumeration correctness and the
 formal topological bridge in stages 2–4 are also outstanding. Finite artwork
 checks and the externally justified topology certificate remain as described
 above; they are not substitutes for these universal proofs.

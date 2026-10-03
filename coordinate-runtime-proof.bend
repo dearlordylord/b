@@ -12,6 +12,7 @@ import ./word-conversion-laws.bend as V
 import ./word-sum3.bend as M
 import ./word-sum3-laws.bend as A
 import ./word-comparison-laws.bend as Compare
+import ./word-comparison-proof.bend as ComparisonProof
 import ./validation-proof.bend as ValidationProof
 
 def coordinate32(+a: Nat, h: {Nat.is_le(a, 16000n) == True{} : Bool}) -> {Nat.is_lt(a, W.capacity(32n)) == True{} : Bool}:

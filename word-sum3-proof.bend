@@ -2,7 +2,6 @@ import Base
 import ./word-arithmetic.bend as W
 import ./word-sum3.bend as S
 import ./word-sum3-laws.bend as L
-import ./word-division4-proof.bend as Existing
 import ./word-multiplication-laws.bend as Mul
 import ./word-multiplication-proof.bend as Arithmetic
 import ./word-conversion-proof.bend as Copy

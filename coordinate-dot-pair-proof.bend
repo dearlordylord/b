@@ -2,6 +2,7 @@ import Base
 import ./coordinate-dot-pair-laws.bend as L
 import ./coordinate-sum4.bend as S
 import ./coordinate-sum4-laws.bend as B
+import ./coordinate-sum4-proof.bend as BoundProof
 import ./word-sum4.bend as M
 import ./word-sum4-laws.bend as Sum
 import ./word-sum4-proof.bend as Existing

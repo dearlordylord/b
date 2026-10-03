@@ -9,6 +9,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 sys.dont_write_bytecode = True
+from proof_scope import proof_scope
 from verify import verify
 from topology_verify import nerve, verify_topology
 
@@ -26,6 +27,17 @@ def bend(directory, file, *args, success=True):
     return output
 
 
+def literal_transverse_checks(directory):
+    executable = directory / "transverse-tests"
+    build = subprocess.run(["bend", "coordinate-transverse-tests.bend", "-o", str(executable)],
+                           cwd=directory, capture_output=True, text=True, timeout=5)
+    assert build.returncode == 0, build.stdout + build.stderr
+    result = subprocess.run([str(executable)], cwd=directory,
+                            capture_output=True, text=True, timeout=5)
+    assert result.returncode == 0 and "transverse-tests: True" in result.stdout, result.stdout + result.stderr
+    return 3
+
+
 def negative_controls(directory):
     controls = [
         ("core.bend", "Seam{boundary_left(cell_start(cell)),",
@@ -40,6 +52,9 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ("validation.bend", "U32.is_gt((dot(right, right) + dot(control, left) : U32), (dot(right, left) + dot(control, right) : U32))", "U32.is_le((dot(right, right) + dot(control, left) : U32), (dot(right, left) + dot(control, right) : U32))", "guarded_transverse_exact"),
+        ("coordinate-transverse.bend", "Nat.is_gt(S.exact(cx, rx, cy, ry, lx, lx, ly, ly), S.exact(cx, lx, cy, ly, lx, rx, ly, ry))", "Nat.is_le(S.exact(cx, rx, cy, ry, lx, lx, ly, ly), S.exact(cx, lx, cy, ly, lx, rx, ly, ry))", "transverse_finish"),
+        ("validation.bend", "U32.is_gt((dot(control, right) + dot(left, left) : U32), (dot(control, left) + dot(left, right) : U32))", "U32.is_le((dot(control, right) + dot(left, left) : U32), (dot(control, left) + dot(left, right) : U32))", "guarded_transverse_exact"),
         ("word-sum4.bend", "Word.mul(n, g, h)", "Word.add(n, g, h)", "finish"),
         ("coordinate-sum4.bend", "Nat.add(Nat.add(Nat.mul(a, b), Nat.mul(c, d)), Nat.add(Nat.mul(e, f), Nat.mul(g, h)))", "Nat.mul(8n, Nat.add(Nat.add(Nat.mul(a, b), Nat.mul(c, d)), Nat.add(Nat.mul(e, f), Nat.mul(g, h))))", "width_bound"),
         ("validation.bend", "U32.from_nat(x) * U32.from_nat(z) + U32.from_nat(y) * U32.from_nat(w)", "U32.from_nat(x) * U32.from_nat(w) + U32.from_nat(y) * U32.from_nat(z)", "guarded_dot_exact"),
@@ -87,7 +102,15 @@ def negative_controls(directory):
         try:
             # A mutant that cannot even compile is not a useful proof control.
             bend(directory, file, "--check-only")
-            output = bend(directory, "sum3-counter.bend" if law == "literal_u32_sum3_exact" else "PROOF.bend", success=False)
+            if law == "literal_u32_sum3_exact":
+                proof_root = "sum3-counter.bend"
+            elif "transverse" in law:
+                proof_root = "TRANSVERSE_PROOF.bend"
+            elif file in {"core.bend", "geometry.bend", "topology.bend"} or law in {"validator_sound", "artwork_gate_sound"}:
+                proof_root = "PROOF.bend"
+            else:
+                proof_root = "ARITHMETIC_PROOF.bend"
+            output = bend(directory, proof_root, success=False)
             assert law in output, output
         finally:
             path.write_text(original)
@@ -198,8 +221,11 @@ if __name__ == "__main__":
         directory = Path(temp)
         for file in HERE.glob("*.bend"):
             shutil.copy2(file, directory / file.name)
-        bend(directory, "PROOF.bend", "--verdict")
-        print("BendTT: all 67 public laws accepted")
+        proof_roots, law_count = proof_scope(directory)
+        for proof_root in proof_roots:
+            bend(directory, proof_root, "--verdict")
+        print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        print(f"Concrete transverse checks accepted: {literal_transverse_checks(directory)}")
         bend(directory, "word-sum4-tests.bend", "--verdict")
         print("Composed four-product word sum fixtures accepted")
         bend(directory, "coordinate-dot-pair-tests.bend", "--verdict")

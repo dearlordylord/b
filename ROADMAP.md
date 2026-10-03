@@ -81,8 +81,12 @@ are established. Partial milestones do not complete the objective.
 - The paired four-product sum is strictly below U32 capacity under the
   coordinate guards. Its production addition bridge is now proved: actual
   source conversions and the sum of two production dots equal the exact
-  four-product model. The final transverse comparisons remain outstanding.
+  four-product model.
+- Both production transverse comparisons, including their conjunction,
+  agree with exact Nat arithmetic for every point accepted by the coordinate
+  filter. Proof groups now have explicit roots with the same five-second
+  per-invocation limit; all earlier laws remain in the full gate.
 
 Still required for stage 1: connect the other production geometric expressions
-(squared widths, centroids, transverse dot comparisons and homogeneous
+(squared widths, centroids and homogeneous
 topology witnesses) to their exact models. Stages 2–4 remain uncompleted.

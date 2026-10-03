@@ -4,7 +4,6 @@ import ./word-sum4-laws.bend as L
 import ./word-arithmetic.bend as W
 import ./word-sum3-proof.bend as A
 import ./word-multiplication-laws.bend as Mul
-import ./coordinate-sum4-proof.bend as Existing
 
 type Bounds<-p: Nat, -q: Nat, -r: Nat, -s: Nat, -limit: Nat> is Data:
   Bound{hp: {Nat.is_lt(p, limit) == True{} : Bool}, hq: {Nat.is_lt(q, limit) == True{} : Bool}, hr: {Nat.is_lt(r, limit) == True{} : Bool}, hs: {Nat.is_lt(s, limit) == True{} : Bool}, hpq: {Nat.is_lt(Nat.add(p, q), limit) == True{} : Bool}, hrs: {Nat.is_lt(Nat.add(r, s), limit) == True{} : Bool}}

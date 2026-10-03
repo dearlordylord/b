@@ -3,10 +3,6 @@ import ./core.bend as C
 import ./LAWS.bend as Laws
 import ./facts.bend as F
 import ./topology-proof.bend as TopologyProof
-import ./arithmetic-proof.bend as ArithmeticProof
-import ./coordinate-dot-pair-proof.bend as WordProof
-import ./arithmetic-order-proof.bend as ArithmeticOrder
-import ./arithmetic-product-proof.bend as ArithmeticProduct
 
 def Laws.seam_attaches_left(cell):
   {==}
