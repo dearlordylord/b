@@ -1631,3 +1631,56 @@ existence direction; this cut does not assume that result.
 `taskset -c 7,11 ./regenerate.sh` passed all proof roots, native compilation,
 generation and independent geometry/topology checks under the existing limits.
 `git diff --exit-code -- b.svg` confirmed byte-identical output.
+
+### Exact intersection candidate search (stage 2, incomplete)
+
+`intersection-search.bend` constructs both four-corner lists and all sixteen
+pairs of directed sides, including closing sides. Opposite closed-side decisions
+produce exact homogeneous segment cuts; every candidate is filtered by a
+positive denominator and all eight closed halfplanes. `scan` returns the first
+accepted candidate in list order. It uses unbounded `Nat` coordinates and no
+fixed denominator grid; it is not yet the bounded native topology search.
+
+Thirteen new public laws pin the corner/side lists, cut orientation, each nested
+loop, complete candidate layout, and both list and public search against an
+independent first-accepted reference. For every input list, a returned hit
+satisfies the actual domain and region predicates. For strict quads it yields
+independent nonnegative four-corner hull weights and therefore `meets=true`.
+The reference laws exclude an implementation that always returns `Miss`.
+
+These are correctness and enumeration laws, **not geometric completeness**:
+`meets=true -> search hit` remains unproved. A missed candidate cannot yet be
+used as a disjointness certificate. Triple-search completeness, independent
+complex enumeration, and the bridge to the topology of the actual SVG fill
+remain open. Stages 2–4 are unfinished.
+
+Validation: the complete final `taskset -c 7,11 python3 -u check.py` run
+passed 269 public laws across 40 roots, all six new literal fixtures and existing
+groups, 194 compiling mutation controls, and independent geometry/topology
+checks. Ten new controls remove an accepted hit, accept an exterior point, omit
+denominator validity, drop a corner or closing side, reverse cut orientation,
+skip a row/column, omit the second corner list, or replace public search with
+`Miss`. Their first failures occur in `choice_sound`, `find_hit_common_hull`,
+`vertices_exact`, `edges_exact`, `cut_branch_exact`, `row_exact`, `pairs_exact`,
+`candidates_layout` and `find_hit_sound`. These handwritten compiling controls
+are not a bend-falsify report; some first failures are shared helpers.
+
+The first full attempt failed at an existing native search-test compilation
+timeout. The next run reached the mutation controls and exposed two incorrect
+expected-diagnostic labels in the new harness rows. Those labels were corrected
+to actual first failures without changing the core or proofs. The successful
+final run retained all original five-second limits. Neither failed run counts
+as passing validation.
+
+Implementer self-review: the new pure search reuses the segment-cut,
+halfplane-region, barycentric-hull and global-intersection owners. Its result
+contains a rational point, while the proof supplies actual hull memberships;
+neither a `Miss` nor a SAT acceptance is promoted to an existence proof.
+The later native topology consumer still needs an exact arithmetic bridge and
+geometric completeness. No production generator or SVG path was changed.
+The independent reference covers traversal and selection but does not replace
+the missing convex-polygon existence theorem.
+
+`taskset -c 7,11 ./regenerate.sh` passed all 40 real proof roots, native
+generation, and the independent geometry/topology checks with the original
+limits. `git diff --exit-code -- b.svg` confirmed byte-identical output.

@@ -144,6 +144,16 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ('intersection-search.bend', 'case True{}: Hit{p}', 'case True{}: Miss{}', 'choice_sound'),
+        ('intersection-search.bend', 'case False{}: fallback', 'case False{}: Hit{p}', 'choice_sound'),
+        ('intersection-search.bend', 'G.positive_denominator(p) && Region.contains(p, q) && Region.contains(p, r)', 'Region.contains(p, q) && Region.contains(p, r)', 'find_hit_common_hull'),
+        ('intersection-search.bend', '[Q.embed(a), Q.embed(b), Q.embed(c), Q.embed(d)]', '[Q.embed(a), Q.embed(b), Q.embed(c)]', 'vertices_exact'),
+        ('intersection-search.bend', '[E{a, b}, E{b, c}, E{c, d}, E{d, a}]', '[E{a, b}, E{b, c}, E{c, d}]', 'edges_exact'),
+        ('intersection-search.bend', 'case False{} True{}: [Cut.point(a, b, q, p)]', 'case False{} True{}: [Cut.point(a, b, p, q)]', 'cut_branch_exact'),
+        ('intersection-search.bend', 'List.append(&2, G.Point, edge_cut(line, h), row(line, t))', 'row(line, t)', 'row_exact'),
+        ('intersection-search.bend', 'List.append(&2, G.Point, row(h, segments), pairs(t, segments))', 'pairs(t, segments)', 'pairs_exact'),
+        ('intersection-search.bend', 'List.append(&2, G.Point, vertices(q), List.append(&2, G.Point, vertices(r), pairs(edges(q), edges(r))))', 'List.append(&2, G.Point, vertices(q), pairs(edges(q), edges(r)))', 'candidates_layout'),
+        ('intersection-search.bend', 'scan(candidates(q, r), q, r)', 'Miss{}', 'find_hit_sound'),
         ('segment-cut.bend', 'Nat.sub(A.negative(a, b, p), A.positive(a, b, p))', 'Nat.sub(A.positive(a, b, p), A.negative(a, b, p))', 'negative_gap_positive'),
         ('segment-cut.bend', 'negative_gap(a, b, q)', 'A.area(a, b, q)', 'crossing_total_positive'),
         ('segment-cut.bend', 'C.join(p, q, first_weight(a, b, q), second_weight(a, b, p))', 'C.join(p, q, second_weight(a, b, p), first_weight(a, b, q))', 'cut_crossing_equal'),
@@ -355,6 +365,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif file == "intersection-search.bend":
+                proof_root = "INTERSECTION_SEARCH_PROOF.bend"
             elif file == "segment-cut.bend":
                 proof_root = "SEGMENT_CUT_PROOF.bend"
             elif file == "quad-intersection.bend":
@@ -593,6 +605,8 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        bend(directory, "intersection-search-tests.bend", "--verdict")
+        print("Exact intersection search fixtures accepted: first hit, denominator validity, exterior skip, reversed cut, disjoint boxes and vertex contact")
         bend(directory, "segment-cut-tests.bend", "--verdict")
         print("Exact segment cut fixtures accepted: unequal gaps, unequal denominators, boundary endpoint, containment and valid membership")
         bend(directory, "quad-intersection-tests.bend", "--verdict")
