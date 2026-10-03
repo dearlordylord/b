@@ -1008,3 +1008,56 @@ unchanged. No real-number convexity or polygon/topology theorem is claimed.
 `taskset -c 7,11 ./regenerate.sh` passed with the five-second kernel limits;
 `git diff --exit-code -- b.svg` confirmed byte-identical output. Stages 2–4
 remain unfinished at the geometric and topological bridges described above.
+
+### Stage 2: quad corners inhabit their half-plane region
+
+[Quad model](quad-geometry.bend), [six laws](quad-geometry-laws.bend) and
+[proof root](QUAD_GEOMETRY_PROOF.bend) connect ordered quad corners to the
+previous rational-region model. Integer cover vertices embed with denominator
+**one**. Triangle-side comparisons are cyclically invariant, and the side
+comparison at either endpoint is exactly `EQ`. These statements include
+coincident points and degenerate triangles; no strictness premise is needed
+for the algebraic identities.
+
+`strict_quad_corners_inside` proves that all four embedded corners belong to
+the region whenever all four cyclic turns are strictly positive. It uses
+endpoint equalities for the two incident sides and cyclic invariance for the
+other two sides of each corner. `strict_quad_decoded` identifies this natural
+four-turn predicate with the existing Nat SAT model. Under the actual 12-bit
+quad-envelope premise, `production_corners_inside` derives the same corner
+membership from the production validator's accepted `strictly_convex` result.
+It reuses the established arithmetic bridge rather than assuming word
+comparisons are exact or silently omitting their bounds.
+
+[Nine literal fixtures](quad-geometry-tests.bend) cover a CCW square, clockwise
+orientation, collinearity and a necessary-fourth-turn counterexample. For
+`[(4,4),(8,4),(8,8),(2,3)]` the first three turns are positive, the fourth is
+negative, and the last corner lies outside the first side's closed half-plane.
+Thus a three-turn acceptance policy does not justify the corner theorem.
+
+Three compiling mutations change the embedding denominator to two, omit the
+fourth turn, and accept negative turns. They violate endpoint/cyclic semantics,
+corner soundness, and the production-decoding/corner contracts, respectively.
+Their first proof failures are `cyclic_fields`, the public
+`strict_quad_corners_inside` law, and `edge_turn`; the first and third are shared
+support lemmas. The theorem statements do not treat a clockwise quad as a
+CCW region or use a strict inequality to exclude boundary corners.
+
+This proves corners-in-region, not region-equals-hull or region-equals-SVG-fill.
+The convex-mixture theorem can now combine these corners, but the reverse
+inclusion, intersection characterization, independent enumeration and
+real-number/topological bridges remain open. Stages 2–4 are unfinished.
+
+Validation: `taskset -c 7,11 python3 -u check.py` passed all 202 public
+laws across 31 proof roots, nine new literal fixtures and the existing groups,
+141 compiling mutation controls and independent artifact checks. Implementer
+self-review found no violations of the stated contracts: it traced denominator
+one, cyclic determinant product order, both endpoint equalities, the two
+incident and two opposite side judgments for every corner, all four turn
+premises, the natural decoder and the production envelope bridge. The shared
+point/quad owners and exact arithmetic policies are reused. The future hull
+inclusion proof can consume corner membership together with rational convex
+mixture closure; reverse inclusion and topology are not assumed here.
+`taskset -c 7,11 ./regenerate.sh` passed with the existing five-second kernel
+limits, and `git diff --exit-code -- b.svg` confirmed byte-identical output.
+Stages 2–4 remain open at the bridges described above.

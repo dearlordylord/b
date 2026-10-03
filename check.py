@@ -52,6 +52,9 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ('quad-geometry.bend', 'G.P{x, y, 1n}', 'G.P{x, y, 2n}', 'cyclic_fields'),
+        ('quad-geometry.bend', '&& turn(d, a, b)', '&& True{}', 'strict_quad_corners_inside'),
+        ('quad-geometry.bend', 'Cmp.is_gt(side(a, b, c))', 'Cmp.is_lt(side(a, b, c))', 'edge_turn'),
         ('homogeneous-combination.bend', 'Nat.mul(u, l)', 'Nat.mul(u, k)', 'weighted_fields'),
         ('homogeneous-combination.bend', 'Nat.add(Nat.mul(y, k), Nat.mul(v, l))', 'Nat.mul(y, k)', 'weighted_fields'),
         ('homogeneous-combination.bend', 'Nat.add(Nat.mul(d, k), Nat.mul(e, l))', 'Nat.mul(d, k)', 'weighted_fields'),
@@ -207,6 +210,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif law in {"cyclic_fields", "strict_quad_corners_inside", "edge_turn"}:
+                proof_root = "QUAD_GEOMETRY_PROOF.bend"
             elif law in {"weighted_fields", "mixture_denominator_exact"}:
                 proof_root = "HOMOGENEOUS_COMBINATION_PROOF.bend"
             elif law in {"edge_values", "inside_halfplanes_decoded", "common_halfplanes_decoded"}:
@@ -419,6 +424,8 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        bend(directory, "quad-geometry-tests.bend", "--verdict")
+        print("Quad geometry fixtures accepted: corners, orientation, missing fourth turn and collinearity")
         bend(directory, "homogeneous-combination-tests.bend", "--verdict")
         print("Homogeneous combination fixtures accepted: unequal denominators, boundary, zero weights and affine mean")
         executable = directory / "search-witness-tests"
