@@ -52,6 +52,10 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ('triangle-area.bend', 'Nat.sub(positive(a, b, p), negative(a, b, p))', 'Nat.sub(negative(a, b, p), positive(a, b, p))', 'area_reconstruct'),
+        ('triangle-area.bend', '), area(a, b, p))', '), area(b, a, p))', 'area_sum_reconstruct'),
+        ('triangle-area.bend', 'area(a, b, Q.embed(c))', 'area(b, a, Q.embed(c))', 'triangle_area_positive'),
+        ('triangle-area.bend', 'Nat.add(Nat.mul(Nat.add(Nat.add(cx, ax), bx), y), Nat.mul(Nat.add(Nat.add(cy, ay), by), x))', 'Nat.mul(Nat.add(Nat.add(cx, ax), bx), y)', 'area_positive_cycle_fields'),
         ('quad-diagonal.bend', 'Region.edge(b, c, p)', 'Region.edge(c, b, p)', 'diagonal_split_choice'),
         ('quad-diagonal.bend', 'case N.Q{a, b, c, d}: Region.edge(a, c, p)', 'case N.Q{a, b, c, d}: Region.edge(c, a, p)', 'diagonal_split_choice'),
         ('quad-diagonal.bend', 'case N.Q{a, b, c, d}: triangle(a, c, d, p)', 'case N.Q{a, b, c, d}: triangle(a, d, c, p)', 'diagonal_split_choice'),
@@ -220,6 +224,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif law in {"area_reconstruct", "area_sum_reconstruct", "triangle_area_positive", "area_positive_cycle_fields"}:
+                proof_root = "TRIANGLE_AREA_PROOF.bend"
             elif law in {"diagonal_split_choice", "diagonal_strict_fields"}:
                 proof_root = "QUAD_DIAGONAL_PROOF.bend"
             elif law in {"quad_weighted_fields", "denominator_sum", "hull_point_inside", "hull_point_positive"}:
@@ -438,6 +444,8 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        bend(directory, "triangle-area-tests.bend", "--verdict")
+        print("Triangle area fixtures accepted: interior, vertex, fraction, outside saturation and zero denominator")
         bend(directory, "quad-diagonal-tests.bend", "--verdict")
         print("Quad diagonal fixtures accepted: both branches, closed boundary, fractions and typed splits")
         bend(directory, "quad-hull-tests.bend", "--verdict")

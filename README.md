@@ -1191,3 +1191,70 @@ barycentric weights or reverse hull inclusion are assumed in this increment.
 limits; `git diff --exit-code -- b.svg` confirmed byte-identical output.
 Stages 2–4 remain open at barycentric construction, reverse inclusion,
 intersection, enumeration and the real topological bridge.
+
+### Stage 2: oriented-area weights have an exact positive total
+
+[Area model](triangle-area.bend), [six laws](triangle-area-laws.bend) and
+[proof root](TRIANGLE_AREA_PROOF.bend) begin the barycentric construction for
+the selected triangle. Each weight is the corresponding directed area:
+`wA = area(B,C,p)`, `wB = area(C,A,p)`, `wC = area(A,B,p)`. The model reuses the
+existing two nonnegative determinant sums and computes their Nat difference.
+Here `area` uses the doubled-area convention and retains the homogeneous
+witness denominator; it is not an ordinary Euclidean area measurement.
+`area_reconstruct` proves that this difference is exact under the closed
+half-plane premise: adding back the negative sum gives the positive sum.
+Outside that premise Nat subtraction may saturate, so these weights alone do
+not establish triangle membership.
+
+The two cycle laws regroup all nine determinant terms. The positive and
+negative totals have the same coordinate-dependent common part; their
+remaining parts are the triangle's positive/negative determinant sums times
+the witness denominator. The proof transposes three rows of three terms,
+distributes products, rotates sums and uses the already proved Nat cancellation
+facts. It adds no signed-number or area axiom.
+
+For a positive triangle turn and a point passing all three closed triangle
+half-planes, `triangle_weights_total` proves exactly
+`wA + wB + wC = denominator(p) * area(A,B,C)`.
+`triangle_area_positive` proves the triangle's directed area is positive,
+and `triangle_weights_positive` combines this with a positive point denominator
+to prove a nonzero total. Individual weights may be zero on edges and corners.
+The total identity also covers a zero denominator algebraically, but the
+positivity theorem requires its separate explicit validity premise.
+
+[Ten fixture judgments/constructions](triangle-area-tests.bend) cover interior
+weights, a vertex's zero weights, an unreduced fraction, positivity through the
+public theorem, outside saturation and zero denominator. For
+`A=(1,1), B=(5,1), C=(1,5)`, the whole directed area is 16; `(2,2,1)` has weights
+`(8,4,4)` and `(4,4,2)` has total 32. The outside point `(6,6,1)` fails the
+triangle predicate and its saturated weights total 40, demonstrating why
+half-plane premises cannot be dropped.
+
+Four compiling mutations reverse subtraction, reverse the third weight's
+side, reverse the whole triangle's orientation and omit a common-coordinate
+term. They fail at the public `area_reconstruct` law, shared
+`area_sum_reconstruct`, public `triangle_area_positive`, and shared
+`area_positive_cycle_fields`, respectively. Each changes a true stated
+arithmetic/geometry contract into a false one; noncompiling mutations are
+excluded from the gate.
+
+The area weights have not yet been proved to reconstruct the point's x/y
+coordinates. Those two identities are required to turn the weights into the
+`InHull` witness and finish region-to-hull inclusion. Intersection
+characterization, independent enumeration and the real topological bridge
+remain open; stages 2–4 are unfinished.
+
+Validation: `taskset -c 7,11 python3 -u check.py` passed all 219 public
+laws across 34 proof roots, ten new fixture judgments/constructions and the
+existing groups, 155 compiling mutation controls and independent artifact
+checks. Implementer self-review found no violations of the stated contracts:
+it traced each directed weight, the subtraction guard, determinant column
+regrouping, the shared coordinate part, both Nat cancellations, strict triangle
+orientation, individual zero weights, positive point denominator and outside
+saturation. Existing determinant, order, cyclic, distribution and cancellation
+owners are reused. The future coordinate-reconstruction proof can consume the
+exact total and nonzero result without assuming either x/y identity.
+`taskset -c 7,11 ./regenerate.sh` passed with the existing five-second kernel
+limits; `git diff --exit-code -- b.svg` confirmed byte-identical output.
+Stages 2–4 remain open at x/y reconstruction, reverse inclusion, intersection,
+independent enumeration and the actual topological bridge.
