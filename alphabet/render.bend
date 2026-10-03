@@ -144,4 +144,4 @@ def glyph(glyph: M.Glyph) -> String:
 def standalone(+item: M.Glyph) -> String:
   match item:
     case M.Glyph{key, +advance, offset, components, holes, arms, painting}:
-      "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"" ++ Nat.show(Nat.div(advance, 100n)) ++ "\" height=\"190\" viewBox=\"0 0 " ++ Nat.show(advance) ++ " 19000\">\n" ++ glyph(item) ++ "</svg>\n"
+      "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"" ++ Nat.show(Nat.div(advance, 100n)) ++ "\" height=\"190\" viewBox=\"0 0 " ++ Nat.show(advance) ++ " 19000\">\n" ++ glyph(item) ++ "</svg>"
