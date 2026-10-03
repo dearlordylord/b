@@ -52,6 +52,11 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ("topology.bend", "case P{x, y}: W{x, y, 1}", "case P{x, y}: W{x, y, 0}", "vertex_witness_exact"),
+        ("sample-arithmetic.bend", "Nat.sub(64n, n)", "Nat.add(64n, n)", "numerator_limit"),
+        ("sample-arithmetic.bend", "Word.sub(bits, sixty_four, n)", "Word.add(bits, sixty_four, n)", "sample_finish"),
+        ("topology.bend", "+m = U32.sub(64, n)", "+m = U32.add(64, n)", "guarded_sample_exact"),
+        ("topology.bend", "W{(x * m + u * n : U32), (y * m + v * n : U32), 64}", "W{(x * m + u * n : U32), (y * m + v * n : U32), 63}", "guarded_sample_exact"),
         ("topology.bend", "Nat.is_eq(Nat.mod(x, 4n), 0n)", "True{}", "accepted_point_unrounded"),
         ("grid-scaling.bend", "Nat.mul(U32.to_nat(x), 4n)", "Nat.mul(U32.to_nat(x), 3n)", "unrounded_point"),
         ("grid-scaling.bend", "Nat.is_le(U32.to_nat(x), W.capacity(width)) && Nat.is_le(U32.to_nat(y), W.capacity(width))", "Nat.is_le(U32.to_nat(x), W.capacity(0n)) && Nat.is_le(U32.to_nat(y), W.capacity(0n))", "scaled_envelope"),
@@ -118,6 +123,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif law in {"numerator_limit", "sample_finish", "guarded_sample_exact", "vertex_witness_exact"}:
+                proof_root = "SAMPLE_ARITHMETIC_PROOF.bend"
             elif law in {"accepted_point_unrounded", "unrounded_point", "scaled_envelope"}:
                 proof_root = "GRID_SCALING_PROOF.bend"
             elif law == "topology_scaled_exact":
@@ -144,6 +151,23 @@ def negative_controls(directory):
                 proof_root = "ARITHMETIC_PROOF.bend"
             output = bend(directory, proof_root, success=False)
             assert law in output, output
+            if law == "numerator_limit":
+                (directory / "sample-counter.bend").write_text(
+                    "import Base\nimport ./sample-arithmetic.bend as M\nimport ./word-arithmetic.bend as W\n"
+                    "def premises() -> {Nat.is_le(1n, W.capacity(0n)) && Nat.is_le(64n, 64n) == True{} : Bool}:\n  {==}\n"
+                    "def broken_bound() -> {Nat.is_le(M.numerator(1n, 1n, 64n), W.capacity(6n)) == False{} : Bool}:\n  {==}\n")
+                bend(directory, "sample-counter.bend", "--verdict")
+            if law == "guarded_sample_exact":
+                expression = ("Nat.is_eq(x_coordinate(T.sample(T.P{1, 2}, T.P{3, 4}, 32)), M.numerator(1n, 3n, 32n))"
+                              if old == "+m = U32.sub(64, n)" else
+                              "Nat.is_eq(denominator(T.sample(T.P{1, 2}, T.P{3, 4}, 32)), 64n)")
+                (directory / "sample-production-counter.bend").write_text(
+                    "import Base\nimport ./sample-arithmetic.bend as M\nimport ./grid-scaling.bend as G\nimport ./topology.bend as T\n"
+                    "def x_coordinate(w: T.Witness) -> Nat:\n  match w:\n    case T.W{x, y, d}: U32.to_nat(x)\n"
+                    "def denominator(w: T.Witness) -> Nat:\n  match w:\n    case T.W{x, y, d}: U32.to_nat(d)\n"
+                    "def premises() -> {G.envelope(12n, T.P{1, 2}) && G.envelope(12n, T.P{3, 4}) && U32.is_le(32, 64) == True{} : Bool}:\n  {==}\n"
+                    f"def wrong_value() -> {{{expression} == False{{}} : Bool}}:\n  {{==}}\n")
+                bend(directory, "sample-production-counter.bend", "--verdict")
             if law == "accepted_point_unrounded":
                 (directory / "grid-counter.bend").write_text(
                     "import Base\nimport ./topology.bend as T\nimport ./core.bend as C\n"
@@ -264,6 +288,8 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        bend(directory, "sample-arithmetic-tests.bend", "--verdict")
+        print("Production sampled-witness endpoints, interior points and envelopes accepted")
         bend(directory, "grid-scaling-tests.bend", "--verdict")
         print("Production grid filter, exact round-trip and envelope fixtures accepted")
         bend(directory, "scaled-coordinate-tests.bend", "--verdict")

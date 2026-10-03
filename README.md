@@ -30,7 +30,7 @@ python3 check.py
 `generate.bend`, checks the emitted SVG, and replaces `b.svg` only on success.
 The generator itself refuses to emit an SVG if its Bend artwork validation fails.
 
-`check.py` runs the 91-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 101-law proof gate, 200 literal arithmetic checks,
 seven executed validator boundary checks, three executed transverse cases,
 compiling mutations that must fail
 proofs, invalid artworks that must be rejected before SVG emission, and Bend
@@ -169,7 +169,7 @@ proofs; its original license is retained in `LICENSE.mathlib`. See [NOTICE](NOTI
 ## Arithmetic programme (in progress)
 
 [ROADMAP.md](ROADMAP.md) records the autonomous four-stage programme. The
-current BendTT gate checks **91 unique public laws**, plus supporting lemmas.
+current BendTT gate checks **101 unique public laws**, plus supporting lemmas.
 Arithmetic results quantify over all inputs at arbitrary word widths; the U32
 operation laws cover every 32-bit constructor payload.
 
@@ -271,10 +271,10 @@ model must give the independently specified Boolean result, with all point
 guards satisfied.
 
 `proof-roots.txt` lists the structural, arithmetic, transverse and absolute
-difference, squared-width, centroid, division, dot, witness-arithmetic scaled-coordinate and grid-scaling proof roots.
+difference, squared-width, centroid, division, dot, witness-arithmetic, scaled-coordinate, grid-scaling and sample-arithmetic proof roots.
 Both `check.py` and `regenerate.sh` audit that every public law module is
 reachable, then check every root, with five seconds per kernel invocation.
-The roots share supporting proofs; the 91-law total counts
+The roots share supporting proofs; the 101-law total counts
 each public law once. Dependency-only imports of unrelated proof groups have
 been removed; a dedicated division root explicitly retains division and its
 subtraction/complement prerequisites. No previously checked law is omitted. The absolute-difference root proves
@@ -365,8 +365,36 @@ kernel invocation retained its five-second limit. The filter counterexample
 was checked by the real BendTT kernel in the mutated source tree.
 `regenerate.sh` also passed every root and preserved the SVG byte for byte.
 
-**Stage 1 remains incomplete:** sampled-witness generation still needs
-exact-model agreement and proof of its output envelopes. Intersection
+The sample-arithmetic root adds ten public laws. Weights `(64-n)` and `n`
+sum to 64 under `n<=64`. For coordinates bounded by `2^width`, their weighted
+numerator is bounded by `64*2^width`, including both endpoints. At width12,
+this proves that the actual ordered subtraction, multiplications and addition
+fit U32 and agree with natural arithmetic. The production `topology.sample`
+returns the exact two numerators and denominator 64. Accepted point envelopes
+and the actual `U32.is_le(n,64)` predicate suffice; callers supply no overflow
+premises. Its output satisfies the numerator/denominator envelopes used by
+homogeneous side comparison proofs. Vertex witnesses preserve their
+coordinates, have denominator 1, and satisfy the same envelopes. Natural
+search indices `n<=fuel<=63` convert `1+n` to a U32 weight accepted at 64.
+This is an index arithmetic law, not yet a proof of the complete search.
+Ten fixtures cover endpoints, midpoint, final interior sample, output bounds,
+simultaneous scalar envelope limits, vertex witnesses and index extremes.
+Five compiling mutations alter weights, word subtraction, actual subtraction,
+the sample denominator or the vertex denominator; every mutant is rejected.
+The weight-model mutant is independently falsified at the scalar envelope
+boundary with `a=b=1` and `n=64`. The production weight and denominator
+mutants also have kernel-checked concrete counterexamples whose point and
+weight guards hold.
+
+Validation of the sample-arithmetic milestone: the ordinary complete
+`python3 check.py` passed all 101 unique laws across twelve roots, every
+fixture group, all 54 compiling mutations and independent SVG geometry and
+topology checks. No kernel invocation exceeded the retained five-second limit.
+`regenerate.sh` also passed all twelve roots and preserved the SVG byte for byte.
+
+**Stage 1 remains incomplete:** audit and connect the witness envelopes to
+the actual side-call preconditions and all bounded search callers. Full
+intersection/search soundness remains part of stage 2. Intersection
 correctness, enumeration correctness and the formal topological bridge in stages 2–4 are also outstanding. Finite artwork
 checks and the externally justified topology certificate remain as described
 above; they are not substitutes for these universal proofs.

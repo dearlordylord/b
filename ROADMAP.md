@@ -113,6 +113,12 @@ are established. Partial milestones do not complete the objective.
   grid filter entails unrounded scaling and the accepted scaled-point
   envelopes used by homogeneous comparison proofs.
 
-Still required for stage 1: prove exact sampled-witness generation and its
-output envelopes.
+- Weight partition and numerator bounds prove exact production sampling,
+  including its denominator 64 and output envelopes. Actual point envelopes
+  and the U32 weight predicate imply these results. Vertex witnesses are
+  exact with denominator 1 and satisfy the same envelopes. Bounded natural
+  search indices convert to accepted U32 weights.
+
+Still required for stage 1: audit and connect generated witness envelopes to
+actual side-call preconditions and bounded search callers.
 Stages 2–4 remain uncompleted.
