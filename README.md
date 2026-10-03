@@ -30,7 +30,7 @@ python3 check.py
 `generate.bend`, checks the emitted SVG, and replaces `b.svg` only on success.
 The generator itself refuses to emit an SVG if its Bend artwork validation fails.
 
-`check.py` runs the 62-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 64-law proof gate, 200 literal arithmetic checks,
 seven executed validator boundary checks, compiling mutations that must fail
 proofs, invalid artworks that must be rejected before SVG emission, and Bend
 and independent Python topology fixtures. Python checks the output artifact;
@@ -168,7 +168,7 @@ proofs; its original license is retained in `LICENSE.mathlib`. See [NOTICE](NOTI
 ## Arithmetic programme (in progress)
 
 [ROADMAP.md](ROADMAP.md) records the autonomous four-stage programme. The
-current BendTT gate checks **62 public laws**, plus supporting lemmas.
+current BendTT gate checks **64 public laws**, plus supporting lemmas.
 Arithmetic results quantify over all inputs at arbitrary word widths; the U32
 operation laws cover every 32-bit constructor payload.
 
@@ -204,11 +204,16 @@ The proved arithmetic foundations are:
   exact determinant sums, including positive, negative and zero orientations.
   A further law derives its premises directly from acceptance by the actual
   `point_bounded` filter for the three source points.
+- The actual production two-product `dot` expression agrees with the exact
+  Nat dot product for every guarded pair of points. Its guard can likewise
+  be supplied as acceptance by the production point filter.
+  The sums of two dot products used by transversality remain outstanding.
 
 The `word-*.bend` modules define these models, laws, proofs and fixtures;
 `arithmetic-*-proof.bend` contains supporting order and product algebra.
-The `coordinate-sum-*` and `coordinate-runtime-*` modules prove the source
-guards and their connection to the production determinant.
+The `coordinate-sum-*`, `coordinate-runtime-*` and `coordinate-dot-*` modules
+prove the source guards and their connection to the production determinant
+and dot expression.
 Fixtures invoke the theorems, cover all three-bit comparisons and complements,
 and include a bounded product whose unused shift overflows. Compiling mutations
 must fail the corresponding proof gate. The subtraction comparison-selector
@@ -216,7 +221,8 @@ mutant fails in the shared `carry_step` lemma; the division remainder mutant
 fails in `bit_division_step`; the product-operation mutant fails in `sum3_finish`.
 Changing the production determinant comparator from greater-than to
 less-or-equal is rejected in `guarded_determinant`; bypassing the actual
-point-range filter is rejected in `accepted_points_determinant`.
+point-range filter is rejected in `accepted_points_determinant`. Substituting
+a wrong coordinate in the production dot expression fails `guarded_dot_exact`.
 The coordinate-sum mutant multiplies the sum by eight, making its bound
 false at the maximum coordinates; it fails in `sum_width_bound`.
 These are shared-lemma rejections, rather than

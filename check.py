@@ -40,6 +40,7 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ("validation.bend", "U32.from_nat(x) * U32.from_nat(z) + U32.from_nat(y) * U32.from_nat(w)", "U32.from_nat(x) * U32.from_nat(w) + U32.from_nat(y) * U32.from_nat(z)", "guarded_dot_exact"),
         ("validation.bend", "Nat.is_le(x, 16000n) && Nat.is_le(y, 16000n)", "True{}", "accepted_points_determinant"),
         ("validation.bend", "U32.is_gt(Arithmetic.u32_sum3(x, v, u, s, r, y), Arithmetic.u32_sum3(y, u, v, r, s, x))", "U32.is_le(Arithmetic.u32_sum3(x, v, u, s, r, y), Arithmetic.u32_sum3(y, u, v, r, s, x))", "guarded_determinant"),
         ("coordinate-sum.bend", "Nat.add(Nat.add(Nat.mul(a, b), Nat.mul(c, d)), Nat.mul(e, f))", "Nat.mul(8n, Nat.add(Nat.add(Nat.mul(a, b), Nat.mul(c, d)), Nat.mul(e, f)))", "sum_width_bound"),
@@ -196,7 +197,9 @@ if __name__ == "__main__":
         for file in HERE.glob("*.bend"):
             shutil.copy2(file, directory / file.name)
         bend(directory, "PROOF.bend", "--verdict")
-        print("BendTT: all 62 public laws accepted")
+        print("BendTT: all 64 public laws accepted")
+        bend(directory, "coordinate-dot-tests.bend", "--verdict")
+        print("Guarded production dot-product fixtures accepted")
         bend(directory, "coordinate-runtime-tests.bend", "--verdict")
         print("Guarded production U32 sum and determinant fixtures accepted")
         bend(directory, "coordinate-sum-tests.bend", "--verdict")

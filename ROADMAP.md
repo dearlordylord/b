@@ -76,6 +76,9 @@ are established. Partial milestones do not complete the objective.
   and three-product helper to the exact Nat sum. The production determinant
   comparison agrees with the exact orientation for every guarded input.
 
+- The production two-product dot expression is exact for all accepted
+  source points. Four-product transverse comparisons still need their bound.
+
 Still required for stage 1: connect the other production geometric expressions
 (squared widths, centroids, transverse dot comparisons and homogeneous
 topology witnesses) to their exact models. Stages 2–4 remain uncompleted.
