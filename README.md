@@ -1130,3 +1130,64 @@ inclusion or topology is assumed by the present proof.
 limits; `git diff --exit-code -- b.svg` confirmed byte-identical output.
 Stages 2–4 remain unfinished at the reverse-inclusion, intersection, enumeration
 and topology bridges stated above.
+
+### Stage 2: region points split into diagonal triangles
+
+[Diagonal model](quad-diagonal.bend), [four laws](quad-diagonal-laws.bend) and
+[proof root](QUAD_DIAGONAL_PROOF.bend) construct a checked triangle choice for
+an arbitrary point passing all four quad half-planes. `Split<q,p>` carries an
+ABC or ACD tag, a proof that the actual diagonal decision selected that tag,
+and a proof of membership in that triangle's **three closed half-planes**.
+The decision uses side AC; nonnegative side selects ACD, and negative side
+selects ABC. A point on AC therefore selects ACD while belonging to both
+closed triangle regions.
+
+`opposite_closed_halfplane` proves that failure of a directed closed half-plane
+implies membership in its reverse. It reuses the established determinant-sum
+reversal identities and proves the comparison implication by Nat induction.
+`region_diagonal_split` uses that result for the ABC branch and the original
+AC half-plane for the ACD branch. Its four input side judgments are extracted
+from the existing region predicate; no convexity assumption is needed for
+this implication. It does not assert that either triangle region is contained
+in the quad region for an arbitrary ordered quad.
+
+`strict_diagonal_triangles` separately derives positive orientation of both
+ABC and ACD from the quad's four strict turns, using the proved cyclic identity.
+The production split theorem applies the exact bounded `inside`/region bridge
+to a word witness under the actual 12-bit quad and witness envelopes. Its
+conclusion is the natural-coordinate split; positivity of a rational witness
+remains an additional requirement, supplied by accepted-search witness laws.
+The polynomial split theorem also applies to denominator-zero inputs, and
+does not interpret those inputs as points in the rational plane.
+
+[Thirteen fixture judgments/constructions](quad-diagonal-tests.bend) cover
+points strictly on either side of AC, the diagonal boundary, both closed
+triangle predicates, both strict turns, an unreduced fraction and concrete
+applications of the tagged split theorem. Four compiling mutations reverse a
+triangle side, reverse the diagonal decision, reverse the ACD corner order and
+reverse its strict turn. The first three fail at shared `diagonal_split_choice`,
+the last at shared `diagonal_strict_fields`. Each violates the corresponding
+public split/orientation contract; the reported failure locations remain shared
+support lemmas, not individual public-law sections.
+
+This prepares region-to-hull inclusion: the selected positively oriented
+triangle still needs a proved barycentric-weight construction for an arbitrary
+positive-denominator point in its three half-planes. That construction and the
+reverse inclusion remain unfinished, followed by intersection characterization,
+independent enumeration and the real topological bridge. Stages 2–4 stay open.
+
+Validation: `taskset -c 7,11 python3 -u check.py` passed all 213 public
+laws across 33 proof roots, thirteen new fixture judgments/constructions and
+the existing groups, 151 compiling mutation controls and independent artifact
+checks. Implementer self-review found no violations of the stated contracts:
+it checked opposite determinant sums, strict failure versus closed inclusion,
+AC/CA direction, ABC/ACD vertex order, all three triangle predicates, the
+closed-boundary tie, tagged decision evidence, both strict orientations and
+production envelope premises. Existing point, region, cyclic-orientation and
+exact-arithmetic owners are reused. The future barycentric construction can
+consume the tagged triangle judgment and strict-turn result directly; no
+barycentric weights or reverse hull inclusion are assumed in this increment.
+`taskset -c 7,11 ./regenerate.sh` passed with the existing five-second kernel
+limits; `git diff --exit-code -- b.svg` confirmed byte-identical output.
+Stages 2–4 remain open at barycentric construction, reverse inclusion,
+intersection, enumeration and the real topological bridge.

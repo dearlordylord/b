@@ -52,6 +52,10 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ('quad-diagonal.bend', 'Region.edge(b, c, p)', 'Region.edge(c, b, p)', 'diagonal_split_choice'),
+        ('quad-diagonal.bend', 'case N.Q{a, b, c, d}: Region.edge(a, c, p)', 'case N.Q{a, b, c, d}: Region.edge(c, a, p)', 'diagonal_split_choice'),
+        ('quad-diagonal.bend', 'case N.Q{a, b, c, d}: triangle(a, c, d, p)', 'case N.Q{a, b, c, d}: triangle(a, d, c, p)', 'diagonal_split_choice'),
+        ('quad-diagonal.bend', 'Q.turn(a, c, d)', 'Q.turn(a, d, c)', 'diagonal_strict_fields'),
         ('quad-hull.bend', 'Q.embed(d), m, n)', 'Q.embed(d), m, 0n)', 'quad_weighted_fields'),
         ('quad-hull.bend', 'm, n), 1n, 1n)', 'm, n), 1n, 0n)', 'quad_weighted_fields'),
         ('quad-hull.bend', 'Q.embed(b), k, l)', 'Q.embed(b), l, k)', 'quad_weighted_fields'),
@@ -216,6 +220,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif law in {"diagonal_split_choice", "diagonal_strict_fields"}:
+                proof_root = "QUAD_DIAGONAL_PROOF.bend"
             elif law in {"quad_weighted_fields", "denominator_sum", "hull_point_inside", "hull_point_positive"}:
                 proof_root = "QUAD_HULL_PROOF.bend"
             elif law in {"cyclic_fields", "strict_quad_corners_inside", "edge_turn"}:
@@ -432,6 +438,8 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        bend(directory, "quad-diagonal-tests.bend", "--verdict")
+        print("Quad diagonal fixtures accepted: both branches, closed boundary, fractions and typed splits")
         bend(directory, "quad-hull-tests.bend", "--verdict")
         print("Quad hull fixtures accepted: four weights, zero pairs, positivity and alternate fraction witness")
         bend(directory, "quad-geometry-tests.bend", "--verdict")
