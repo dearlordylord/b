@@ -2226,7 +2226,7 @@ supply geometry and representation transport. The later source-provenance
 consumer still needs endpoint coefficients and boundary labels, including
 metadata swaps in reversed mixed cases. No source-provenance, complete search,
 enumeration or topology theorem is inferred from this traversal. Full
-integrated validation and regeneration are pending for this checkpoint.
+integrated validation and regeneration passed for this checkpoint.
 Stages 2–4 remain open; the trusted Base/compiler boundary is unchanged.
 The production generator and intersection search do not yet consume this
 iterator; source-provenance and candidate-completeness bridges are still needed.
@@ -2251,8 +2251,8 @@ exited 0 with 331 unique root-level public laws across 49 roots, all fixture
 groups and 247 compiling mutation controls. Invalid-artwork, SVG corruption
 and independent topology controls passed. Exact finite artifact checks still
 report 3 tubes, 96 convex cells, 24 seams, one component, two holes and Euler
--1 (simplex counts [96,146,64,15]). Regeneration is pending. The two earlier
-failed integrated attempts remain recorded as failed attempts. These checks
+-1 (simplex counts [96,146,64,15]). The subsequent regeneration also passed.
+The two earlier failed integrated attempts remain recorded as failed attempts. These checks
 cover the root-level B generator and proof core, not the separate alphabet
 work added concurrently in commit `921c842`.
 
@@ -2260,4 +2260,14 @@ Publication checkpoint: the walk proof root and all three walk fixture groups
 were rechecked successfully with the unchanged five-second limit. All thirteen
 walk mutants compiled, failed their public-law proof, and passed the literal
 refutation check. Complete integrated validation remains pending as recorded
-above; publication of this checkpoint does not claim a full-suite pass.
+above at publication of that checkpoint. The later completed full-suite and
+regeneration evidence is recorded below.
+
+
+Verified walk regeneration: `sh -x ./regenerate.sh` exited 0, with all 49
+real BendTT roots accepted at the unchanged five-second limit, bounded native
+C emission/Clang compilation, execution and independent geometry/topology
+checks. `git diff --exit-code -- b.svg` confirms byte-for-byte preservation.
+The implementer self-review found no additional contract violations in this
+traversal slice. This is a verified stage-2 checkpoint, not completion of
+intersection completeness, independent enumeration or the topology bridge.
