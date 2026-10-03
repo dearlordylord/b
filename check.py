@@ -40,6 +40,8 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ("word-division4.bend", "WCon{second(p, t), quotient(p, t)}", "WCon{head(p, t), quotient(p, t)}", "division4_loop_bits"),
+        ("word-division4.bend", "case True{} True{}: 3", "case True{} True{}: 2", "bit_division_step"),
         ("word-subtraction.bend", "W.add_carry(n, a, Word.not(n, b), c)", "W.add_carry(n, a, b, c)", "subtraction_low_agrees"),
         ("word-subtraction.bend", "case EQ{}: c", "case EQ{}: True{}", "carry_step"),
         ("word-subtraction.bend", "Word.sub(n, a, b)", "Word.add(n, a, b)", "ordered_subtraction"),
@@ -178,7 +180,9 @@ if __name__ == "__main__":
         for file in HERE.glob("*.bend"):
             shutil.copy2(file, directory / file.name)
         bend(directory, "PROOF.bend", "--verdict")
-        print("BendTT: all 49 public laws accepted")
+        print("BendTT: all 55 public laws accepted")
+        bend(directory, "word-division4-tests.bend", "--verdict")
+        print("Actual division-by-four, quotient and remainder fixtures accepted")
         bend(directory, "word-subtraction-tests.bend", "--verdict")
         print("Ordered subtraction, borrow and wrapping-boundary fixtures accepted")
         bend(directory, "word-comparison-tests.bend", "--verdict")
@@ -201,7 +205,7 @@ if __name__ == "__main__":
         print("Bend topology fixtures accepted")
         print(f"Literal arithmetic checks: {literal_checks(directory)} accepted")
         print(f"Compiling mutations rejected by the proof gate: {negative_controls(directory)}")
-        print("Note: subtraction comparison-selector mutant fails in shared carry_step lemma")
+        print("Note: selector/remainder mutants fail in shared carry_step/bit_division_step lemmas")
         print(f"Invalid artworks rejected by Bend before SVG emission: {bend_artwork_negative_controls(directory)}")
     root = ET.parse(HERE / "b.svg").getroot()
     print("Independent exact SVG geometry:", verify(root))

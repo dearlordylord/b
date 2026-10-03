@@ -7,3 +7,6 @@ The source license is retained in LICENSE.mathlib.
 
 subtraction-algebra-proof.bend contains additional selected cancellation
 facts derived from bendlib bend-mathlib/nat.bend, under LICENSE.mathlib.
+
+word-division4-proof.bend includes the quotient-shift loop fact derived
+from bendlib bend-mathlib/nat.bend, under LICENSE.mathlib.

@@ -63,6 +63,8 @@ are established. Partial milestones do not complete the objective.
 - Subtraction carry characterizes the borrow; ordered Word/U32 subtraction
   agrees with exact Nat subtraction.
 
-Still required for stage 1: prove division,
-instantiate the arithmetic bounds for geometry, and connect each production
+- Actual division by four, its quotient/remainder and agreement with Nat.div
+  are proved. Four is the only U32 divisor used by the generator.
+
+Still required for stage 1: instantiate the arithmetic bounds for geometry, and connect each production
 geometric expression to its exact model. Stages 2–4 remain uncompleted.
