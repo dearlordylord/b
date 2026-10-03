@@ -856,3 +856,40 @@ correct. Stage 2 must establish the polygon/half-plane and intersection/
 witness meanings; stage 3 must establish independent enumeration of the
 intended complex; stage 4 must prove the topological bridge. The complete
 four-stage objective remains unfinished.
+
+### Stage 2: homogeneous witness representation
+
+[Model](homogeneous-geometry.bend), [eight laws](homogeneous-geometry-laws.bend)
+and [proof root](HOMOGENEOUS_GEOMETRY_PROOF.bend) establish representation
+invariance for nonnegative rational coordinates. A point stores `(x, y, d)`;
+its rational interpretation requires `d > 0`. `scale(p, k)` multiplies all
+three fields by **1 + k**, not by k. The signed-side comparison and closed
+left-half-plane predicate are invariant under this positive scaling and under
+any equivalent pair of positive-denominator representations, including pairs
+that are not integer multiples of each other. Equivalence checks both cross
+products. The proof passes through equal common-denominator points and proves
+positive-product comparison by induction, without a division axiom.
+
+The side and half-plane predicates here are homogeneous polynomial definitions;
+no real-number plane or quotient type is introduced. This is an algebraic
+representation result. It does not yet establish polygon
+membership, intersection completeness, geometric witness correctness, or the
+connection to the topology of the SVG. Stages 2–4 remain unfinished.
+
+Three compiling mutation controls change denominator scaling, allow zero
+denominators, or omit the y-coordinate equivalence test. Each violates at least
+one representation contract. The proof gate rejects them at `scaled_side`,
+`denominator_scale`, and `equivalent_scaled`, respectively; these are the first
+proof incompatibilities, not necessarily the violated public theorem itself.
+For example, accepting zero denominators permits inequivalent side results for
+`(0,1,0)` and `(0,0,0)` despite equal cross products. Dropping the y test admits
+`(0,0,1)` and `(0,1,1)`, which lie on different sides of the horizontal boundary.
+
+Validation: `taskset -c 7,11 python3 -u check.py` passed all 183 public
+laws across 28 roots, existing fixture groups, 131 compiling mutation controls
+and independent artifact checks. `taskset -c 7,11 ./regenerate.sh` passed and
+`git diff --exit-code -- b.svg` confirmed byte-identical output. Implementer
+self-review covered zero-denominator rejection, positive scaling, both cross
+products, equal common-denominator construction, the two side-polynomial
+operands, and honest proof/mutation scope. No findings; the remaining geometric
+and topological bridges are explicitly outside this increment.

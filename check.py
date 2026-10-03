@@ -52,6 +52,9 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ('homogeneous-geometry.bend', 'Nat.mul(d, 1n+k)}', 'd}', 'scaled_side'),
+        ('homogeneous-geometry.bend', 'Nat.is_gt(d, 0n)', 'True{}', 'denominator_scale'),
+        ('homogeneous-geometry.bend', '&& Nat.is_eq(Nat.mul(y, e), Nat.mul(v, d))', '&& True{}', 'equivalent_scaled'),
         ('natural-cover.bend', 'Nat.div(x, 4n), Nat.div(y, 4n)', 'Nat.div(x, 3n), Nat.div(y, 4n)', 'scaled_fields'),
         ('natural-cover.bend', 'scaled(C.boundary_left(b)), scaled(C.boundary_right(b))', 'scaled(C.boundary_right(b)), scaled(C.boundary_left(b))', 'raw_cell_decoded'),
         ('natural-cover.bend', 'Cmp.is_gt(Side.exact_side(ax, ay, bx, by, cx, cy, 1n))', 'Cmp.is_lt(Side.exact_side(ax, ay, bx, by, cx, cy, 1n))', 'orientation_decoded'),
@@ -197,6 +200,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif law in {"scaled_side", "denominator_scale", "equivalent_scaled"}:
+                proof_root = "HOMOGENEOUS_GEOMETRY_PROOF.bend"
             elif law in {"scaled_fields", "raw_cell_decoded", "orientation_decoded", "cells_walk_decoded", "cells_tail_decoded", "cells_decoded"}:
                 proof_root = "NATURAL_COVER_PROOF.bend"
             elif law in {"source_accepted_fields", "source_gate_exact", "source_valid_arithmetic_exact"}:
