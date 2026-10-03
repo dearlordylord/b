@@ -1,0 +1,367 @@
+{
+  "shared_proof_gate": true,
+  "shared_public_laws": 299,
+  "shared_proof_roots": 46,
+  "compiling_seam_mutants_rejected": 3,
+  "native_boundary_cases": 19,
+  "empty_generator_rejected": true,
+  "svg_negative_controls": 114,
+  "glyphs": [
+    {
+      "key": "B",
+      "arms": 3,
+      "cells": 96,
+      "seams": 16,
+      "components": 1,
+      "holes": 2,
+      "nerve": {
+        "components": 1,
+        "holes": 2,
+        "euler": -1,
+        "simplices": [
+          96,
+          146,
+          64,
+          15
+        ]
+      }
+    },
+    {
+      "key": "D",
+      "arms": 2,
+      "cells": 163,
+      "seams": 13,
+      "components": 1,
+      "holes": 1,
+      "nerve": {
+        "components": 1,
+        "holes": 1,
+        "euler": 0,
+        "simplices": [
+          163,
+          221,
+          97,
+          39
+        ]
+      }
+    },
+    {
+      "key": "E",
+      "arms": 4,
+      "cells": 153,
+      "seams": 12,
+      "components": 1,
+      "holes": 0,
+      "nerve": {
+        "components": 1,
+        "holes": 0,
+        "euler": 1,
+        "simplices": [
+          153,
+          292,
+          244,
+          104
+        ]
+      }
+    },
+    {
+      "key": "H",
+      "arms": 3,
+      "cells": 140,
+      "seams": 11,
+      "components": 1,
+      "holes": 0,
+      "nerve": {
+        "components": 1,
+        "holes": 0,
+        "euler": 1,
+        "simplices": [
+          140,
+          281,
+          252,
+          110
+        ]
+      }
+    },
+    {
+      "key": "N",
+      "arms": 3,
+      "cells": 166,
+      "seams": 9,
+      "components": 1,
+      "holes": 0,
+      "nerve": {
+        "components": 1,
+        "holes": 0,
+        "euler": 1,
+        "simplices": [
+          166,
+          332,
+          270,
+          103
+        ]
+      }
+    },
+    {
+      "key": "O",
+      "arms": 1,
+      "cells": 151,
+      "seams": 12,
+      "components": 1,
+      "holes": 1,
+      "nerve": {
+        "components": 1,
+        "holes": 1,
+        "euler": 0,
+        "simplices": [
+          151,
+          151
+        ]
+      }
+    },
+    {
+      "key": "R",
+      "arms": 3,
+      "cells": 171,
+      "seams": 11,
+      "components": 1,
+      "holes": 1,
+      "nerve": {
+        "components": 1,
+        "holes": 1,
+        "euler": 0,
+        "simplices": [
+          171,
+          327,
+          267,
+          111
+        ]
+      }
+    },
+    {
+      "key": "S",
+      "arms": 1,
+      "cells": 148,
+      "seams": 12,
+      "components": 1,
+      "holes": 0,
+      "nerve": {
+        "components": 1,
+        "holes": 0,
+        "euler": 1,
+        "simplices": [
+          148,
+          147
+        ]
+      }
+    },
+    {
+      "key": "a",
+      "arms": 2,
+      "cells": 129,
+      "seams": 7,
+      "components": 1,
+      "holes": 1,
+      "nerve": {
+        "components": 1,
+        "holes": 1,
+        "euler": 0,
+        "simplices": [
+          129,
+          229,
+          169,
+          69
+        ]
+      }
+    },
+    {
+      "key": "b",
+      "arms": 2,
+      "cells": 144,
+      "seams": 7,
+      "components": 1,
+      "holes": 1,
+      "nerve": {
+        "components": 1,
+        "holes": 1,
+        "euler": 0,
+        "simplices": [
+          144,
+          272,
+          198,
+          70
+        ]
+      }
+    },
+    {
+      "key": "d",
+      "arms": 2,
+      "cells": 144,
+      "seams": 7,
+      "components": 1,
+      "holes": 1,
+      "nerve": {
+        "components": 1,
+        "holes": 1,
+        "euler": 0,
+        "simplices": [
+          144,
+          272,
+          198,
+          70
+        ]
+      }
+    },
+    {
+      "key": "e",
+      "arms": 1,
+      "cells": 125,
+      "seams": 8,
+      "components": 1,
+      "holes": 1,
+      "nerve": {
+        "components": 1,
+        "holes": 1,
+        "euler": 0,
+        "simplices": [
+          125,
+          154,
+          43,
+          14
+        ]
+      }
+    },
+    {
+      "key": "g",
+      "arms": 2,
+      "cells": 168,
+      "seams": 8,
+      "components": 1,
+      "holes": 1,
+      "nerve": {
+        "components": 1,
+        "holes": 1,
+        "euler": 0,
+        "simplices": [
+          168,
+          297,
+          200,
+          71
+        ]
+      }
+    },
+    {
+      "key": "i",
+      "arms": 2,
+      "cells": 36,
+      "seams": 2,
+      "components": 2,
+      "holes": 0,
+      "nerve": {
+        "components": 2,
+        "holes": 0,
+        "euler": 2,
+        "simplices": [
+          36,
+          34
+        ]
+      }
+    },
+    {
+      "key": "l",
+      "arms": 1,
+      "cells": 53,
+      "seams": 4,
+      "components": 1,
+      "holes": 0,
+      "nerve": {
+        "components": 1,
+        "holes": 0,
+        "euler": 1,
+        "simplices": [
+          53,
+          52
+        ]
+      }
+    },
+    {
+      "key": "m",
+      "arms": 3,
+      "cells": 179,
+      "seams": 4,
+      "components": 1,
+      "holes": 0,
+      "nerve": {
+        "components": 1,
+        "holes": 0,
+        "euler": 1,
+        "simplices": [
+          179,
+          376,
+          288,
+          90
+        ]
+      }
+    },
+    {
+      "key": "n",
+      "arms": 2,
+      "cells": 104,
+      "seams": 3,
+      "components": 1,
+      "holes": 0,
+      "nerve": {
+        "components": 1,
+        "holes": 0,
+        "euler": 1,
+        "simplices": [
+          104,
+          195,
+          128,
+          36
+        ]
+      }
+    },
+    {
+      "key": "r",
+      "arms": 2,
+      "cells": 61,
+      "seams": 2,
+      "components": 1,
+      "holes": 0,
+      "nerve": {
+        "components": 1,
+        "holes": 0,
+        "euler": 1,
+        "simplices": [
+          61,
+          135,
+          117,
+          42
+        ]
+      }
+    },
+    {
+      "key": "u",
+      "arms": 2,
+      "cells": 103,
+      "seams": 3,
+      "components": 1,
+      "holes": 0,
+      "nerve": {
+        "components": 1,
+        "holes": 0,
+        "euler": 1,
+        "simplices": [
+          103,
+          191,
+          123,
+          34
+        ]
+      }
+    }
+  ],
+  "total_cells": 2434,
+  "total_seams": 151,
+  "scope": "shared universal seam laws + executed model checks; exact independent nerve enumeration; continuous topology bridge is not proved in Bend"
+}
