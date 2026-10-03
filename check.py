@@ -52,6 +52,12 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ('natural-cover.bend', 'Nat.div(x, 4n), Nat.div(y, 4n)', 'Nat.div(x, 3n), Nat.div(y, 4n)', 'scaled_fields'),
+        ('natural-cover.bend', 'scaled(C.boundary_left(b)), scaled(C.boundary_right(b))', 'scaled(C.boundary_right(b)), scaled(C.boundary_left(b))', 'raw_cell_decoded'),
+        ('natural-cover.bend', 'Cmp.is_gt(Side.exact_side(ax, ay, bx, by, cx, cy, 1n))', 'Cmp.is_lt(Side.exact_side(ax, ay, bx, by, cx, cy, 1n))', 'orientation_decoded'),
+        ('natural-cover.bend', 'Con{orient(sign, raw_cell(previous, h)), cells_walk(t, h, sign)}', 'Con{orient(sign, raw_cell(previous, h)), []}', 'cells_walk_decoded'),
+        ('natural-cover.bend', 'def cells_tail(xs: List<&2, C.Section>, +first: C.Section) -> List<&2, Quad>:\n  match xs:\n    case Nil{}: Nil{}', 'def cells_tail(xs: List<&2, C.Section>, +first: C.Section) -> List<&2, Quad>:\n  match xs:\n    case Nil{}: [raw_cell(first, first)]', 'cells_tail_decoded'),
+        ('natural-cover.bend', 'def cells(xs: List<&2, C.Section>) -> List<&2, Quad>:\n  match xs:\n    case Nil{}: Nil{}', 'def cells(xs: List<&2, C.Section>) -> List<&2, Quad>:\n  match xs:\n    case Nil{}: [Q{P{0n, 0n}, P{0n, 0n}, P{0n, 0n}, P{0n, 0n}}]', 'cells_decoded'),
         ('source-inspection.bend', 'case True{}: Counts.inspect_cells(T.cells(a), T.cells(b), T.cells(c))', 'case True{}: Counts.inspect_cells(T.cells(a), T.cells(b), [])', 'source_accepted_fields'),
         ('source-inspection.bend', 'case False{}: T.Counts{0n, 0n, 0n, 0n, False{}, False{}, False{}, False{}}', 'case False{}: T.Counts{0n, 0n, 0n, 0n, True{}, False{}, False{}, False{}}', 'source_gate_exact'),
         ('source-inspection.bend', 'T.counts_valid(inspect(a, b, c))', 'False{}', 'source_valid_arithmetic_exact'),
@@ -191,6 +197,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif law in {"scaled_fields", "raw_cell_decoded", "orientation_decoded", "cells_walk_decoded", "cells_tail_decoded", "cells_decoded"}:
+                proof_root = "NATURAL_COVER_PROOF.bend"
             elif law in {"source_accepted_fields", "source_gate_exact", "source_valid_arithmetic_exact"}:
                 proof_root = "SOURCE_INSPECTION_PROOF.bend"
             elif law in {"fourth_arithmetic_exact", "third_arithmetic_exact", "second_arithmetic_exact", "first_arithmetic_exact", "inspect_cells_arithmetic_exact"}:

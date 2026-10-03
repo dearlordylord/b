@@ -13,6 +13,13 @@ stays inside a convex section of its arm. BendTT checks the general algebraic
 proofs; Bend checks the concrete artwork before emitting SVG. An independent
 Python checker also inspects the resulting SVG.
 
+Current formalization status: **stage 1 is complete for the current production
+bounded arithmetic**, under the existing trusted Base/compiler boundary.
+The [caller audit](ARITHMETIC_AUDIT.md) records the operation inventory and
+kernel contracts. Stages 2–4 (geometric interpretation, independent complex
+enumeration, and the topological bridge) remain open. Earlier milestones
+below retain the state and evidence that applied when they were completed.
+
 ## Generate and check
 
 Requirements: Bend **2.0.34**, Clang 14+ for native compilation, Python 3, and GNU
@@ -34,7 +41,7 @@ commands; this avoids an expensive combined optimization step on shared
 machines. Other platforms retain Bend's native build command. Proof checks
 use the same five-second BendTT gate on every platform.
 
-`check.py` runs the 169-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 175-law proof gate, 200 literal arithmetic checks,
 seven executed validator boundary checks, three executed transverse cases,
 four executed cell-transverse cases and rejection beyond each source-coordinate limit,
 compiling mutations that must fail
@@ -522,7 +529,7 @@ and preserved the SVG byte for byte. Every kernel invocation retained its
 five-second limit. Implementer self-review found no weakened arithmetic
 preconditions; geometric interpretation and the later stages remain open.
 
-**Stage 1 remains incomplete:** audit all production callers and connect
+At the filter/classifier milestone, **stage 1 remained incomplete:** audit all production callers and connect
 any remaining arithmetic paths. The composition laws below now cover
 separation, outside, intersection and convexity arithmetic. Full
 intersection/search soundness remains part of stage 2. Intersection
@@ -581,7 +588,7 @@ the corresponding public law sections reject them.
 
 The [production arithmetic audit](ARITHMETIC_AUDIT.md) records current
 caller coverage and the remaining unscaled-validator compositions and
-accepted-input traversal bridges. Stage 1 remains incomplete.
+accepted-input traversal bridges. That earlier audit left stage 1 incomplete.
 
 Validation of the edge-identity milestone:
 `taskset -c 7,11 python3 -u check.py` passed 130 unique public laws across
@@ -811,3 +818,41 @@ is rejected by its proof. Implementer self-review covered all three source
 guards, generated-cell envelopes, empty versus rejected input, report fields,
 final validity reuse and root/mutation routing. No production behavior
 changed. Source-cover construction coverage and stages 2–4 remain open.
+
+Independent natural cover construction: six public laws now identify the
+decoded point scaling, raw cell, orientation choice and full source-cell
+walk/tail/entry list with `natural-cover.bend`. Its Point/Quad coordinates
+are Nat; its scaler performs Nat division and its orientation uses exact
+natural homogeneous comparison. It does not reuse production cell
+construction. The decoder only reads the native word fields for comparison.
+Actual point/section/list guards supply all bounds, while structural reversal
+and orientation preserve corner order. The final list equality is positional
+and covers empty/singleton lists and both winding directions. Native fixtures
+exercise those cases, three sections producing two cells, explicit winding
+signs, and scaling at 12/16000. Six compiling controls change the scale
+divisor, swap raw corners, reverse the orientation predicate, drop the walk
+tail, invent a trailing cell or invent an empty-input cell. Scale and sign
+controls fail in shared `scaled_fields` and `orientation_decoded`; the
+remaining four in their public construction laws. A final arithmetic coverage
+audit remains necessary before closing stage 1; stages 2–4 remain open.
+
+Validation and final arithmetic coverage audit:
+`taskset -c 7,11 python3 -u check.py` passed 175 unique public laws across
+twenty-seven roots, every fixture group, 128 compiling mutations and
+independent artifact checks. `taskset -c 7,11 ./regenerate.sh` passed with
+the five-second limit on each kernel invocation and preserved `b.svg` byte
+for byte. Implementer self-review covered natural coordinate representation,
+raw corner order, the first-cell sign, structural reversal, previous/current
+section propagation, positional list equality, empty/singleton branches and
+all production word-operation callers. No production behavior changed.
+
+**Stage 1 is complete for the current production bounded arithmetic.** The
+final inventory in `ARITHMETIC_AUDIT.md` accounts for every word operation
+in the production owners and its guard/traversal premises; entry-point,
+search, count/report and independently decoded cover contracts passed the
+real kernel. Nat-only policies remain in their existing owners. This is not
+compiler/backend verification or a proof that the geometric policies are
+correct. Stage 2 must establish the polygon/half-plane and intersection/
+witness meanings; stage 3 must establish independent enumeration of the
+intended complex; stage 4 must prove the topological bridge. The complete
+four-stage objective remains unfinished.

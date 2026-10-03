@@ -13,6 +13,7 @@ import ./cover-arithmetic.bend as Cover
 import ./search-arithmetic.bend as SearchNat
 import ./count-arithmetic.bend as CountNat
 import ./source-inspection.bend as SourceInspect
+import ./natural-cover.bend as NaturalCover
 
 def same(a: Bool, b: Bool) -> Bool:
   Bool.not(Bool.xor(a, b))
@@ -70,8 +71,23 @@ def source_strip(+x: Nat, +y: Nat) -> List<&2, C.Section>:
 def source_inspection_cases() -> Bool:
   same_reports(T.inspect(source_strip(0n, 4n), source_strip(4n, 8n), source_strip(8n, 12n)), SourceInspect.inspect(source_strip(0n, 4n), source_strip(4n, 8n), source_strip(8n, 12n))) && same_reports(SourceInspect.inspect([], [], []), T.Counts{0n, 0n, 0n, 0n, False{}, True{}, True{}, False{}}) && same_reports(SourceInspect.inspect(source_strip(1n, 4n), source_strip(4n, 8n), source_strip(8n, 12n)), T.Counts{0n, 0n, 0n, 0n, False{}, False{}, False{}, False{}}) && same_reports(SourceInspect.inspect(source_strip(0n, 4n), source_strip(4n, 8n), source_strip(16000n, 16004n)), T.Counts{0n, 0n, 0n, 0n, False{}, False{}, False{}, False{}}) && same(T.valid(source_strip(0n, 4n), source_strip(4n, 8n), source_strip(8n, 12n)), SourceInspect.valid(source_strip(0n, 4n), source_strip(4n, 8n), source_strip(8n, 12n))) && Bool.not(SourceInspect.valid(source_strip(1n, 4n), source_strip(4n, 8n), source_strip(8n, 12n)))
 
+def same_natural_point(a: NaturalCover.Point, b: NaturalCover.Point) -> Bool:
+  match a b:
+    case NaturalCover.P{x, y} NaturalCover.P{u, v}: Nat.is_eq(x, u) && Nat.is_eq(y, v)
+def same_natural_quad(a: NaturalCover.Quad, b: NaturalCover.Quad) -> Bool:
+  match a b:
+    case NaturalCover.Q{p, q, r, s} NaturalCover.Q{u, v, w, x}: same_natural_point(p, u) && same_natural_point(q, v) && same_natural_point(r, w) && same_natural_point(s, x)
+def same_natural_cells(a: List<&2, NaturalCover.Quad>, b: List<&2, NaturalCover.Quad>) -> Bool:
+  match a b:
+    case Nil{} Nil{}: True{}
+    case Nil{} Con{h, t}: False{}
+    case Con{h, t} Nil{}: False{}
+    case Con{h, t} Con{u, v}: same_natural_quad(h, u) && same_natural_cells(t, v)
+def natural_cover_cases() -> Bool:
+  same_natural_point(NaturalCover.decode_point(T.scaled(C.Pt{12n, 16000n})), NaturalCover.P{3n, 4000n}) && same_natural_cells(NaturalCover.decode_cells(T.cells(source_strip(0n, 4n))), NaturalCover.cells(source_strip(0n, 4n))) && same_natural_cells(NaturalCover.decode_cells(T.cells(source_strip(4n, 0n))), NaturalCover.cells(source_strip(4n, 0n))) && same_natural_cells(NaturalCover.cells([]), []) && same_natural_cells(NaturalCover.cells([C.Section{C.Pt{0n, 0n}, C.Pt{0n, 4n}}]), []) && same_natural_cells(NaturalCover.decode_cells(T.cells([C.Section{C.Pt{0n, 0n}, C.Pt{0n, 4n}}, C.Section{C.Pt{4n, 0n}, C.Pt{4n, 4n}}, C.Section{C.Pt{8n, 0n}, C.Pt{8n, 4n}}])), NaturalCover.cells([C.Section{C.Pt{0n, 0n}, C.Pt{0n, 4n}}, C.Section{C.Pt{4n, 0n}, C.Pt{4n, 4n}}, C.Section{C.Pt{8n, 0n}, C.Pt{8n, 4n}}])) && Nat.is_eq(List.length(&2, NaturalCover.Quad, NaturalCover.cells([C.Section{C.Pt{0n, 0n}, C.Pt{0n, 4n}}, C.Section{C.Pt{4n, 0n}, C.Pt{4n, 4n}}, C.Section{C.Pt{8n, 0n}, C.Pt{8n, 4n}}])), 2n) && NaturalCover.orientation(NaturalCover.raw_cell(C.Section{C.Pt{0n, 0n}, C.Pt{0n, 4n}}, C.Section{C.Pt{4n, 0n}, C.Pt{4n, 4n}})) && Bool.not(NaturalCover.orientation(NaturalCover.raw_cell(C.Section{C.Pt{4n, 0n}, C.Pt{4n, 4n}}, C.Section{C.Pt{0n, 0n}, C.Pt{0n, 4n}})))
+
 def cases() -> Bool:
-  source_inspection_cases() && count_arithmetic_cases() && search_arithmetic_cases() && filter_inspection_cases() && cover_arithmetic_cases() && validator_natural_cases() && width_range_cases() && source_convexity_cases() && edge_cases() && sat_cases() && classifier_cases() && source_cases() && filtered_cases() && same(T.segment_search(0n, T.P{0, 0}, T.P{8, 8}, inside_box(), inside_box(), inside_box()), False{}) && T.segment_search(1n, T.P{0, 0}, T.P{8, 8}, inside_box(), inside_box(), inside_box()) && T.segment_search(63n, T.P{0, 0}, T.P{8, 8}, inside_box(), inside_box(), inside_box()) && T.pair_search([T.P{8, 8}], T.P{0, 0}, inside_box(), inside_box(), inside_box()) && T.all_pairs([T.P{0, 0}, T.P{8, 8}], inside_box(), inside_box(), inside_box()) && T.vertex_search([T.P{4, 4}], inside_box(), inside_box(), inside_box()) && same(T.triangle_search([], inside_box(), inside_box(), inside_box()), False{}) && T.triangle_witness(inside_box(), inside_box(), inside_box()) && same(T.triangle_witness(box(0, 0, 2, 2), box(10, 0, 12, 2), box(20, 0, 22, 2)), False{}) && M.quad_envelope(12n, inside_box()) && same(U32.is_gt(M.denominator(T.sample(T.P{0, 0}, T.P{8, 8}, 1)), 0), True{}) && U32.is_eq(M.denominator(T.witness(T.P{4, 4})), 1)
+  natural_cover_cases() && source_inspection_cases() && count_arithmetic_cases() && search_arithmetic_cases() && filter_inspection_cases() && cover_arithmetic_cases() && validator_natural_cases() && width_range_cases() && source_convexity_cases() && edge_cases() && sat_cases() && classifier_cases() && source_cases() && filtered_cases() && same(T.segment_search(0n, T.P{0, 0}, T.P{8, 8}, inside_box(), inside_box(), inside_box()), False{}) && T.segment_search(1n, T.P{0, 0}, T.P{8, 8}, inside_box(), inside_box(), inside_box()) && T.segment_search(63n, T.P{0, 0}, T.P{8, 8}, inside_box(), inside_box(), inside_box()) && T.pair_search([T.P{8, 8}], T.P{0, 0}, inside_box(), inside_box(), inside_box()) && T.all_pairs([T.P{0, 0}, T.P{8, 8}], inside_box(), inside_box(), inside_box()) && T.vertex_search([T.P{4, 4}], inside_box(), inside_box(), inside_box()) && same(T.triangle_search([], inside_box(), inside_box(), inside_box()), False{}) && T.triangle_witness(inside_box(), inside_box(), inside_box()) && same(T.triangle_witness(box(0, 0, 2, 2), box(10, 0, 12, 2), box(20, 0, 22, 2)), False{}) && M.quad_envelope(12n, inside_box()) && same(U32.is_gt(M.denominator(T.sample(T.P{0, 0}, T.P{8, 8}, 1)), 0), True{}) && U32.is_eq(M.denominator(T.witness(T.P{4, 4})), 1)
 
 def main() -> IO(Unit):
   do IO<Unit>:
