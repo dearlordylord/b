@@ -30,7 +30,7 @@ python3 check.py
 `generate.bend`, checks the emitted SVG, and replaces `b.svg` only on success.
 The generator itself refuses to emit an SVG if its Bend artwork validation fails.
 
-`check.py` runs the 85-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 88-law proof gate, 200 literal arithmetic checks,
 seven executed validator boundary checks, three executed transverse cases,
 compiling mutations that must fail
 proofs, invalid artworks that must be rejected before SVG emission, and Bend
@@ -169,7 +169,7 @@ proofs; its original license is retained in `LICENSE.mathlib`. See [NOTICE](NOTI
 ## Arithmetic programme (in progress)
 
 [ROADMAP.md](ROADMAP.md) records the autonomous four-stage programme. The
-current BendTT gate checks **85 unique public laws**, plus supporting lemmas.
+current BendTT gate checks **88 unique public laws**, plus supporting lemmas.
 Arithmetic results quantify over all inputs at arbitrary word widths; the U32
 operation laws cover every 32-bit constructor payload.
 
@@ -271,10 +271,10 @@ model must give the independently specified Boolean result, with all point
 guards satisfied.
 
 `proof-roots.txt` lists the structural, arithmetic, transverse and absolute
-difference, squared-width, centroid, division, dot and witness-arithmetic proof roots.
+difference, squared-width, centroid, division, dot, witness-arithmetic and scaled-coordinate proof roots.
 Both `check.py` and `regenerate.sh` audit that every public law module is
 reachable, then check every root, with five seconds per kernel invocation.
-The roots share supporting proofs; the 85-law total counts
+The roots share supporting proofs; the 88-law total counts
 each public law once. Dependency-only imports of unrelated proof groups have
 been removed; a dedicated division root explicitly retains division and its
 subtraction/complement prerequisites. No previously checked law is omitted. The absolute-difference root proves
@@ -329,9 +329,25 @@ and accepted every proof root but timed out on the existing squared-width
 fixture group. Thus consolidated-run timing remains unresolved; no timeout
 is reported as a passing check.
 
-**Stage 1 remains incomplete:** scaling original guarded points and generating
-sampled witnesses still need exact-model agreement and proofs that their
-outputs satisfy the envelopes used above. Intersection
+The scaled-coordinate root adds three public laws. Every original coordinate
+at most 16000 has its natural quotient by four bounded by `2^12`. The actual
+U32 conversion followed by division by four gives that natural quotient, and
+both coordinates returned by production `topology.scaled` agree with those
+quotients. These results include nonmultiples of four: division rounds down.
+Three fixtures cover divisible points, rounded points and the scaled envelope;
+a compiling production mutation changes divisor four to three and is rejected.
+
+Validation of the scaled-coordinate milestone: the ordinary complete
+`python3 check.py` invocation passed all 88 unique public laws across ten
+roots, every fixture group, all 46 compiling mutations and the independent
+SVG geometry/topology checks, with the original five-second limits. This is
+a complete successful run. `regenerate.sh` also passed all ten roots and
+preserved the SVG byte for byte. The earlier timing failures remain historical
+failed runs and are not counted as passing evidence.
+
+**Stage 1 remains incomplete:** the grid filter still needs a bridge to exact
+unrounded rational scaling. Generation of sampled witnesses also needs
+exact-model agreement and proof of its output envelopes. Intersection
 correctness, enumeration correctness and the formal topological bridge in stages 2–4 are also outstanding. Finite artwork
 checks and the externally justified topology certificate remain as described
 above; they are not substitutes for these universal proofs.

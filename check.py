@@ -52,6 +52,7 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ("topology.bend", "P{U32.div(U32.from_nat(x), 4), U32.div(U32.from_nat(y), 4)}", "P{U32.div(U32.from_nat(x), 3), U32.div(U32.from_nat(y), 3)}", "topology_scaled_exact"),
         ("homogeneous.bend", "Nat.add(Nat.add(Nat.mul(Nat.mul(a, b), d), Nat.mul(c, y)), Nat.mul(x, e))", "Nat.mul(8n, Nat.add(Nat.add(Nat.mul(Nat.mul(a, b), d), Nat.mul(c, y)), Nat.mul(x, e)))", "homogeneous_sum_bound"),
         ("homogeneous.bend", "S.sum3(n, Word.mul(n, a, b), d, c, y, x, e)", "S.sum3(n, Word.add(n, a, b), d, c, y, x, e)", "word_homogeneous_exact"),
         ("topology.bend", "ax * by * d + bx * y + x * ay", "ax * by + bx * y + x * ay", "guarded_side_exact"),
@@ -114,6 +115,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif law == "topology_scaled_exact":
+                proof_root = "SCALED_COORDINATE_PROOF.bend"
             elif law in {"homogeneous_sum_bound", "word_homogeneous_exact", "guarded_side_exact"}:
                 proof_root = "WITNESS_ARITHMETIC_PROOF.bend"
             elif file in {"word-division4.bend", "word-subtraction.bend", "word-complement.bend"}:
@@ -249,6 +252,8 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        bend(directory, "scaled-coordinate-tests.bend", "--verdict")
+        print("Production scaled coordinate exactness and envelope fixtures accepted")
         bend(directory, "witness-arithmetic-tests.bend", "--verdict")
         print("Production homogeneous side fixtures accepted: denominators 1/64, positive/zero/negative")
         bend(directory, "centroid-tests.bend", "--verdict")

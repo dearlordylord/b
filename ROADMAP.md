@@ -105,6 +105,10 @@ are established. Partial milestones do not complete the objective.
   every intermediate multiplication/addition fits, with the first coordinate
   product bounded by the same envelopes.
 
-Still required for stage 1: prove exact scaling of guarded source points,
-exact generation of sampled witnesses and their output envelopes.
+- Guarded source coordinates have natural quotients by four bounded by the
+  12-bit envelope. Actual U32 conversion/division and production point scaling
+  agree with those quotients, including rounded inputs.
+
+Still required for stage 1: prove that the grid filter implies unrounded
+rational scaling; prove exact sampled-witness generation and its envelopes.
 Stages 2–4 remain uncompleted.
