@@ -1294,8 +1294,8 @@ and `coord_reconstruct_fields` (the last two controls), rather than distinct
 public law sections. Each corrupts a stated law on valid literal inputs; these
 are handwritten compiling proof controls, not a bend-falsify report.
 
-Reverse region-to-hull inclusion can now consume both the exact coordinates and
-the positive total. It still needs to construct four-corner `InHull` witnesses
+At the coordinate milestone, reverse region-to-hull inclusion could consume both
+the exact coordinates and the positive total. It still needed four-corner `InHull` witnesses
 for the selected diagonal triangle. Intersection characterization, independent
 enumeration and the actual topological bridge remain open. Stages 2–4 are
 unfinished.
@@ -1317,3 +1317,86 @@ the current laws do not claim that this witness has already been constructed.
 `taskset -c 7,11 ./regenerate.sh` also passed every proof root under the existing
 five-second kernel limit, native generation and independent geometry/topology
 checks. `git diff --exit-code -- b.svg` confirmed byte-identical output.
+
+### Stage 2: constructive region/hull equivalence
+
+[Barycentric model](quad-barycentric.bend), [eight laws](quad-barycentric-laws.bend)
+and [proof root](QUAD_BARYCENTRIC_PROOF.bend) construct four-corner convex-hull
+membership from the closed half-plane predicate. The actual diagonal selector
+assigns weights in the original `A,B,C,D` order. On the ABC branch it uses
+`(area(B,C,p), area(C,A,p), area(A,B,p), 0)`; on ACD it uses
+`(area(C,D,p), 0, area(D,A,p), area(A,C,p))`. A point on the diagonal follows
+the closed ACD branch. The proof preserves each branch's own triangle area;
+they need not be equal.
+
+For a strictly positive-turn quad and a point passing its closed half-planes
+with positive denominator,
+`selected_weights_valid` proves a positive total and exact cross-product
+equivalence to the selected four-weight point. `region_point_in_hull` packages
+these actual weights into the existing existential `InHull` type. It does not
+define membership as a renamed half-plane Boolean. The two zero-corner
+reconstruction laws hold without geometry premises; the guarded selector proof
+combines them with the earlier diagonal split, strict triangle turns and exact
+triangle reconstruction. Zero individual weights and boundary points remain
+valid.
+
+`region_hull_characterization` supplies both implication functions: passing the
+half-planes produces an `InHull` witness, and an `InHull` witness passes the
+half-planes. The reverse function reuses the original hull inclusion owner and
+the proved corner-containment theorem. This is a universal pointwise equivalence
+in the stated natural-coordinate/positive-denominator rational domain. It does
+not quantify over a newly introduced real plane or over arbitrary SVG paths.
+
+The native inside/strict-convexity bridge consumes the existing width-12
+arithmetic envelopes and exact native judgments. Its positive-denominator
+premise is explicit: an arithmetic envelope only gives upper bounds, and also
+accepts a zero denominator. For triples, `CommonHull` carries one rational point
+with independent `InHull` evidence for each of the three cells.
+`common_region_in_hulls` converts a shared half-plane witness, and
+`production_triangle_hull_witness` turns an accepted native triple search into
+that genuine shared convex-hull point when all three native quads are strictly
+convex. This is search soundness; completeness of the finite search is still
+open.
+
+[Nineteen fixture judgments/constructions](quad-barycentric-tests.bend) cover
+both selected branches, distinct coordinates, diagonal contact, a vertex's
+zero weights, an unreduced fraction, two different triangle areas in a skew
+quad, explicit hull membership, both characterization functions, native
+membership, shared membership in three different cells and the actual native
+triple search. The skew quad `(1,1),(6,1),(5,4),(1,5)` reconstructs `(4,2,1)`
+with denominator 15 and `(2,4,1)` with denominator 16. Outside, flat-quad and
+zero-denominator fixtures expose the guards rather than asserting membership.
+
+Six compiling controls add a nonzero unused fourth weight, swap the ACD
+third/fourth weights, change either diagonal branch, omit the fourth weight
+from the total, and omit it from the reconstructed point. Their first failures
+are in shared `bary_abc_fields`, `bary_acd_fields`, `bary_selected_abc`,
+`bary_selected_acd` and `bary_acd_valid`, rather than distinct public law
+sections. Each control additionally checks a literal false instance of the
+public selector contract with strict-quad, inside and positive-denominator
+premises verified. The total control uses the fourth vertex, where only the
+fourth weight is nonzero. These are handwritten proof controls, not an external
+bend-falsify report.
+
+Stages 2–4 remain unfinished. SAT intersection characterization, complete
+intersection enumeration, the independent complex counts and the formal link
+from that complex to the actual SVG fill and its two holes are still open.
+
+Validation: `taskset -c 7,11 python3 -u check.py` passed all 232 public laws
+across 36 proof roots, the nineteen new fixture judgments/constructions and
+existing groups, 166 compiling mutation controls, all six new literal mutant
+counterexamples and independent artifact checks. Every kernel invocation kept
+the five-second limit. Implementer self-review found no violations of the
+stated contracts: it traced all four weight slots, each omitted corner,
+coordinate/denominator regrouping, the actual selector decisions, both strict
+triangle areas, positive totals, fraction validity, both implication functions,
+bounded native bridges and the single point shared by all three hull witnesses.
+Existing area, coordinate reconstruction, diagonal, hull inclusion, arithmetic
+and search owners are reused. The new owner constructs barycentric evidence;
+it does not duplicate intersection policy or redefine the existing hull type.
+The next consumers are SAT intersection characterization and an independent
+intersection enumerator. Independent SVG topology results remain finite
+artifact evidence, not the unfinished universal topological bridge.
+`taskset -c 7,11 ./regenerate.sh` passed every proof root, native compilation,
+generation and independent geometry/topology checks with the existing limits.
+`git diff --exit-code -- b.svg` confirmed byte-identical output.

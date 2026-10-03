@@ -38,6 +38,24 @@ def literal_transverse_checks(directory):
     return 3
 
 
+def barycentric_counter(directory, mutation_source):
+    """Confirm a false public selector contract with its premises on the core."""
+    q = "N.Q{N.P{1n, 1n}, N.P{5n, 1n}, N.P{5n, 5n}, N.P{1n, 5n}}"
+    if "H.weight_total" in mutation_source:
+        p = "G.P{1n, 5n, 1n}"
+        broken = f"Nat.is_gt(M.total(M.selected({q}, {p})), 0n)"
+    else:
+        p = ("G.P{4n, 2n, 1n}" if "A.area(b, c, p)" in mutation_source or "False{}" in mutation_source
+             else "G.P{2n, 4n, 1n}")
+        broken = f"G.equivalent({p}, M.point({q}, M.selected({q}, {p})))"
+    (directory / "barycentric-counter.bend").write_text(
+        "import Base\nimport ./quad-barycentric.bend as M\nimport ./natural-cover.bend as N\n"
+        "import ./homogeneous-geometry.bend as G\nimport ./quad-geometry.bend as Q\nimport ./halfplane-region.bend as Region\n"
+        f"def premises() -> {{Q.strict_quad({q}) && G.positive_denominator({p}) && Region.contains({p}, {q}) == True{{}} : Bool}}:\n  {{==}}\n"
+        f"def broken_public_contract() -> {{{broken} == False{{}} : Bool}}:\n  {{==}}\n")
+    bend(directory, "barycentric-counter.bend", "--verdict")
+
+
 def negative_controls(directory):
     controls = [
         ("core.bend", "Seam{boundary_left(cell_start(cell)),",
@@ -50,6 +68,14 @@ def negative_controls(directory):
          "Nat.add(Nat.mul(Nat.mul(v, v), start), 1n)", "seam_inside_cell_coordinate"),
         ("geometry.bend", "F.weight_total(u, v)",
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
+    ]
+    controls += [
+        ('quad-barycentric.bend', 'W{A.area(b, c, p), A.area(c, a, p), A.area(a, b, p), 0n}', 'W{A.area(b, c, p), A.area(c, a, p), A.area(a, b, p), 1n}', 'bary_abc_fields'),
+        ('quad-barycentric.bend', 'W{A.area(c, d, p), 0n, A.area(d, a, p), A.area(a, c, p)}', 'W{A.area(c, d, p), 0n, A.area(a, c, p), A.area(d, a, p)}', 'bary_acd_fields'),
+        ('quad-barycentric.bend', 'case N.Q{a, b, c, d} False{}: abc(a, b, c, p)', 'case N.Q{a, b, c, d} False{}: acd(a, c, d, p)', 'bary_selected_abc'),
+        ('quad-barycentric.bend', 'case N.Q{a, b, c, d} True{}: acd(a, c, d, p)', 'case N.Q{a, b, c, d} True{}: abc(a, b, c, p)', 'bary_selected_acd'),
+        ('quad-barycentric.bend', 'case W{k, l, m, n}: H.weight_total(k, l, m, n)', 'case W{k, l, m, n}: H.weight_total(k, l, m, 0n)', 'bary_acd_valid'),
+        ('quad-barycentric.bend', 'case W{k, l, m, n}: H.weighted(q, k, l, m, n)', 'case W{k, l, m, n}: H.weighted(q, k, l, m, 0n)', 'bary_acd_fields'),
     ]
     controls += [
         ('triangle-coordinate.bend', 'def corner_coordinate(p: N.Point, axis: Bool) -> Nat:\n  match p:\n    case N.P{x, y}: Bool.pick(Nat, axis, y, x)', 'def corner_coordinate(p: N.Point, axis: Bool) -> Nat:\n  match p:\n    case N.P{x, y}: Bool.pick(Nat, axis, x, y)', 'coord_x_positive_fields'),
@@ -231,6 +257,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif file == "quad-barycentric.bend":
+                proof_root = "QUAD_BARYCENTRIC_PROOF.bend"
             elif law in {"coord_x_positive_fields", "coord_x_negative_fields", "coord_sum_reconstruct", "coord_reconstruct_fields"}:
                 proof_root = "TRIANGLE_COORDINATE_PROOF.bend"
             elif law in {"area_reconstruct", "area_sum_reconstruct", "triangle_area_positive", "area_positive_cycle_fields"}:
@@ -308,6 +336,8 @@ def negative_controls(directory):
             except AssertionError as error:
                 raise AssertionError(f"Mutation {file}: {law} did not produce a proof diagnostic\n{error}") from error
             assert law in output, output
+            if file == "quad-barycentric.bend":
+                barycentric_counter(directory, old)
             if law == "accepted_side_exact":
                 (directory / "side-counter.bend").write_text(
                     "import Base\nimport ./topology.bend as T\nimport ./grid-scaling.bend as G\n"
@@ -453,6 +483,8 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        bend(directory, "quad-barycentric-tests.bend", "--verdict")
+        print("Barycentric hull fixtures accepted: both branches, distinct areas, fractions, bidirectional membership and native triple witness")
         bend(directory, "triangle-coordinate-tests.bend", "--verdict")
         print("Exact triangle coordinate reconstruction, fraction validity and guard fixtures accepted")
         bend(directory, "triangle-area-tests.bend", "--verdict")
