@@ -1803,3 +1803,63 @@ not counted as passing. The complete retry, `taskset -c 7,11 sh -x
 independent geometry/topology checks with unchanged limits. Shell tracing
 provided command diagnostics only. `git diff --exit-code -- b.svg` confirmed
 byte-identical output.
+
+### Retained-segment coefficient rebasing (stage 2, incomplete)
+
+`clip-weights.bend` replaces endpoints p,q by p and the homogeneous cut
+`v*p + w*q`. For an original point `k*p + l*q`, the retained coefficients are
+`alpha = k*w - l*v` and `l`. Five universal laws prove subtraction reconstruction
+under `l*v <= k*w`, exact equality of all three homogeneous components to the
+original point scaled by w, positive retained total when the old total and w
+are positive, positive result denominator and equivalent coordinates, and an
+actual nonnegative-weight `InSegment(p,cut,oldPoint)` witness. Existing natural
+subtraction, arithmetic, raw scaling, point equality and homogeneous-join owners
+supply the facts. No ordinary rational averaging or denominator rounding occurs.
+
+Real BendTT accepted the five laws and seven fixture constructions/judgments:
+interior, zero-alpha boundary and zero-second-weight segment membership with
+unequal endpoint denominators; exact components; false balance guard; changed
+coordinates after saturated subtraction; and invalid zero-scale output.
+Five compiling controls reverse subtraction, replace either product by a sum,
+swap cut weights, or drop the second retained coefficient. First failures occur
+in public `retained_reconstruct` or `rebase_exact`. Each also has a literal
+refutation of public `rebase_valid` with all five premises checked true.
+These are handwritten proof controls, not a bend-falsify report.
+
+This is conditional algebra needed for segment clipping. It does not yet derive
+the balance condition from closed-halfplane membership, nor handle a retained
+endpoint whose halfplane gap w is zero. Those geometric obligations must be
+proved before claiming a clipping completeness theorem. The no-contained-corner
+intersection branch, triple-search completeness, independent complex enumeration
+and the actual SVG-fill/topological bridge remain open. Stages 2–4 are unfinished.
+
+Implementer self-review: the rebase equality covers the denominator alongside
+both coordinates. Positive old total, positive w and valid endpoints are
+explicit prerequisites for the geometric membership law. The boundary with zero
+alpha and the endpoint with zero l are preserved. Saturated subtraction and zero
+w have concrete counterexamples, so their missing premises cannot be silently
+promoted to general clipping correctness. The later halfplane consumer must
+prove the balance condition; this pure coefficient module cannot infer it.
+
+Validation: the final complete `taskset -c 7,11 python3 -u check.py` run
+passed all 283 public laws across 43 proof roots, seven new rebase fixtures,
+existing fixture groups, 208 compiling mutation controls, all five new literal
+public-validity refutations, and independent geometry/topology checks.
+The first full attempt timed out in unchanged `SOURCE_INSPECTION_PROOF.bend`;
+a separate exact repeat passed in about 2.7 seconds under the same limit.
+The second full attempt accepted all 283 laws and the new fixtures, then timed
+out in the existing combined `segment-cut-tests.bend`. Neither failed run is
+counted as passing. The final complete run retained all five-second limits.
+
+The fourteen original segment-cut fixtures now run in raw-coordinate and
+witness-construction groups sharing `segment-cut-fixtures.bend`. All 19 original
+fixture/helper definitions were verified present exactly once; no assertion or
+coordinate was removed or weakened. Both groups passed separate real BendTT
+checks and the final complete run. Self-review covered guard placement, both
+zero-coefficient boundaries, all three reconstructed components, retained total,
+positive endpoint/result denominators and the actual segment-weight witness.
+
+`taskset -c 7,11 sh -x ./regenerate.sh` passed all 43 real proof roots,
+native generation and independent geometry/topology checks under unchanged
+limits; shell tracing provided command diagnostics only.
+`git diff --exit-code -- b.svg` confirmed byte-identical output.

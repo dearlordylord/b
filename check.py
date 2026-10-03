@@ -154,6 +154,18 @@ def corner_candidate_counter(directory, original):
     bend(directory, "corner-candidate-counter.bend", "--verdict")
 
 
+def clip_weights_counter(directory):
+    (directory / "clip-weights-counter.bend").write_text(
+        "import Base\nimport ./clip-weights.bend as M\nimport ./homogeneous-geometry.bend as G\n"
+        "import ./homogeneous-combination.bend as C\nimport ./boolean-reflection.bend as B\n"
+        "def p() -> G.Point: G.P{2n,4n,2n}\ndef q() -> G.Point: G.P{15n,3n,3n}\n"
+        "def premises() -> {Nat.is_le(3n,8n) && Nat.is_gt(5n,0n) && Nat.is_gt(2n,0n) && G.positive_denominator(p()) && G.positive_denominator(q()) == True{} : Bool}:\n  {==}\n"
+        "def invalid_public_equivalence() -> {G.equivalent(C.join(p(),q(),4n,1n),M.rebase(p(),q(),4n,1n,2n,3n)) == False{} : Bool}:\n  {==}\n"
+        "def refutes_public_valid(h:{G.positive_denominator(M.rebase(p(),q(),4n,1n,2n,3n)) == True{} : Bool} & {G.equivalent(C.join(p(),q(),4n,1n),M.rebase(p(),q(),4n,1n,2n,3n)) == True{} : Bool}) -> Empty:\n"
+        "  match h:\n    case (positive,equivalent): B.false_impossible(equivalent)\n")
+    bend(directory, "clip-weights-counter.bend", "--verdict")
+
+
 def negative_controls(directory):
     controls = [
         ("core.bend", "Seam{boundary_left(cell_start(cell)),",
@@ -168,6 +180,11 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ('clip-weights.bend', 'Nat.sub(Nat.mul(k,w),Nat.mul(l,v))', 'Nat.sub(Nat.mul(l,v),Nat.mul(k,w))', 'retained_reconstruct'),
+        ('clip-weights.bend', 'Nat.mul(k,w)', 'Nat.add(k,w)', 'retained_reconstruct'),
+        ('clip-weights.bend', 'Nat.mul(l,v)', 'Nat.add(l,v)', 'retained_reconstruct'),
+        ('clip-weights.bend', 'C.join(p,q,v,w)', 'C.join(p,q,w,v)', 'rebase_exact'),
+        ('clip-weights.bend', 'retained(k,l,w,v),l)', 'retained(k,l,w,v),0n)', 'rebase_exact'),
         ('corner-candidate.bend', 'Region.contains(Q.embed(a),r)', 'False{}', 'corner_admissions'),
         ('corner-candidate.bend', 'Region.contains(Q.embed(b),r)', 'False{}', 'corner_admissions'),
         ('corner-candidate.bend', 'Region.contains(Q.embed(c),r)', 'False{}', 'corner_admissions'),
@@ -398,6 +415,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif file == "clip-weights.bend":
+                proof_root = "CLIP_WEIGHTS_PROOF.bend"
             elif file == "corner-candidate.bend":
                 proof_root = "CORNER_CANDIDATE_PROOF.bend"
             elif file == "candidate-existence.bend":
@@ -489,6 +508,8 @@ def negative_controls(directory):
             except AssertionError as error:
                 raise AssertionError(f"Mutation {file}: {law} did not produce a proof diagnostic\n{error}") from error
             assert law in output, output
+            if file == "clip-weights.bend":
+                clip_weights_counter(directory)
             if file == "corner-candidate.bend":
                 corner_candidate_counter(directory, old)
             if file == "segment-cut.bend":
@@ -644,6 +665,9 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        bend(directory, "clip-weights-tests.bend", "--verdict")
+        bend(directory, "clip-weights-guard-tests.bend", "--verdict")
+        print("Retained-segment rebase fixtures accepted: unequal denominators, interior/boundary/endpoint membership, saturation and zero-scale rejection")
         bend(directory, "corner-candidate-tests.bend", "--verdict")
         bend(directory, "corner-candidate-b-tests.bend", "--verdict")
         bend(directory, "corner-candidate-c-tests.bend", "--verdict")
@@ -656,6 +680,7 @@ if __name__ == "__main__":
         bend(directory, "intersection-search-tests.bend", "--verdict")
         print("Exact intersection search fixtures accepted: first hit, denominator validity, exterior skip, reversed cut, disjoint boxes and vertex contact")
         bend(directory, "segment-cut-tests.bend", "--verdict")
+        bend(directory, "segment-cut-witness-tests.bend", "--verdict")
         print("Exact segment cut fixtures accepted: unequal gaps, unequal denominators, boundary endpoint, containment and valid membership")
         bend(directory, "quad-intersection-tests.bend", "--verdict")
         bend(directory, "quad-intersection-common-tests.bend", "--verdict")
