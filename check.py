@@ -40,6 +40,7 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ("word-sum4.bend", "Word.mul(n, g, h)", "Word.add(n, g, h)", "finish"),
         ("coordinate-sum4.bend", "Nat.add(Nat.add(Nat.mul(a, b), Nat.mul(c, d)), Nat.add(Nat.mul(e, f), Nat.mul(g, h)))", "Nat.mul(8n, Nat.add(Nat.add(Nat.mul(a, b), Nat.mul(c, d)), Nat.add(Nat.mul(e, f), Nat.mul(g, h))))", "width_bound"),
         ("validation.bend", "U32.from_nat(x) * U32.from_nat(z) + U32.from_nat(y) * U32.from_nat(w)", "U32.from_nat(x) * U32.from_nat(w) + U32.from_nat(y) * U32.from_nat(z)", "guarded_dot_exact"),
         ("validation.bend", "Nat.is_le(x, 16000n) && Nat.is_le(y, 16000n)", "True{}", "accepted_points_determinant"),
@@ -198,7 +199,11 @@ if __name__ == "__main__":
         for file in HERE.glob("*.bend"):
             shutil.copy2(file, directory / file.name)
         bend(directory, "PROOF.bend", "--verdict")
-        print("BendTT: all 65 public laws accepted")
+        print("BendTT: all 67 public laws accepted")
+        bend(directory, "word-sum4-tests.bend", "--verdict")
+        print("Composed four-product word sum fixtures accepted")
+        bend(directory, "coordinate-dot-pair-tests.bend", "--verdict")
+        print("Guarded production dot-pair sum fixtures accepted")
         bend(directory, "coordinate-sum4-tests.bend", "--verdict")
         print("Coordinate guards imply the four-product U32 bound")
         bend(directory, "coordinate-dot-tests.bend", "--verdict")
@@ -233,7 +238,7 @@ if __name__ == "__main__":
         print("Bend topology fixtures accepted")
         print(f"Literal arithmetic checks: {literal_checks(directory)} accepted")
         print(f"Compiling mutations rejected by the proof gate: {negative_controls(directory)}")
-        print("Note: selector/remainder/product mutants fail in shared carry_step/bit_division_step/sum3_finish/sum_width_bound/width_bound lemmas")
+        print("Note: selector/remainder/product mutants fail in shared carry_step/bit_division_step/sum3_finish/sum_width_bound/width_bound/finish lemmas")
         print("Note: U32 wrapper mutant uses a literal law instance with its premise checked; generic error printing overflows")
         print(f"Invalid artworks rejected by Bend before SVG emission: {bend_artwork_negative_controls(directory)}")
     root = ET.parse(HERE / "b.svg").getroot()

@@ -79,7 +79,9 @@ are established. Partial milestones do not complete the objective.
 - The production two-product dot expression is exact for all accepted
   source points.
 - The paired four-product sum is strictly below U32 capacity under the
-  coordinate guards. Its production addition bridge remains outstanding.
+  coordinate guards. Its production addition bridge is now proved: actual
+  source conversions and the sum of two production dots equal the exact
+  four-product model. The final transverse comparisons remain outstanding.
 
 Still required for stage 1: connect the other production geometric expressions
 (squared widths, centroids, transverse dot comparisons and homogeneous

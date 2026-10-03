@@ -30,7 +30,7 @@ python3 check.py
 `generate.bend`, checks the emitted SVG, and replaces `b.svg` only on success.
 The generator itself refuses to emit an SVG if its Bend artwork validation fails.
 
-`check.py` runs the 65-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 67-law proof gate, 200 literal arithmetic checks,
 seven executed validator boundary checks, compiling mutations that must fail
 proofs, invalid artworks that must be rejected before SVG emission, and Bend
 and independent Python topology fixtures. Python checks the output artifact;
@@ -168,7 +168,7 @@ proofs; its original license is retained in `LICENSE.mathlib`. See [NOTICE](NOTI
 ## Arithmetic programme (in progress)
 
 [ROADMAP.md](ROADMAP.md) records the autonomous four-stage programme. The
-current BendTT gate checks **65 public laws**, plus supporting lemmas.
+current BendTT gate checks **67 public laws**, plus supporting lemmas.
 Arithmetic results quantify over all inputs at arbitrary word widths; the U32
 operation laws cover every 32-bit constructor payload.
 
@@ -207,16 +207,19 @@ The proved arithmetic foundations are:
 - The actual production two-product `dot` expression agrees with the exact
   Nat dot product for every guarded pair of points. Its guard can likewise
   be supplied as acceptance by the production point filter.
-  The sums of two dot products used by transversality remain outstanding.
+  The production sum of two dots is also exact under the coordinate guards.
+  The final transversality comparisons remain outstanding.
 - Eight coordinates bounded by 16000 imply a strict U32 bound for the paired
-  sum of four products. The bound is universal; connecting it to the actual
-  sum of two production dot expressions remains outstanding.
+  sum of four products. The actual paired Word products and additions equal
+  that exact formula whenever its complete sum fits; all intermediate bounds
+  follow. Source conversions connect this result to the production sum of two
+  dots under the coordinate guards, without an extra overflow premise.
 
 The `word-*.bend` modules define these models, laws, proofs and fixtures;
 `arithmetic-*-proof.bend` contains supporting order and product algebra.
-The `coordinate-sum-*`, `coordinate-runtime-*` and `coordinate-dot-*` modules
-prove the source guards and their connection to the production determinant
-and dot expression.
+The coordinate sum, runtime, dot and dot-pair modules prove the source
+guards and their connection to the production determinant, dot expression
+and sum of two dots.
 Fixtures invoke the theorems, cover all three-bit comparisons and complements,
 and include a bounded product whose unused shift overflows. Compiling mutations
 must fail the corresponding proof gate. The subtraction comparison-selector
@@ -228,7 +231,8 @@ point-range filter is rejected in `accepted_points_determinant`. Substituting
 a wrong coordinate in the production dot expression fails `guarded_dot_exact`.
 The coordinate-sum mutant multiplies the sum by eight, making its bound
 false at the maximum coordinates; it fails in `sum_width_bound`. The analogous
-four-product mutant is rejected in `width_bound`.
+four-product mutant is rejected in `width_bound`. Changing a multiplication
+to addition in the paired Word sum is rejected in the shared `finish` lemma.
 These are shared-lemma rejections, rather than
 failures in the public law sections. The U32 sum-wrapper mutant is checked
 against a literal instance of its law, with the premise independently accepted;
