@@ -1735,3 +1735,71 @@ and independent geometry/topology checks. `git diff --exit-code -- b.svg`
 confirmed byte-identical output. The Linux native-build harness change was
 self-reviewed against the existing regeneration path and passed the actual
 native fixture in the successful complete run.
+
+### Geometric completeness for contained corners (stage 2, incomplete)
+
+`corner-candidate.bend` states that at least one original corner of q lies in
+r's closed halfplane region. Four public laws prove that, for a strict q, this
+predicate exactly equals admissibility of q's four embedded corners; a true
+predicate forces a witness from the actual complete candidate search. With both
+quads strict, the selected witness supplies independent nonnegative hull weights.
+A symmetric law proves success when a corner of the second quad lies in the
+first; this law uses strictness of the second quad, not an assumed first-list
+hit. The proofs reuse own-corner containment, positive embedded denominators,
+list-level existence, concatenation, and actual search-hit soundness.
+
+Five witness fixtures exercise each of the four corner positions and the
+second-quad containment direction. A separate crossing fixture proves that
+horizontal and vertical rectangles can intersect with no contained corner in
+either direction, while the exact search still succeeds. This literal example
+is not a universal proof of the crossing branch.
+
+Five compiling controls remove each corner in turn or replace the outer OR
+with AND. Each fails at shared `corner_admissions`; each also has a separately
+checked literal refutation of public `corner_admission_exact` with its strict-q
+premise true and an actual admissible vertex present. These are handwritten
+proof controls, not a bend-falsify report. The new proof passed real BendTT
+under the five-second limit with CPU affinity; an initial unrestricted run of
+the extended proof exceeded that limit and was not counted as passing. Crossing
+fixtures are separate from witness fixtures so their literal computation does
+not add to the imported universal proof-check workload.
+
+The contained-corner branches are proved. The no-contained-corner branch still
+needs a universal theorem providing an admissible side-intersection candidate.
+This is not full SAT/geometric completeness. Triple-search completeness,
+independent complex enumeration, and the actual SVG-fill topological bridge
+remain open. Stages 2–4 are unfinished.
+
+Implementer self-review: contained-corner acceptance is a region predicate,
+while the resulting witness includes actual equality to the full search output;
+it does not substitute the original corner for the selected point. Strictness
+is used only to prove own-corner containment, and both hull memberships require
+both strict-quad premises. The symmetric branch preserves the original search
+order and proves existence in the second list. Existing geometry owners and
+the native generator are unchanged. The later crossing consumer cannot infer
+geometric disjointness merely from failure of these corner predicates.
+
+Validation: the final complete `taskset -c 7,11 python3 -u check.py` run
+passed 278 public laws across 42 roots, all new and existing fixtures, 203
+compiling mutation controls, the five new literal public-law refutations, and
+independent geometry/topology checks. Three earlier full attempts failed on
+five-second timeouts in the monolithic intersection fixtures, the unchanged
+`QUAD_BARYCENTRIC_PROOF.bend` root, and the combined corner-witness fixtures.
+They are not counted as passing validation. A separate repeat of the unchanged
+barycentric root passed in approximately 2.7 seconds with the same limit.
+
+The old intersection fixtures now run in separation, common-point, and
+native-bridge groups with shared `quad-intersection-fixtures.bend` data.
+All 26 original fixture/helper definitions were verified present exactly once;
+no assertion or coordinate was removed or weakened. The five new corner-witness
+constructions run separately with shared `corner-candidate-fixtures.bend` data.
+Each separate group passed real BendTT under its unchanged five-second limit,
+as did the final complete run. The self-review checked preserved test coverage,
+actual result extraction, guard placement and both candidate-list directions.
+
+The first regeneration attempt exited 124 during its proof-root loop and is
+not counted as passing. The complete retry, `taskset -c 7,11 sh -x
+./regenerate.sh`, passed all 42 real proof roots, native generation and
+independent geometry/topology checks with unchanged limits. Shell tracing
+provided command diagnostics only. `git diff --exit-code -- b.svg` confirmed
+byte-identical output.

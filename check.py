@@ -130,6 +130,30 @@ def segment_cut_counter(directory, original, replacement):
     bend(directory, "segment-cut-counter.bend", "--verdict")
 
 
+def corner_candidate_counter(directory, original):
+    # Refute the public admission equality while strict-q remains true.
+    cases = {
+        "a": "N.Q{N.P{0n,0n},N.P{1n,0n},N.P{1n,1n},N.P{0n,1n}}",
+        "b": "N.Q{N.P{3n,0n},N.P{5n,0n},N.P{5n,1n},N.P{3n,1n}}",
+        "c": "N.Q{N.P{3n,3n},N.P{5n,3n},N.P{5n,5n},N.P{3n,5n}}",
+        "d": "N.Q{N.P{0n,3n},N.P{1n,3n},N.P{1n,5n},N.P{0n,5n}}",
+    }
+    corner = next(k for k in cases if f"Q.embed({k})" in original)
+    q = "N.Q{N.P{0n,0n},N.P{4n,0n},N.P{4n,4n},N.P{0n,4n}}"
+    r = cases[corner]
+    (directory / "corner-candidate-counter.bend").write_text(
+        "import Base\nimport ./corner-candidate.bend as M\nimport ./natural-cover.bend as N\n"
+        "import ./quad-geometry.bend as Q\nimport ./candidate-existence.bend as E\n"
+        "import ./intersection-search.bend as S\nimport ./boolean-reflection.bend as B\n"
+        f"def box() -> N.Quad:\n  {q}\ndef other() -> N.Quad:\n  {r}\n"
+        "def premise() -> {Q.strict_quad(box()) == True{} : Bool}:\n  {==}\n"
+        "def candidate_exists() -> {E.any_valid(S.vertices(box()),box(),other()) == True{} : Bool}:\n  {==}\n"
+        "def wrong_admission() -> {M.inside_other(box(),other()) == False{} : Bool}:\n  {==}\n"
+        "def refutes_public_equality(h:{E.any_valid(S.vertices(box()),box(),other()) == M.inside_other(box(),other()) : Bool}) -> Empty:\n"
+        "  B.false_impossible(Equal.sym(Bool,True{},False{},h))\n")
+    bend(directory, "corner-candidate-counter.bend", "--verdict")
+
+
 def negative_controls(directory):
     controls = [
         ("core.bend", "Seam{boundary_left(cell_start(cell)),",
@@ -144,6 +168,11 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ('corner-candidate.bend', 'Region.contains(Q.embed(a),r)', 'False{}', 'corner_admissions'),
+        ('corner-candidate.bend', 'Region.contains(Q.embed(b),r)', 'False{}', 'corner_admissions'),
+        ('corner-candidate.bend', 'Region.contains(Q.embed(c),r)', 'False{}', 'corner_admissions'),
+        ('corner-candidate.bend', 'Region.contains(Q.embed(d),r)', 'False{}', 'corner_admissions'),
+        ('corner-candidate.bend', 'Region.contains(Q.embed(a),r) ||', 'Region.contains(Q.embed(a),r) &&', 'corner_admissions'),
         ('candidate-existence.bend', 'S.admit(h,q,r) || any_valid(t,q,r)', 'S.admit(h,q,r) && any_valid(t,q,r)', 'scan_found_exact'),
         ('candidate-existence.bend', 'S.admit(h,q,r) || any_valid(t,q,r)', 'any_valid(t,q,r)', 'scan_found_exact'),
         ('candidate-existence.bend', 'case S.Hit{p}: True{}', 'case S.Hit{p}: False{}', 'choice_found'),
@@ -369,6 +398,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif file == "corner-candidate.bend":
+                proof_root = "CORNER_CANDIDATE_PROOF.bend"
             elif file == "candidate-existence.bend":
                 proof_root = "CANDIDATE_EXISTENCE_PROOF.bend"
             elif file == "intersection-search.bend":
@@ -458,6 +489,8 @@ def negative_controls(directory):
             except AssertionError as error:
                 raise AssertionError(f"Mutation {file}: {law} did not produce a proof diagnostic\n{error}") from error
             assert law in output, output
+            if file == "corner-candidate.bend":
+                corner_candidate_counter(directory, old)
             if file == "segment-cut.bend":
                 segment_cut_counter(directory, old, new)
             if file == "quad-intersection.bend":
@@ -611,6 +644,13 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        bend(directory, "corner-candidate-tests.bend", "--verdict")
+        bend(directory, "corner-candidate-b-tests.bend", "--verdict")
+        bend(directory, "corner-candidate-c-tests.bend", "--verdict")
+        bend(directory, "corner-candidate-d-tests.bend", "--verdict")
+        bend(directory, "corner-right-contained-tests.bend", "--verdict")
+        bend(directory, "corner-crossing-tests.bend", "--verdict")
+        print("Corner completeness fixtures accepted: all four corners, second-quad containment and crossings without contained vertices")
         bend(directory, "candidate-existence-tests.bend", "--verdict")
         print("Candidate existence fixtures accepted: actual witness, empty list, appended hit and invalid denominator")
         bend(directory, "intersection-search-tests.bend", "--verdict")
@@ -618,6 +658,8 @@ if __name__ == "__main__":
         bend(directory, "segment-cut-tests.bend", "--verdict")
         print("Exact segment cut fixtures accepted: unequal gaps, unequal denominators, boundary endpoint, containment and valid membership")
         bend(directory, "quad-intersection-tests.bend", "--verdict")
+        bend(directory, "quad-intersection-common-tests.bend", "--verdict")
+        bend(directory, "quad-intersection-native-tests.bend", "--verdict")
         print("Global intersection fixtures accepted: one-sided separation, common points, edge/corner contact, native rejection and symmetry")
         bend(directory, "strict-halfplane-tests.bend", "--verdict")
         print("Strict separation fixtures accepted: contact, zero pairs, alternate fractions, hull exclusion and native bridge")
