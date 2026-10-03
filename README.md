@@ -34,7 +34,7 @@ commands; this avoids an expensive combined optimization step on shared
 machines. Other platforms retain Bend's native build command. Proof checks
 use the same five-second BendTT gate on every platform.
 
-`check.py` runs the 133-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 136-law proof gate, 200 literal arithmetic checks,
 seven executed validator boundary checks, three executed transverse cases,
 four executed cell-transverse cases and rejection beyond each source-coordinate limit,
 compiling mutations that must fail
@@ -613,3 +613,31 @@ self-review covered source-point guards, determinant reuse, both winding
 branches, actual cell corner order, fixtures and mutation/root registration.
 No production behavior changed; geometric interpretation and the remaining
 caller obligations recorded in the audit are still open.
+
+Width interval composition: three public laws connect `width_in_range`,
+bounded point widths and `section_width` with natural squared-distance and
+interval formulas. Threshold words are symbolic arguments pinned by equality
+to the actual constants 3240000 and 6760000. This keeps the numerical policy
+fixed while avoiding the checker's deep expansion of their Nat values. An
+initial closed-threshold formulation overflowed the machine stack and is
+not counted as passing evidence. The natural interval decodes those literal
+word thresholds; it does not perform word arithmetic or native comparisons.
+The accepted point guards suffice for the squared-width bridge. Native
+fixtures check both inclusive thresholds, their adjacent values, physical
+widths 1799/1800/2600/2601 and zero width at the coordinate limit. Three
+compiling controls invert the lower comparison, increase the upper limit,
+or compare a section endpoint with itself. The range and section public
+law sections reject them. Accepted traversal and geometric interpretation
+remain open.
+
+Validation of width interval composition:
+`taskset -c 7,11 python3 -u check.py` passed 136 unique public laws across
+twenty-one roots, all fixture groups, 90 compiling mutations and independent
+artifact checks. `taskset -c 7,11 ./regenerate.sh` passed with the five-second
+limit on every kernel invocation and preserved `b.svg` byte for byte.
+Implementer self-review covered the pinned threshold equalities, inclusive
+comparison directions, accepted squared-width dependency, section endpoint
+selection, fixtures and root/mutation registration. No production behavior
+changed. The initial stack-overflow formulation is excluded from evidence;
+the committed symbolic formulation passed the real kernel. Accepted source
+traversal and later geometric/topological obligations remain open.

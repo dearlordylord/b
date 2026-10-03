@@ -17,7 +17,7 @@ production behavior.
 | --- | --- | --- |
 | `core.cell_center` | Centroid model, bounded centroid and validated centroid-mean laws | Connect any downstream composite check still lacking a natural model |
 | `validation.determinant_positive` | `accepted_points_determinant` in `coordinate-runtime-laws.bend` | `source-convexity-laws.bend` now composes `positive_quad`, `convex_quad`, `cell_convex`; propagate actual accepted source guards through the validator traversal |
-| `validation.width_squared` | `accepted_points_width` in `coordinate-width-laws.bend` | Compose `width_in_range`/`section_width` with natural bounds and accepted section traversal |
+| `validation.width_squared` | `accepted_points_width` in `coordinate-width-laws.bend` | `width-range-laws.bend` now composes `width_in_range`/`section_width` with natural bounds; connect accepted section traversal |
 | `validation.dot`, `cell_transverse` | Accepted point dot law and `source_corners_transverse_exact` | Audit composition into the full cell validator and source traversal |
 | `topology.scaled` | Grid round-trip, scaled coordinate exactness and envelopes | Geometric scale correspondence belongs to stage 2 |
 | `topology.cells`, append, selected cells and neighbors | `source-cells-laws.bend` envelope preservation | Connect these facts throughout the actual inspection traversal |
