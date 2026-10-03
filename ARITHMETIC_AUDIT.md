@@ -20,7 +20,7 @@ production behavior.
 | `validation.width_squared` | `accepted_points_width` in `coordinate-width-laws.bend` | `width-range-laws.bend` now composes `width_in_range`/`section_width` with natural bounds; `validator-natural-laws.bend` now connects accepted section traversal |
 | `validation.dot`, `cell_transverse` | Accepted point dot law and `source_corners_transverse_exact` | `validator-natural-laws.bend` now composes into the full cell validator and source traversal |
 | `topology.scaled` | Grid round-trip, scaled coordinate exactness and envelopes | Geometric scale correspondence belongs to stage 2 |
-| `topology.cells`, append, selected cells and neighbors | `source-cells-laws.bend` envelope preservation | Natural filter equality and envelope propagation now compose; connect the guarded source entry and remaining guarded source inspection |
+| `topology.cells`, append, selected cells and neighbors | `source-cells-laws.bend` envelope preservation | Natural filter equality and envelope propagation now compose; `source-inspection-laws.bend` now connects the guarded source entry; audit source scaling/orientation construction |
 | `topology.sample`, vertex witnesses and search weights | Sample arithmetic, denominator, bounds and search-hit laws | Full bounded search Boolean agreement now appears in `search-arithmetic-laws.bend`; geometric interpretation of found witnesses belongs to stage 2 |
 | `topology.side`, `inside`, `common` | Side bridge and natural inside/common agreements | Half-plane/convex-polygon membership interpretation belongs to stage 2 |
 | `topology.separated`, `outside`, `meets`, `strictly_convex`, `orientation` | Five composition laws in `sat-arithmetic-laws.bend` | Geometric separation and convexity theorems belong to stage 2 |
@@ -36,7 +36,10 @@ and filter envelope laws supply part of that missing bridge. A full audit
 must connect the actual accepted input, recursive traversal and each called
 arithmetic predicate. The unscaled validator now has full arithmetic agreement via
 `validator_arithmetic_exact`; the bounded topology cell inspection now has full arithmetic agreement,
-but its guarded source entry still needs a composed bridge. Stage 1 is therefore still incomplete.
+and `source-inspection-laws.bend` connects the guarded source entry.
+That reference reuses `T.cells`; a final audit must account separately for
+the source scaling and orientation choices. Stage 1 remains incomplete
+until that coverage is established.
 
 The search is intentionally conservative. A successful search now carries a
 bounded witness with positive denominator and exact natural half-plane

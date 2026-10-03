@@ -34,7 +34,7 @@ commands; this avoids an expensive combined optimization step on shared
 machines. Other platforms retain Bend's native build command. Proof checks
 use the same five-second BendTT gate on every platform.
 
-`check.py` runs the 166-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 169-law proof gate, 200 literal arithmetic checks,
 seven executed validator boundary checks, three executed transverse cases,
 four executed cell-transverse cases and rejection beyond each source-coordinate limit,
 compiling mutations that must fail
@@ -782,3 +782,32 @@ bounds at the third/second levels, triangle-witness agreement, Nat-only
 constructor/addition reuse, all report fields and positional fixture semantics.
 No production behavior changed. Guarded source inspection and the geometric,
 independent enumeration and topological bridges remain open.
+
+Guarded source inspection composition: three public laws now connect the
+actual `topology.inspect` and `valid` entry points with `source-inspection.bend`
+and pin its failed-guard branch to the zero/false report. These agreements
+cover arbitrary source lists without an externally supplied bounds premise.
+The accepted branch splits all three actual source guards, obtains the
+existing generated-cell envelopes and invokes the full count/report
+arithmetic agreement. The reference intentionally reuses `T.cells` and
+the Nat-only report validity policy; it is not an independent source-cover
+construction or geometric specification. Native fixtures cover a three-strip
+chain, empty input, a non-grid coordinate, an out-of-range third cover and
+the final decision. Three compiling controls omit the third cover, alter
+a failed-guard flag, or force the final decision false. They fail in
+shared `source_accepted_fields`, `source_gate_exact`, and the public
+`source_valid_arithmetic_exact` section respectively. Stage 1 still requires
+a final coverage audit of source scaling/orientation construction; stages
+2–4 remain open.
+
+Validation of guarded source inspection:
+`taskset -c 7,11 python3 -u check.py` passed 169 unique public laws across
+twenty-six roots, every fixture group, 122 compiling mutations and independent
+artifact checks. `taskset -c 7,11 ./regenerate.sh` passed with the five-second
+limit on each kernel invocation and preserved `b.svg` byte for byte. An
+initial third-cover mutation duplicated a linear list and was discarded as
+ill-typed; it is not counted. The committed omission control compiles and
+is rejected by its proof. Implementer self-review covered all three source
+guards, generated-cell envelopes, empty versus rejected input, report fields,
+final validity reuse and root/mutation routing. No production behavior
+changed. Source-cover construction coverage and stages 2–4 remain open.

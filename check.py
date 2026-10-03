@@ -52,6 +52,9 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ('source-inspection.bend', 'case True{}: Counts.inspect_cells(T.cells(a), T.cells(b), T.cells(c))', 'case True{}: Counts.inspect_cells(T.cells(a), T.cells(b), [])', 'source_accepted_fields'),
+        ('source-inspection.bend', 'case False{}: T.Counts{0n, 0n, 0n, 0n, False{}, False{}, False{}, False{}}', 'case False{}: T.Counts{0n, 0n, 0n, 0n, True{}, False{}, False{}, False{}}', 'source_gate_exact'),
+        ('source-inspection.bend', 'T.counts_valid(inspect(a, b, c))', 'False{}', 'source_valid_arithmetic_exact'),
         ('count-arithmetic.bend', 'def fourth(xs: List<&2, T.Quad>) -> T.CliqueCounts:\n  match xs:\n    case Nil{}: T.empty_counts()', 'def fourth(xs: List<&2, T.Quad>) -> T.CliqueCounts:\n  match xs:\n    case Nil{}: T.fourth_step(True{})', 'fourth_arithmetic_exact'),
         ('count-arithmetic.bend', 'T.third_step(Search.triangle_witness(a, b, h), fourth(Cover.neighbors(h, t)))', 'T.third_step(True{}, fourth(Cover.neighbors(h, t)))', 'third_arithmetic_exact'),
         ('count-arithmetic.bend', 'T.CC{1n, 0n, 0n, True{}, True{}}', 'T.CC{0n, 0n, 0n, True{}, True{}}', 'second_arithmetic_exact'),
@@ -188,6 +191,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif law in {"source_accepted_fields", "source_gate_exact", "source_valid_arithmetic_exact"}:
+                proof_root = "SOURCE_INSPECTION_PROOF.bend"
             elif law in {"fourth_arithmetic_exact", "third_arithmetic_exact", "second_arithmetic_exact", "first_arithmetic_exact", "inspect_cells_arithmetic_exact"}:
                 proof_root = "COUNT_ARITHMETIC_PROOF.bend"
             elif law in {"word_sample_values", "common_coords_values", "segment_search_arithmetic_exact", "pair_search_arithmetic_exact", "all_pairs_arithmetic_exact", "vertex_search_arithmetic_exact", "triangle_search_arithmetic_exact", "triangle_witness_arithmetic_exact"}:
