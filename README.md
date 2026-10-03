@@ -1929,3 +1929,46 @@ under the same five-second limit. That attempt is a failed run. Before the next
 full run, the new balance law was strengthened to exact Boolean equivalence,
 with the original preservation law derived from it. The new rejection fixture
 and all six compiling/literal controls passed real BendTT. The complete retry passed with unchanged proof limits: 291 laws across 44 roots and 214 compiling controls. Generator regeneration also passed all 44 real proof roots, bounded native compilation and independent artifact checks. The generated SVG is byte-for-byte unchanged.
+
+
+### Exact source-segment provenance (stage 2, incomplete)
+
+`segment-provenance.bend` carries a pair of original-source coefficients through
+one combination of reparameterized endpoints. Four universal laws prove that
+`compose` equals the nested homogeneous join in all three raw components, that
+valid nonempty combinations retain a positive denominator, and that
+`cut_on_source` equals the actual determinant-gap cut of the current endpoints.
+The source-cut denominator is positive under valid original endpoints,
+nonempty current coefficient pairs and the actual outside-endpoint premise.
+The cut weights are computed from the current points, not from the original
+source endpoints. Zero inside gap is allowed by the cut validity contract.
+
+Ten fixture definitions cover unequal denominators, exact components, empty
+outer weights, a zero inner pair, current endpoint combinations, source-cut
+validity and a boundary cut with zero inside gap. Three handwritten compiling
+controls drop either contribution to the source coefficients or swap the
+current cut gaps. Each is tied to a literal refutation of the corresponding
+exact public equality; these equality laws have no premises. The swap
+counterexample uses unequal gaps and small coordinates to keep literal kernel
+reduction within the unchanged five-second limit. An earlier larger literal
+counterexample timed out and is not counted as passing. Integrated validation passed: 295 unique public laws across 45 roots, all fixture groups, 217 compiling mutation controls, invalid-artwork controls and independent SVG geometry/topology checks. Generator regeneration also passed all 45 real proof roots, bounded native compilation and independent artifact checks. The generated SVG is byte-for-byte unchanged.
+
+Implementer self-review: the new pure owner depends on the existing homogeneous
+combination and exact segment-cut owners. Its proofs reuse their denominator
+contracts and the existing distributive/regrouping facts. The scalar helper
+states arithmetic independently of the implementation so coefficient mutations
+fail in public `compose_exact`; the cut-gap mutation fails in `source_cut_exact`.
+No native search, generator or SVG behavior has changed. The intended later
+consumer is the clipping iterator, whose endpoints must remain tied to the
+original side rather than merely belong to a transient segment.
+
+This establishes a single composition step, not an implemented iteration or a
+proof that every final endpoint occurs in the original candidate list.
+Proportional-weight equivalence, clipping selection and complete search still
+need their proofs. Independent enumeration and the actual topological bridge
+remain open; stages 2–4 are unfinished.
+
+Validation checkpoint: the first integrated provenance run accepted all 295 laws
+across 45 roots and the new fixtures, then timed out in unchanged
+`candidate-existence-tests.bend`. Its separate repeat passed at the same
+five-second limit; the first integrated run remains failed. The complete retry passed with unchanged limits and assertions: 295 laws across 45 roots, all fixtures and 217 compiling controls.

@@ -208,6 +208,29 @@ def clip_halfplane_counter(directory, original, replacement):
     bend(directory, "clip-halfplane-counter.bend", "--verdict")
 
 
+def segment_provenance_counter(directory, original):
+    """Refute the exact public equality at literals; these laws have no premises."""
+    if original.startswith("compose(p,q,k,l,m,n,Cut.first"):
+        endpoints = "def p() -> G.Point: G.P{0n,3n,1n}\ndef q() -> G.Point: G.P{1n,0n,1n}\n"
+        actual = "M.cut_on_source(a(),b(),p(),q(),1n,0n,0n,1n)"
+        expected = "Cut.point(a(),b(),C.join(p(),q(),1n,0n),C.join(p(),q(),0n,1n))"
+    else:
+        endpoints = "def p() -> G.Point: G.P{1n,4n,2n}\ndef q() -> G.Point: G.P{5n,1n,3n}\n"
+        actual = "M.compose(p(),q(),2n,1n,1n,3n,2n,1n)"
+        expected = "C.join(C.join(p(),q(),2n,1n),C.join(p(),q(),1n,3n),2n,1n)"
+    (directory / "segment-provenance-counter.bend").write_text(
+        "import Base\nimport ./segment-provenance.bend as M\n"
+        "import ./homogeneous-geometry.bend as G\nimport ./homogeneous-combination.bend as C\n"
+        "import ./natural-cover.bend as N\nimport ./segment-cut.bend as Cut\n"
+        "import ./boolean-reflection.bend as B\n"
+        + endpoints +
+        "def a() -> N.Point: N.P{0n,1n}\ndef b() -> N.Point: N.P{1n,1n}\n"
+        f"def broken_public_equality() -> {{G.equivalent({actual},{expected}) == False{{}} : Bool}}:\n  {{==}}\n"
+        f"def refutes_public_equality(h:{{{actual} == {expected} : G.Point}}) -> Empty:\n"
+        f"  B.false_impossible(Equal.cong(G.Point,Bool,x => G.equivalent(x,{expected}),{actual},{expected},h))\n")
+    bend(directory, "segment-provenance-counter.bend", "--verdict")
+
+
 def negative_controls(directory):
     controls = [
         ("core.bend", "Seam{boundary_left(cell_start(cell)),",
@@ -222,6 +245,9 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ('segment-provenance.bend', 'Nat.add(Nat.mul(k,v),Nat.mul(m,w))', 'Nat.mul(k,v)', 'compose_exact'),
+        ('segment-provenance.bend', 'Nat.add(Nat.mul(l,v),Nat.mul(n,w))', 'Nat.mul(l,v)', 'compose_exact'),
+        ('segment-provenance.bend', 'compose(p,q,k,l,m,n,Cut.first_weight(a,b,C.join(p,q,m,n)),Cut.second_weight(a,b,C.join(p,q,k,l)))', 'compose(p,q,k,l,m,n,Cut.second_weight(a,b,C.join(p,q,k,l)),Cut.first_weight(a,b,C.join(p,q,m,n)))', 'source_cut_exact'),
         ('clip-halfplane.bend', 'Nat.is_le(Nat.mul(l,Cut.first_weight(a,b,q)),Nat.mul(k,Cut.second_weight(a,b,p)))', 'True{}', 'closed_join_balance_exact'),
         ('clip-halfplane.bend', 'Nat.is_le(Nat.mul(l,Cut.first_weight(a,b,q)),Nat.mul(k,Cut.second_weight(a,b,p)))', 'Nat.is_le(Nat.mul(k,Cut.second_weight(a,b,p)),Nat.mul(l,Cut.first_weight(a,b,q)))', 'closed_join_balance_exact'),
         ('clip-halfplane.bend', 'Nat.mul(l,Cut.first_weight(a,b,q))', 'Nat.add(l,Cut.first_weight(a,b,q))', 'closed_join_balance_exact'),
@@ -463,6 +489,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif file == "segment-provenance.bend":
+                proof_root = "SEGMENT_PROVENANCE_PROOF.bend"
             elif file == "clip-halfplane.bend":
                 proof_root = "CLIP_HALFPLANE_PROOF.bend"
             elif file == "clip-weights.bend":
@@ -558,6 +586,8 @@ def negative_controls(directory):
             except AssertionError as error:
                 raise AssertionError(f"Mutation {file}: {law} did not produce a proof diagnostic\n{error}") from error
             assert law in output, output
+            if file == "segment-provenance.bend":
+                segment_provenance_counter(directory, old)
             if file == "clip-halfplane.bend":
                 clip_halfplane_counter(directory, old, new)
             if file == "clip-weights.bend":
@@ -717,6 +747,9 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        bend(directory, "segment-provenance-raw-tests.bend", "--verdict")
+        bend(directory, "segment-provenance-tests.bend", "--verdict")
+        print("Source-segment provenance fixtures accepted: exact coefficients, unequal denominators, zero weights, actual cuts and validity")
         bend(directory, "clip-halfplane-tests.bend", "--verdict")
         bend(directory, "clip-halfplane-boundary-tests.bend", "--verdict")
         bend(directory, "clip-halfplane-guard-tests.bend", "--verdict")
