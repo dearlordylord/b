@@ -52,6 +52,13 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ('cover-arithmetic.bend', 'Bool.not(Sat.meets(q, h)) && disjoint_all(q, t)', 'True{} && disjoint_all(q, t)', 'disjoint_all_arithmetic_exact'),
+        ('cover-arithmetic.bend', 'case Con{h, t}: disjoint_all(q, t)', 'case Con{h, t}: disjoint_all(q, Con{h, t})', 'disjoint_nonadjacent_arithmetic_exact'),
+        ('cover-arithmetic.bend', 'Sat.meets(q, h) || overlaps_one(q, t)', 'Sat.meets(q, h) || False{}', 'overlaps_one_arithmetic_exact'),
+        ('cover-arithmetic.bend', 'overlaps_one(h, ys) || overlaps(t, ys)', 'False{} || overlaps(t, ys)', 'overlaps_arithmetic_exact'),
+        ('cover-arithmetic.bend', 'case Con{h, t}: Edge.shared_edge(q, h)', 'case Con{h, t}: True{}', 'adjacent_arithmetic_exact'),
+        ('cover-arithmetic.bend', 'Sat.strictly_convex(h) && adjacent(h, t)', 'True{} && adjacent(h, t)', 'ribbon_walk_arithmetic_exact'),
+        ('cover-arithmetic.bend', 'Bool.not(List.is_empty(&2, T.Quad, xs)) && ribbon_walk(xs)', 'True{} && ribbon_walk(xs)', 'ribbon_arithmetic_exact'),
         ('validator-natural.bend', 'Transverse.exact(cell) &&', 'True{} &&', 'bounded_cell_arithmetic_exact'),
         ('validator-natural.bend', 'cell_valid(lower, upper, C.Cell{previous, h}) && cells_valid(t, h, lower, upper)', 'cell_valid(lower, upper, C.Cell{previous, h}) && True{}', 'bounded_cells_arithmetic_exact'),
         ('validator-natural.bend', 'Width.section_width(lower, upper, h) && cells_valid(t, h, lower, upper)', 'True{} && cells_valid(t, h, lower, upper)', 'bounded_nonempty_arithmetic_exact'),
@@ -163,6 +170,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif law in {"disjoint_all_arithmetic_exact", "disjoint_nonadjacent_arithmetic_exact", "overlaps_one_arithmetic_exact", "overlaps_arithmetic_exact", "adjacent_arithmetic_exact", "ribbon_walk_arithmetic_exact", "ribbon_arithmetic_exact"}:
+                proof_root = "COVER_ARITHMETIC_PROOF.bend"
             elif law in {"bounded_cell_arithmetic_exact", "bounded_cells_arithmetic_exact", "bounded_nonempty_arithmetic_exact", "gate_exact"}:
                 proof_root = "VALIDATOR_NATURAL_PROOF.bend"
             elif law in {"width_in_range_arithmetic_exact", "section_width_arithmetic_exact"}:

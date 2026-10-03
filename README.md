@@ -34,7 +34,7 @@ commands; this avoids an expensive combined optimization step on shared
 machines. Other platforms retain Bend's native build command. Proof checks
 use the same five-second BendTT gate on every platform.
 
-`check.py` runs the 140-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 147-law proof gate, 200 literal arithmetic checks,
 seven executed validator boundary checks, three executed transverse cases,
 four executed cell-transverse cases and rejection beyond each source-coordinate limit,
 compiling mutations that must fail
@@ -670,3 +670,30 @@ previous/current section relation, empty and failed-guard branches, pinned
 thresholds and gate integration. No production behavior or caller-supplied
 overflow premise was added. The topology traversal arithmetic bridge and
 stages 2–4 remain open.
+
+Bounded cover-fold arithmetic: seven public laws now connect `disjoint_all`,
+`disjoint_nonadjacent`, `overlaps_one`, `overlaps`, `adjacent`, `ribbon_walk`
+and `ribbon` with folds over natural separation/convexity and edge-identity
+formulas. Actual list envelopes provide head and tail bounds recursively;
+`adjacent` needs no bound because its edge equality bridge is universal.
+The reference preserves the existing rule that only the immediate neighbor
+is excluded from nonadjacent disjointness. It does not prove that rule's
+geometric sufficiency or that a valid ribbon is connected. Native fixtures
+cover empty/singleton ribbons, a three-cell chain, point contact, a gap, a
+later overlap hit, the neighbor exclusion and reversed winding. Seven
+compiling model controls skip a tested head or tail, include the adjacent
+cell among disjointness checks, weaken shared-edge/convexity checks, or
+allow an empty ribbon. Their corresponding public law sections reject
+them. Inspection assembly, filtering/count traversal and geometric
+interpretation remain open.
+
+Validation of bounded cover-fold arithmetic:
+`taskset -c 7,11 python3 -u check.py` passed 147 unique public laws across
+twenty-three roots, every fixture group, 101 compiling mutations and
+independent artifact checks. `taskset -c 7,11 ./regenerate.sh` passed with
+the five-second limit on every kernel invocation and preserved `b.svg` byte
+for byte. Implementer self-review covered head/tail envelope propagation,
+conservative closed-contact comparisons, the immediate-neighbor exclusion,
+shared-edge identity, empty-list branches and mutation/root registration.
+No production behavior or bound was changed. Filtering/inspection assembly
+and the geometric, enumeration and topological bridges remain open.

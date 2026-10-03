@@ -25,6 +25,7 @@ production behavior.
 | `topology.side`, `inside`, `common` | Side bridge and natural inside/common agreements | Half-plane/convex-polygon membership interpretation belongs to stage 2 |
 | `topology.separated`, `outside`, `meets`, `strictly_convex`, `orientation` | Five composition laws in `sat-arithmetic-laws.bend` | Geometric separation and convexity theorems belong to stage 2 |
 | `topology.point_equal`, `reverse_edge`, `shared_edge` | Three universal agreements in `edge-arithmetic-laws.bend` | Shared-edge geometric meaning and ribbon connectivity remain open |
+| `topology.disjoint_all`, nonadjacent disjointness, overlaps and ribbons | Seven `cover-arithmetic-laws.bend` fold agreements | Connect the inspection assembly; geometric sufficiency and connectivity remain stage 2 |
 | `topology.sum_counts`, list length and Euler equation | Nat operations, report condition laws | Enumeration of the intended complex is stage 3, not established by arithmetic exactness |
 
 ## Boundaries of the evidence
