@@ -52,6 +52,8 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ("word-squares.bend", "Word.mul(n, b, b)", "Word.add(n, b, b)", "bounded_squares_exact"),
+        ("validation.bend", "(dx * dx + dy * dy : U32)", "(dx * dx + dx * dy : U32)", "guarded_width_exact"),
         ("validation.bend", "U32.sub(U32.max(a, b), U32.min(a, b))", "U32.sub(U32.min(a, b), U32.max(a, b))", "u32_absolute_exact"),
         ("absolute-difference.bend", "Bool.pick(Nat, less, Nat.sub(b, a), Nat.sub(a, b))", "Bool.pick(Nat, less, Nat.sub(a, b), Nat.sub(b, a))", "choice_value"),
         ("validation.bend", "U32.is_gt((dot(right, right) + dot(control, left) : U32), (dot(right, left) + dot(control, right) : U32))", "U32.is_le((dot(right, right) + dot(control, left) : U32), (dot(right, left) + dot(control, right) : U32))", "guarded_transverse_exact"),
@@ -106,6 +108,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif law in {"guarded_width_exact", "accepted_points_width"} or file in {"word-squares.bend", "natural-squares.bend"}:
+                proof_root = "WIDTH_PROOF.bend"
             elif law == "guarded_dot_exact":
                 proof_root = "coordinate-dot-proof.bend"
             elif "absolute" in law or file.startswith("absolute-"):
@@ -231,6 +235,10 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        bend(directory, "word-squares-tests.bend", "--verdict")
+        print("Bounded squared-sum fixtures accepted")
+        bend(directory, "coordinate-width-tests.bend", "--verdict")
+        print("Guarded production squared-width fixtures accepted")
         bend(directory, "absolute-difference-tests.bend", "--verdict")
         print("Absolute difference, symmetry and coordinate-bound fixtures accepted")
         print(f"Concrete transverse checks accepted: {literal_transverse_checks(directory)}")

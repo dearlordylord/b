@@ -89,8 +89,12 @@ are established. Partial milestones do not complete the objective.
 
 - Production absolute difference is exact for all U32 inputs. Its natural
   model is symmetric, respects a common coordinate bound and agrees with
-  the actual guarded source conversions. Squared-width composition remains.
+  the actual guarded source conversions.
+- The production squared-width expression equals the exact sum of squared
+  natural distances for all accepted points. The coordinate guards imply
+  every intermediate bound. Bounded squared sums are exact at every word
+  width.
 
 Still required for stage 1: connect the other production geometric expressions
-(squared widths, centroids and homogeneous
-topology witnesses) to their exact models. Stages 2–4 remain uncompleted.
+(centroids and homogeneous topology witnesses) to their exact models.
+Stages 2–4 remain uncompleted.

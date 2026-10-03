@@ -30,7 +30,7 @@ python3 check.py
 `generate.bend`, checks the emitted SVG, and replaces `b.svg` only on success.
 The generator itself refuses to emit an SVG if its Bend artwork validation fails.
 
-`check.py` runs the 73-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 77-law proof gate, 200 literal arithmetic checks,
 seven executed validator boundary checks, three executed transverse cases,
 compiling mutations that must fail
 proofs, invalid artworks that must be rejected before SVG emission, and Bend
@@ -169,7 +169,7 @@ proofs; its original license is retained in `LICENSE.mathlib`. See [NOTICE](NOTI
 ## Arithmetic programme (in progress)
 
 [ROADMAP.md](ROADMAP.md) records the autonomous four-stage programme. The
-current BendTT gate checks **73 unique public laws**, plus supporting lemmas.
+current BendTT gate checks **77 unique public laws**, plus supporting lemmas.
 Arithmetic results quantify over all inputs at arbitrary word widths; the U32
 operation laws cover every 32-bit constructor payload.
 
@@ -222,7 +222,16 @@ The proved arithmetic foundations are:
   distance for every pair of U32 values; max/min selection supplies the order
   required by subtraction. The natural model is symmetric and bounded by
   any common input bound. Guarded source conversions preserve that distance.
-  Squaring and adding the distances for actual widths remain outstanding.
+  The actual `width_squared` expression also equals the sum of squared
+  natural distances for every pair of points accepted by the coordinate
+  filter. The source bounds suffice for both squares and their sum; no
+  intermediate overflow premise is needed.
+- At every word width, a bounded sum of two squares equals its exact Nat
+  formula. Natural components bounded by 16000 imply that strict U32 bound.
+
+The squared-width proof group also connects the actual point-bound filter
+to the numeric result. Replacing a square with addition, or mixing the
+horizontal and vertical factors in production, is rejected by its laws.
 
 The `word-*.bend` modules define these models, laws, proofs and fixtures;
 `arithmetic-*-proof.bend` contains supporting order and product algebra.
@@ -262,20 +271,18 @@ model must give the independently specified Boolean result, with all point
 guards satisfied.
 
 `proof-roots.txt` lists the structural, arithmetic, transverse and absolute
-difference proof roots.
+difference and squared-width proof roots.
 Both `check.py` and `regenerate.sh` audit that every public law module is
 reachable, then check every root, with five seconds per kernel invocation.
-The roots share supporting proofs; the 73-law total counts
+The roots share supporting proofs; the 77-law total counts
 each public law once. Dependency-only imports of unrelated proof groups have
 been removed; arithmetic aggregation explicitly retains division and its
 subtraction/complement prerequisites. No previously checked law is omitted. The absolute-difference root proves
 subtraction and coordinate conversion without importing the width or
 transverse compositions.
 
-**Stage 1 remains incomplete:** the other production expressions (squared
-widths, centroids and homogeneous topology witnesses) still require their
-exact-model agreement and applicable bounds. Intersection correctness,
-enumeration correctness and the
-formal topological bridge in stages 2–4 are also outstanding. Finite artwork
+**Stage 1 remains incomplete:** centroids and homogeneous topology witnesses
+still require their exact-model agreement and applicable bounds. Intersection
+correctness, enumeration correctness and the formal topological bridge in stages 2–4 are also outstanding. Finite artwork
 checks and the externally justified topology certificate remain as described
 above; they are not substitutes for these universal proofs.
