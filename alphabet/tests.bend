@@ -36,7 +36,8 @@ def cases() -> Bool:
     Bool.not(M.glyph_valid(hidden())) &&
     Bool.not(M.painting_valid([], [arm()])) &&
     Bool.not(M.painting_valid([1n], [arm()])) &&
-    Bool.not(M.painting_valid([0n, 0n], [arm(), arm()]))
+    Bool.not(M.painting_valid([0n, 0n], [arm(), arm()])) &&
+    Bool.not(M.glyph_valid(glyph([M.Arm{[first(), last(), first()], [False{}, False{}], 0n, 0n, C.Pt{0n, 0n}, True{}}], 1n, 0n)))
 
 def main() -> IO(Unit):
   IO.print("alphabet-tests: " ++ Bool.show(cases()))

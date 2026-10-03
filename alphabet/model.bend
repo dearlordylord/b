@@ -58,6 +58,13 @@ def all_cells(arms: List<&2, Arm>) -> List<&2, T.Quad>:
     case Nil{}: Nil{}
     case Con{h, t}: List.append(&2, T.Quad, T.cells(arm_sections(h)), all_cells(t))
 
+# T.cells uses one orientation for an entire arm. Its membership/SAT checks
+# require every resulting cell to be CCW, including after a tight turn.
+def cells_oriented(cells: List<&2, T.Quad>) -> Bool:
+  match cells:
+    case Nil{}: True{}
+    case Con{h, t}: T.strictly_convex(h) && cells_oriented(t)
+
 def parent_valid(parent: Maybe<&2, Arm>, component: Nat, +join: C.Point, own: List<&2, C.Section>) -> Bool:
   match parent:
     case None{}: False{}
@@ -134,7 +141,9 @@ def separate_components(arms: List<&2, Arm>) -> Bool:
 def glyph_guard(valid: Bool, +arms: List<&2, Arm>, components: Nat) -> Bool:
   match valid:
     case False{}: False{}
-    case True{}: Nat.is_eq(roots(arms), components) && attachments(arms, 0n, arms) && separate_components(arms) && all_marks(arms, all_cells(arms))
+    case True{}:
+      +cover = all_cells(arms)
+      cells_oriented(cover) && Nat.is_eq(roots(arms), components) && attachments(arms, 0n, arms) && separate_components(arms) && all_marks(arms, cover)
 
 def indices(arms: List<&2, Arm>, +index: Nat) -> List<&2, Nat>:
   match arms:

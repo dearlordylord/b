@@ -31,7 +31,9 @@ def run(args, timeout=5):
 def build(entry, directory):
     c=directory/'program.c';exe=directory/'program'
     run(['bend',str(entry),'-o',str(c)])
-    run(['clang','-O1','-pthread',str(c),'-lm','-o',str(exe)])
+    # Validation/rendering is fast without LLVM optimization; optimizing the
+    # large literal artwork can exceed the five-second compile gate under load.
+    run(['clang','-O0','-pthread',str(c),'-lm','-o',str(exe)])
     return exe
 
 
@@ -103,7 +105,7 @@ def main():
         mutants=proof_controls(stage)
         tests=native(HERE/'tests.bend',stage)
         assert 'alphabet-tests: True' in tests,tests
-        print('Native boundary/rejection cases: 18 accepted',flush=True)
+        print('Native boundary/rejection cases: 19 accepted',flush=True)
         rejection=build(HERE/'rejection.bend',stage)
         rejected=subprocess.run([str(rejection)],capture_output=True,text=True,timeout=5)
         assert rejected.returncode==1 and not rejected.stdout and 'Alphabet validation failed' in rejected.stderr,rejected
@@ -119,7 +121,7 @@ def main():
             print(f'Native + exact artifact: {key}, {result["cells"]} cells, {result["seams"]} seams, {result["components"]} components / {result["holes"]} holes; {controls} negative controls',flush=True)
         ET.register_namespace('',NS)
         ET.ElementTree(specimen(roots)).write(stage/'specimen.svg',encoding='unicode')
-        report={'shared_proof_gate':not args.skip_proofs,'shared_public_laws':scope[1],'shared_proof_roots':len(scope[0]),'compiling_seam_mutants_rejected':mutants,'native_boundary_cases':18,'empty_generator_rejected':True,'svg_negative_controls':6*len(results),'glyphs':results,'total_cells':sum(r['cells'] for r in results),'total_seams':sum(r['seams'] for r in results),'scope':'shared universal seam laws + executed model checks; exact independent nerve enumeration; continuous topology bridge is not proved in Bend'}
+        report={'shared_proof_gate':not args.skip_proofs,'shared_public_laws':scope[1],'shared_proof_roots':len(scope[0]),'compiling_seam_mutants_rejected':mutants,'native_boundary_cases':19,'empty_generator_rejected':True,'svg_negative_controls':6*len(results),'glyphs':results,'total_cells':sum(r['cells'] for r in results),'total_seams':sum(r['seams'] for r in results),'scope':'shared universal seam laws + executed model checks; exact independent nerve enumeration; continuous topology bridge is not proved in Bend'}
         (stage/'validation.json').write_text(json.dumps(report,indent=2)+'\n')
         # Every staged file is checked before it replaces a public artifact.
         output_dir=HERE/'output';output_dir.mkdir(exist_ok=True)

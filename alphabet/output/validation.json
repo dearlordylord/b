@@ -3,7 +3,7 @@
   "shared_public_laws": 299,
   "shared_proof_roots": 46,
   "compiling_seam_mutants_rejected": 3,
-  "native_boundary_cases": 18,
+  "native_boundary_cases": 19,
   "empty_generator_rejected": true,
   "svg_negative_controls": 114,
   "glyphs": [

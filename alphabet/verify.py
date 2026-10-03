@@ -80,6 +80,8 @@ def verify(root, topology=True):
             require(1800**2<=(l[0]-r[0])**2+(l[1]-r[1])**2<=2600**2, 'width outside 18–26 px')
         cells = [positive([left[j],left[j+1],right[j+1],right[j]]) for j in range(half-1)]
         require(all(convex(cell) for cell in cells), 'nonconvex source cell')
+        signs=[cross(left[j],left[j+1],right[j+1])>0 for j in range(half-1)]
+        require(all(sign==signs[0] for sign in signs),'source arm orientation changes')
         expected_cover.extend(cells)
         shade = [((l[0]+3*r[0])//4,(l[1]+3*r[1])//4) for l,r in zip(left,right)]
         expected_shade.extend(positive([shade[j],shade[j+1],right[j+1],right[j]]) for j in range(half-1))

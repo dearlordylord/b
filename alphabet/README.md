@@ -19,11 +19,13 @@ python3 alphabet/regenerate.py
 Requirements are the existing Bend **2.0.34**, Clang, and Python 3. Each proof,
 C emission, native compilation, and generator invocation has an individual
 five-second limit. Entries are compiled one glyph at a time, so the growing
-catalog does not require a longer compiler gate. No Shapely, CairoSVG or
+catalog does not require a longer compiler gate. Clang uses `-O0`: optimizing
+large literal geometry once exceeded that same limit at `-O1`; native
+validation/rendering does not need LLVM optimization. No Shapely, CairoSVG or
 prototype generator is used in this command.
 
 The command checks the shared proof roots and `alphabet/PROOF.bend`, rejects
-three well-typed seam mutations through the public laws, executes 18 native
+three well-typed seam mutations through the public laws, executes 19 native
 boundary/rejection cases, and confirms that the real generator emits nothing
 for invalid artwork. It then generates every glyph, independently checks its
 actual SVG and exact intersection topology, and rejects six broken SVGs per
@@ -44,7 +46,7 @@ Each arm contains paired boundary sections, an explicit seam-selection list,
 and a component/attachment certificate. Every native generator checks:
 
 - At least two sections, coordinate bounds **0–16000**, and the four-unit grid.
-- Every cell's strict convexity, exact centroid, exact seam attachment,
+- Every cell's strict convexity and consistent arm orientation, exact centroid, exact seam attachment,
   strictly forward seam derivative, and **18–26 px** section width.
 - Exactly one seam-selection flag per cell; selected endpoints are outside
   the interiors of other cells, avoiding hidden junction seams.
