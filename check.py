@@ -52,6 +52,15 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ("topology.bend", "Q{scaled(Core.boundary_left(a)), scaled(Core.boundary_left(b)), scaled(Core.boundary_right(b)), scaled(Core.boundary_right(a))}", "Q{scaled(Core.point_add(Core.boundary_left(a), Core.boundary_left(a))), scaled(Core.boundary_left(b)), scaled(Core.boundary_right(b)), scaled(Core.boundary_right(a))}", "raw_cell_envelope"),
+        ("topology.bend", "def reverse(q: Quad) -> Quad:\n  match q:\n    case Q{a, b, c, d}: Q{d, c, b, a}", "def double_point(p: Point) -> Point:\n  match p:\n    case P{+x, y}: P{(x + x : U32), y}\ndef reverse(q: Quad) -> Quad:\n  match q:\n    case Q{a, b, c, d}: Q{double_point(d), c, b, a}", "reversed_fields"),
+        ("source-cells.bend", "M.quad_envelope(width, h) && envelope(width, t)", "M.quad_envelope(width, h) && Bool.not(envelope(width, t))", "walk_bound"),
+        ("topology.bend", 'def segment_search(fuel: Nat, +p: Point, +q: Point, +a: Quad, +b: Quad, +c: Quad) -> Bool:\n  match fuel:\n    case Zero{}: False{}', 'def segment_search(fuel: Nat, +p: Point, +q: Point, +a: Quad, +b: Quad, +c: Quad) -> Bool:\n  match fuel:\n    case Zero{}: True{}', "segment_search_hit"),
+        ("topology.bend", 'def pair_search(xs: List<&2, Point>, +p: Point, +a: Quad, +b: Quad, +c: Quad) -> Bool:\n  match xs:\n    case Nil{}: False{}', 'def pair_search(xs: List<&2, Point>, +p: Point, +a: Quad, +b: Quad, +c: Quad) -> Bool:\n  match xs:\n    case Nil{}: True{}', "pair_search_hit"),
+        ("topology.bend", 'def all_pairs(xs: List<&2, Point>, +a: Quad, +b: Quad, +c: Quad) -> Bool:\n  match xs:\n    case Nil{}: False{}', 'def all_pairs(xs: List<&2, Point>, +a: Quad, +b: Quad, +c: Quad) -> Bool:\n  match xs:\n    case Nil{}: True{}', "all_pairs_hit"),
+        ("topology.bend", 'def vertex_search(xs: List<&2, Point>, +a: Quad, +b: Quad, +c: Quad) -> Bool:\n  match xs:\n    case Nil{}: False{}', 'def vertex_search(xs: List<&2, Point>, +a: Quad, +b: Quad, +c: Quad) -> Bool:\n  match xs:\n    case Nil{}: True{}', "vertex_search_hit"),
+        ("topology.bend", "vertex_search(points, a, b, c) || all_pairs(points, a, b, c)", "True{}", "triangle_search_ready"),
+        ("topology.bend", "triangle_search(List.append(&2, Point, vertices(a), List.append(&2, Point, vertices(b), vertices(c))), a, b, c)", "True{}", "triangle_witness_ready"),
         ("cell-transverse.bend", "C.boundary_right(C.cell_start(cell))", "C.boundary_right(C.cell_finish(cell))", "source_corners_transverse_exact"),
         ("cell-transverse.bend", "M.center(cell)", "C.boundary_left(C.cell_finish(cell))", "source_corners_transverse_exact"),
         ("side-bridge.bend", "case (x, (y, d)): points(a, b, x, y, d)", "case (x, (y, d)): points(a, b, y, x, d)", "accepted_side_exact"),
@@ -127,6 +136,10 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif law in {"raw_cell_envelope", "reversed_fields", "walk_bound"}:
+                proof_root = "SOURCE_CELLS_PROOF.bend"
+            elif law in {"segment_search_hit", "pair_search_hit", "all_pairs_hit", "vertex_search_hit", "triangle_search_ready", "triangle_witness_ready"}:
+                proof_root = "SEARCH_WITNESS_PROOF.bend"
             elif law == "source_corners_transverse_exact":
                 proof_root = "CELL_TRANSVERSE_PROOF.bend"
             elif law == "accepted_side_exact":
@@ -307,6 +320,12 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        executable = directory / "search-witness-tests"
+        build = subprocess.run(["bend", "search-witness-tests.bend", "-o", str(executable)], cwd=directory, capture_output=True, text=True, timeout=5)
+        assert build.returncode == 0, build.stdout + build.stderr
+        result = subprocess.run([str(executable)], cwd=directory, capture_output=True, text=True, timeout=5)
+        assert result.returncode == 0 and "search-witness-tests: True" in result.stdout, result.stdout + result.stderr
+        print("Native search witness fixtures accepted: empty search, weights 1/63, vertices, pairs, triangles and disjoint cells")
         executable = directory / "cell-transverse-tests"
         build = subprocess.run(["bend", "cell-transverse-tests.bend", "-o", str(executable)], cwd=directory, capture_output=True, text=True, timeout=5)
         assert build.returncode == 0, build.stdout + build.stderr

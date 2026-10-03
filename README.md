@@ -34,7 +34,7 @@ commands; this avoids an expensive combined optimization step on shared
 machines. Other platforms retain Bend's native build command. Proof checks
 use the same five-second BendTT gate on every platform.
 
-`check.py` runs the 105-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 114-law proof gate, 200 literal arithmetic checks,
 seven executed validator boundary checks, three executed transverse cases,
 four executed cell-transverse cases and rejection beyond each source-coordinate limit,
 compiling mutations that must fail
@@ -449,8 +449,46 @@ groups on this shared machine. A trial mutation of the limit numeral crashed
 Bend's diagnostic normalization and was discarded; it is not counted among
 the rejected mutations. The new native build path was tested on Linux.
 
-**Stage 1 remains incomplete:** audit and connect every bounded search caller
-and remaining production arithmetic composition. Full
+The search-witness root adds six public laws over the actual search functions.
+An accepted segment search with `fuel<=63` constructs a witness satisfying
+the sample arithmetic envelope, native `common`, and exact denominator 64.
+The proof derives the index guard at every recursive step. This result is
+preserved through `pair_search` and `all_pairs`. An accepted `vertex_search`
+constructs the same kind of witness with denominator 1. `triangle_search`
+and `triangle_witness` combine these cases into an existential witness with
+a strictly positive denominator and the proved arithmetic envelope.
+Their callers provide point or quad envelopes, not witness bounds.
+
+The source-cells root adds three public laws connecting those quad envelopes
+to production source data. Four actual source-point guards suffice for
+`raw_cell`; orientation preserves all vertex envelopes; and the actual
+`sections_guard(xs)` implies that every cell in `cells(xs)` satisfies its
+envelope. These results include empty and singleton source lists and either
+orientation. Source-cell predicates reuse the same point and quad envelopes
+as the search proofs.
+
+The new laws establish native witness provenance and arithmetic bounds.
+They do not yet connect native `common` to Euclidean polygon membership,
+prove that the finite sample search finds every intersection, or establish
+the topological interpretation. Those requirements remain in stages 2–4.
+Native fixtures cover empty searches, weights 1/63, vertex and pair hits,
+accepted and disjoint triples, and empty/singleton/forward/reversed source
+cells. Six compiling mutations introduce empty-search hits or bypass either
+triangle search; each is rejected in its public law. Three further mutations
+double a raw-cell coordinate, distort reversal, or corrupt the cell-envelope
+recursion. The reversal and recursion mutations fail in the shared
+`reversed_fields` and `walk_bound` helpers; these are not independent
+law-specific sections.
+
+Validation of the search/source-envelope milestone:
+`taskset -c 7,11 python3 -u check.py` passed all 114 unique public laws across
+sixteen roots, every fixture group, all 67 compiling mutations, and the
+independent SVG checks. `taskset -c 7,11 ./regenerate.sh` passed all sixteen
+roots and reproduced `b.svg` byte for byte. Every kernel check retained the
+five-second limit. This was implementer self-review, not independent review.
+
+**Stage 1 remains incomplete:** audit envelope propagation through concatenation and
+neighbor filtering, and connect the remaining production arithmetic compositions. Full
 intersection/search soundness remains part of stage 2. Intersection
 correctness, enumeration correctness and the formal topological bridge in stages 2–4 are also outstanding. Finite artwork
 checks and the externally justified topology certificate remain as described
