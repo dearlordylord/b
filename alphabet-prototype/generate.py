@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Throwaway vector specimen; run with Python 3, no dependencies.
+"""Throwaway vector specimen; run with uv run --with shapely python.
 
 Question: do broad segmented metal ribbons work as a readable mixed-case family?
 This is a visual prototype, not Bend-validated production artwork.
@@ -7,6 +7,7 @@ This is a visual prototype, not Bend-validated production artwork.
 from pathlib import Path
 from math import hypot, cos, sin, pi
 import html
+import re
 import xml.etree.ElementTree as ET
 
 HERE = Path(__file__).resolve().parent
@@ -56,7 +57,7 @@ def polygon(points):
     return 'M'+' L'.join(map(xy, points))+' Z'
 
 
-def tube(points, width=22, pitch=25, closed=False):
+def ribbon_edges(points, width, closed=False):
     points, length = resample(points)
     left, right = [], []
     for i, point in enumerate(points):
@@ -69,6 +70,11 @@ def tube(points, width=22, pitch=25, closed=False):
         nx, ny = -dy/size*width/2, dx/size*width/2
         left.append((point[0]+nx, point[1]+ny))
         right.append((point[0]-nx, point[1]-ny))
+    return left, right, length
+
+
+def tube(points, width=22, pitch=25, closed=False):
+    left, right, length = ribbon_edges(points, width, closed)
     if closed:
         outline = polygon(left)+polygon(right[::-1])
     else:
@@ -80,11 +86,49 @@ def tube(points, width=22, pitch=25, closed=False):
     seam_count = round(length/pitch) if length >= width else 0
     for seam in range(seam_count):
         fraction = (seam+.5)/seam_count
-        i = round(fraction*(len(points)-1))
-        j = min(i+2, len(points)-1)
+        i = round(fraction*(len(left)-1))
+        j = min(i+2, len(left)-1)
         control = tuple((left[i][k]+right[i][k]+left[j][k]+right[j][k])/4 for k in (0, 1))
         parts.append(f'<path class="seam" d="M{xy(left[i])} Q{xy(control)} {xy(right[i])}" fill="none" stroke="{INK}" stroke-width="1.5"/>')
     parts.append(f'<path d="{outline}" fill="none" stroke="{INK}" stroke-width="2.8" stroke-linejoin="round"/>')
+    return '\n'.join(parts)
+
+
+def merged_tubes(name, arms):
+    """One silhouette, no end-cap borders or seams through welded joins."""
+    from shapely.geometry import Polygon, LineString
+    from shapely.ops import unary_union
+
+    def path(geometry):
+        if geometry.is_empty:
+            return ''
+        if geometry.geom_type == 'Polygon':
+            return polygon(list(geometry.exterior.coords))+''.join(polygon(list(ring.coords)) for ring in geometry.interiors)
+        return ''.join(path(part) for part in geometry.geoms)
+
+    edges = [ribbon_edges(points, width, closed) for points, width, _, closed in arms]
+    shapes = [Polygon(left+right[::-1]).buffer(0) for left, right, _ in edges]
+    silhouette = unary_union(shapes)
+    parts = [f'<path d="{path(silhouette)}" fill="{STEEL}" fill-rule="evenodd"/>']
+    for i, ((left, right, _), arm) in enumerate(zip(edges, arms)):
+        shade = [(l[0]*.25+r[0]*.75, l[1]*.25+r[1]*.75) for l, r in zip(left, right)]
+        shadow = Polygon(shade+right[::-1]).buffer(0).intersection(silhouette)
+        parts.append(f'<path d="{path(shadow)}" fill="{SHADE}" fill-rule="evenodd"/>')
+        others = unary_union([shape for j, shape in enumerate(shapes) if i != j])
+        visible_seams = shapes[i].difference(others.buffer(3))
+        clip_id = f'{name}-seam-region-{i}'
+        parts.append(f'<defs><clipPath id="{clip_id}"><path d="{path(visible_seams)}" clip-rule="evenodd"/></clipPath></defs>')
+        seam_paths = []
+        for element in ET.fromstring('<g>'+tube(*arm)+'</g>'):
+            if element.get('class') != 'seam':
+                continue
+            x0, y0, cx, cy, x1, y1 = map(float, re.findall(r'-?\d+(?:\.\d+)?', element.get('d')))
+            curve = LineString([((1-t)**2*x0+2*(1-t)*t*cx+t*t*x1, (1-t)**2*y0+2*(1-t)*t*cy+t*t*y1) for t in [j/32 for j in range(33)]])
+            # Omit the entire seam at a junction, rather than leave a clipped stub.
+            if not curve.buffer(.8).intersects(others.buffer(3)):
+                seam_paths.append(ET.tostring(element, encoding='unicode'))
+        parts.append(f'<g clip-path="url(#{clip_id})">'+''.join(seam_paths)+'</g>')
+    parts.append(f'<path d="{path(silhouette)}" fill="none" stroke="{INK}" stroke-width="2.8" stroke-linejoin="round"/>')
     return '\n'.join(parts)
 
 
@@ -104,10 +148,16 @@ def glyphs():
         'S': (121, [cap(bezier((100, 39), ((83, 20), (26, 18), (23, 55)), ((20, 86), (100, 76), (101, 109)), ((104, 143), (43, 145), (22, 124))))]),
         'D': (127, [cap(bezier((25, 31), ((135, 13), (137, 151), (25, 132)))), cap(stem(24))]),
         'E': (113, [cap(line((25, 31), (98, 31))), cap(line((25, 81), (85, 81))), cap(line((25, 132), (98, 132))), cap(stem(24))]),
-        'a': (108, [(bowl(), 20, 29, True), small(stem(86, 74))]),
+        'a': (113, [
+            (bezier((31, 78), ((47, 65), (85, 68), (85, 90)), ((85, 106), (85, 121), (85, 127)), ((85, 133), (91, 134), (97, 132))), 18, 29, False),
+            (bezier((85, 102), ((58, 96), (25, 101), (25, 118)), ((25, 138), (64, 140), (85, 121))), 18, 29, False),
+        ]),
         'b': (107, [(bowl(57), 20, 29, True), small(stem(25))]),
         'd': (107, [(bowl(), 20, 29, True), small(stem(86))]),
-        'e': (105, [small(line((24, 102), (84, 102))), small(bezier((84, 102), ((85, 67), (32, 63), (23, 91)), ((6, 136), (60, 155), (86, 126))))]),
+        'e': (105, [
+            (bezier((85, 102), ((86, 62), (32, 58), (23, 87)), ((6, 132), (60, 152), (86, 126))), 18, 29, False),
+            (line((24, 102), (85, 102)), 18, 29, False),
+        ]),
         'n': (108, [small(arch(25)), small(stem(25, 74))]),
         'g': (108, [small(bezier((86, 75), ((86, 106), (86, 140), (86, 156)), ((86, 180), (51, 183), (31, 165)))), (bowl(), 20, 29, True)]),
         'i': (49, [small(stem(24, 75)), (line((24, 43), (24, 58)), 18, 100, False)]),
@@ -125,7 +175,7 @@ def glyphs():
     # Keep the original B itself, rather than approximating its silhouette.
     result['B'] = (123, f'<g transform="translate(-17 0) scale(.01)">{source}</g>')
     for name, (advance, arms) in forms.items():
-        result[name] = advance, '\n'.join(tube(*arm) for arm in arms)
+        result[name] = advance, merged_tubes(name, arms) if name in ('a', 'e') else '\n'.join(tube(*arm) for arm in arms)
     return result
 
 
@@ -175,8 +225,18 @@ def main():
         filename = ('upper-' if char.isupper() else 'lower-')+char+'.svg'
         (HERE/'glyphs'/filename).write_text(svg(body, advance, 190, False))
     (HERE/'specimen.svg').write_text(specimen())
+    # Retain the first revision for an explicit before/after design review.
+    comparison = ['<rect width="1040" height="770" fill="#e0e6e9"/>', label('BEFORE', 55, 45, 18), label('AFTER / ASTRA REVIEW', 540, 45, 18)]
+    for char, y in [('a', 62), ('e', 285)]:
+        previous = ET.parse(HERE/'revision-02'/f'before-{char}.svg').getroot()
+        previous_body = ''.join(ET.tostring(element, encoding='unicode') for element in previous)
+        comparison.append(f'<g transform="translate(70 {y}) scale(1.7)">{previous_body}</g>')
+        comparison.append(f'<use href="#glyph-{ord(char)}" transform="translate(560 {y}) scale(1.7)"/>')
+    comparison.append(label('READING CHECK / made a name', 55, 585, 16))
+    comparison.append(word('made a name', 55, 603, .70)[0])
+    (HERE/'revision-02'/'comparison.svg').write_text(svg(''.join(comparison), 1040, 770))
     rows = []
-    for title, text in [('Прописные', 'BHORS'), ('Строчные', 'aengi'), ('В словах', 'BENDER'), ('Смешанный регистр', 'Bender'), ('Ритм штрихов', 'minimum')]:
+    for title, text in [('Прописные', 'BHORS'), ('Строчные', 'aengi'), ('Проверка новых a/e', 'made a name'), ('В словах', 'BENDER'), ('Смешанный регистр', 'Bender'), ('Ритм штрихов', 'minimum')]:
         element, width = word(text)
         rows.append(f'<section><h2>{title}</h2>{svg(element, width, 192, False)}</section>')
     for title, text in [('Дополнительные прописные', 'DEN'), ('Дополнительные строчные', 'bdrmul')]:
@@ -191,6 +251,7 @@ document.getElementById('seams').addEventListener('click',e=>{const off=document
 document.getElementById('background').addEventListener('click',e=>{const dark=document.body.classList.toggle('dark');e.target.textContent=dark?'Светлый фон':'Тёмный фон'});
 </script></html>'''
     page = page.replace('<main>', '<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute" aria-hidden="true">'+DEFS+'</svg><main>', 1)
+    page = page.replace('Скачать лист SVG</a>', 'Скачать лист SVG</a> · <a href="revision-02/comparison.png">a/e: до и после</a>', 1)
     (HERE/'index.html').write_text(page)
     print(f'Generated {len(FORMS)} glyphs, specimen.svg and index.html in {HERE}')
 
