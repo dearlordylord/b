@@ -1972,3 +1972,68 @@ Validation checkpoint: the first integrated provenance run accepted all 295 laws
 across 45 roots and the new fixtures, then timed out in unchanged
 `candidate-existence-tests.bend`. Its separate repeat passed at the same
 five-second limit; the first integrated run remains failed. The complete retry passed with unchanged limits and assertions: 295 laws across 45 roots, all fixtures and 217 compiling controls.
+
+
+### Proportional source-segment representatives (stage 2, incomplete)
+
+`segment-proportional.bend` compares the actual cross products `k*w` and `l*v`
+and reports equivalence of the two actual homogeneous joins. Four public laws
+pin both reports to their exact calculations, prove that a true coefficient
+proportion implies identical rational coordinates, and prove exact equality of
+closed-region membership for valid nonempty representatives. The region law
+uses positive original endpoint denominators and positive totals for both
+coefficient pairs. It preserves both acceptance and rejection, without
+requiring membership as an extra caller premise.
+
+The proof expands the two coordinate cross products into four checked Nat
+terms. The proportion matches the two mixed terms; commutativity matches the
+other two. It uses no division, numeric sampling, cancellation of possibly
+zero factors or new axioms. Region transport reuses the existing homogeneous
+combination and halfplane-region contracts. Algebraic equivalence also holds
+for an all-zero coefficient pair, but such a join has a zero denominator and
+cannot satisfy the region theorem's validity guards.
+
+Ten fixture definitions cover unequal endpoint denominators, rejection of
+unequal proportions, scaled coefficient pairs, a zero endpoint weight, an
+all-zero pair's algebraic equivalence and invalidity, and inside/outside
+region preservation. Three handwritten compiling controls always accept the
+ratio, replace equality with an inequality, or swap the second pair of join
+weights. Each fails in public `proportional_exact` or `same_point_exact` and
+has a checked literal refutation of that exact public law. The report laws
+have no premises; the swapped-weight example additionally checks a true ratio.
+Integrated validation and generator regeneration are pending at this checkpoint.
+
+Implementer self-review: the two pure reporting functions have exact contracts
+for all inputs, so constant acceptance cannot pass unnoticed. The algebraic
+proof is independent of domain validity; only the existing region owner
+interprets valid point equivalence geometrically. The later clipping consumer
+can use this transport to compare a reparameterized source-segment point with
+a direct candidate, but must still derive the proportion from the actual
+boundary condition. No generator, native search or SVG behavior has changed.
+
+This does not yet prove that an on-boundary point's coefficients have the
+computed cut-gap proportion, implement interval clipping, or establish
+complete pair/triple search. Independent enumeration and the actual
+topological bridge remain open; stages 2–4 are unfinished.
+
+Validation checkpoint: the first integrated proportional-representative run
+timed out in unchanged `SOURCE_INSPECTION_PROOF.bend`; it is a failed run.
+Its separate repeat passed at the same five-second proof limit. A complete
+retry is pending with unchanged proof limits.
+
+The next integrated retry timed out in unchanged `QUAD_DIAGONAL_PROOF.bend`
+and is also a failed run. A sampled CPU utilization check found one of the
+previous two pinned CPUs busy and CPU 11 idle; the exact separate diagonal
+repeat passed pinned to CPU 11 with the same five-second limit. The next
+complete run uses that CPU without changing limits, statements or assertions.
+
+The CPU-11 integrated attempt also timed out, in unchanged
+`INSIDE_ARITHMETIC_PROOF.bend`; it is not a pass. That root's separate repeat
+passed under the same five-second limit on CPUs 7 and 11. CPU affinity alone
+has not eliminated these transient whole-run failures. The next complete
+retry is pending with the same assertions and proof limits.
+
+The CPUs-6/11 complete attempt timed out in unchanged
+`NATURAL_COVER_PROOF.bend` and remains failed. That root's separate repeat
+passed with normal scheduler affinity at the same five-second limit. The
+next complete retry uses normal affinity; no gate is skipped or extended.

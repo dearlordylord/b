@@ -231,6 +231,28 @@ def segment_provenance_counter(directory, original):
     bend(directory, "segment-provenance-counter.bend", "--verdict")
 
 
+def segment_proportional_counter(directory, original):
+    """Refute a literal of the exact classifier/reporting public law."""
+    if original.startswith("G.equivalent"):
+        premise = "def ratio_premise() -> {M.proportional(1n,2n,2n,4n) == True{} : Bool}:\n  {==}\n"
+        actual = "M.same_point(p(),q(),1n,2n,2n,4n)"
+        expected = "G.equivalent(C.join(p(),q(),1n,2n),C.join(p(),q(),2n,4n))"
+        refute = "B.false_impossible(h)"
+    else:
+        premise = ""
+        actual = "M.proportional(1n,2n,2n,3n)"
+        expected = "Nat.is_eq(Nat.mul(1n,3n),Nat.mul(2n,2n))"
+        refute = "B.false_impossible(Equal.sym(Bool,True{},False{},h))"
+    (directory / "segment-proportional-counter.bend").write_text(
+        "import Base\nimport ./segment-proportional.bend as M\n"
+        "import ./homogeneous-geometry.bend as G\nimport ./homogeneous-combination.bend as C\n"
+        "import ./boolean-reflection.bend as B\n"
+        "def p() -> G.Point: G.P{0n,1n,1n}\ndef q() -> G.Point: G.P{1n,0n,1n}\n"
+        + premise +
+        f"def refutes_public_exact(h:{{{actual} == {expected} : Bool}}) -> Empty:\n  {refute}\n")
+    bend(directory, "segment-proportional-counter.bend", "--verdict")
+
+
 def negative_controls(directory):
     controls = [
         ("core.bend", "Seam{boundary_left(cell_start(cell)),",
@@ -245,6 +267,9 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ('segment-proportional.bend', 'Nat.is_eq(Nat.mul(k,w),Nat.mul(l,v))', 'True{}', 'proportional_exact'),
+        ('segment-proportional.bend', 'Nat.is_eq(Nat.mul(k,w),Nat.mul(l,v))', 'Nat.is_le(Nat.mul(k,w),Nat.mul(l,v))', 'proportional_exact'),
+        ('segment-proportional.bend', 'G.equivalent(C.join(p,q,k,l),C.join(p,q,v,w))', 'G.equivalent(C.join(p,q,k,l),C.join(p,q,w,v))', 'same_point_exact'),
         ('segment-provenance.bend', 'Nat.add(Nat.mul(k,v),Nat.mul(m,w))', 'Nat.mul(k,v)', 'compose_exact'),
         ('segment-provenance.bend', 'Nat.add(Nat.mul(l,v),Nat.mul(n,w))', 'Nat.mul(l,v)', 'compose_exact'),
         ('segment-provenance.bend', 'compose(p,q,k,l,m,n,Cut.first_weight(a,b,C.join(p,q,m,n)),Cut.second_weight(a,b,C.join(p,q,k,l)))', 'compose(p,q,k,l,m,n,Cut.second_weight(a,b,C.join(p,q,k,l)),Cut.first_weight(a,b,C.join(p,q,m,n)))', 'source_cut_exact'),
@@ -489,6 +514,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif file == "segment-proportional.bend":
+                proof_root = "SEGMENT_PROPORTIONAL_PROOF.bend"
             elif file == "segment-provenance.bend":
                 proof_root = "SEGMENT_PROVENANCE_PROOF.bend"
             elif file == "clip-halfplane.bend":
@@ -586,6 +613,8 @@ def negative_controls(directory):
             except AssertionError as error:
                 raise AssertionError(f"Mutation {file}: {law} did not produce a proof diagnostic\n{error}") from error
             assert law in output, output
+            if file == "segment-proportional.bend":
+                segment_proportional_counter(directory, old)
             if file == "segment-provenance.bend":
                 segment_provenance_counter(directory, old)
             if file == "clip-halfplane.bend":
@@ -747,6 +776,9 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        bend(directory, "segment-proportional-raw-tests.bend", "--verdict")
+        bend(directory, "segment-proportional-tests.bend", "--verdict")
+        print("Proportional segment fixtures accepted: exact ratio, unequal denominators, zero weights, validity guards and inside/outside membership")
         bend(directory, "segment-provenance-raw-tests.bend", "--verdict")
         bend(directory, "segment-provenance-tests.bend", "--verdict")
         print("Source-segment provenance fixtures accepted: exact coefficients, unequal denominators, zero weights, actual cuts and validity")
