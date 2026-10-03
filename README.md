@@ -30,7 +30,7 @@ python3 check.py
 `generate.bend`, checks the emitted SVG, and replaces `b.svg` only on success.
 The generator itself refuses to emit an SVG if its Bend artwork validation fails.
 
-`check.py` runs the 101-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 104-law proof gate, 200 literal arithmetic checks,
 seven executed validator boundary checks, three executed transverse cases,
 compiling mutations that must fail
 proofs, invalid artworks that must be rejected before SVG emission, and Bend
@@ -169,7 +169,7 @@ proofs; its original license is retained in `LICENSE.mathlib`. See [NOTICE](NOTI
 ## Arithmetic programme (in progress)
 
 [ROADMAP.md](ROADMAP.md) records the autonomous four-stage programme. The
-current BendTT gate checks **101 unique public laws**, plus supporting lemmas.
+current BendTT gate checks **104 unique public laws**, plus supporting lemmas.
 Arithmetic results quantify over all inputs at arbitrary word widths; the U32
 operation laws cover every 32-bit constructor payload.
 
@@ -271,10 +271,10 @@ model must give the independently specified Boolean result, with all point
 guards satisfied.
 
 `proof-roots.txt` lists the structural, arithmetic, transverse and absolute
-difference, squared-width, centroid, division, dot, witness-arithmetic, scaled-coordinate, grid-scaling and sample-arithmetic proof roots.
+difference, squared-width, centroid, division, dot, witness-arithmetic, scaled-coordinate, grid-scaling, sample-arithmetic and side-bridge proof roots.
 Both `check.py` and `regenerate.sh` audit that every public law module is
 reachable, then check every root, with five seconds per kernel invocation.
-The roots share supporting proofs; the 101-law total counts
+The roots share supporting proofs; the 104-law total counts
 each public law once. Dependency-only imports of unrelated proof groups have
 been removed; a dedicated division root explicitly retains division and its
 subtraction/complement prerequisites. No previously checked law is omitted. The absolute-difference root proves
@@ -392,8 +392,26 @@ fixture group, all 54 compiling mutations and independent SVG geometry and
 topology checks. No kernel invocation exceeded the retained five-second limit.
 `regenerate.sh` also passed all twelve roots and preserved the SVG byte for byte.
 
-**Stage 1 remains incomplete:** audit and connect the witness envelopes to
-the actual side-call preconditions and all bounded search callers. Full
+The side-bridge root adds three public laws. Actual point and witness envelope
+predicates imply every arithmetic precondition of production `topology.side`.
+For generated samples, its comparison equals the independent natural formula
+with the two weighted numerators and denominator 64; for vertices it uses the
+original coordinates and denominator 1. These compositions require only
+point envelopes and the actual weight predicate, with no manual overflow
+premises or independently assumed witness bounds. Five fixtures cover both
+witness kinds, strict signs and boundary contact. Two compiling mutations
+swap witness coordinates or reverse the model edge. Their kernel-checked
+counterexamples satisfy every guard: the actual comparison is LT while the
+mutated model says GT.
+
+Validation of the side-composition milestone: the ordinary complete
+`python3 check.py` passed all 104 unique laws across thirteen roots, every
+fixture group, all 56 compiling mutations and independent SVG geometry and
+topology checks. Each kernel invocation retained the five-second limit.
+`regenerate.sh` also passed all thirteen roots and preserved the SVG byte for byte.
+
+**Stage 1 remains incomplete:** audit and connect every bounded search caller
+and remaining production arithmetic composition. Full
 intersection/search soundness remains part of stage 2. Intersection
 correctness, enumeration correctness and the formal topological bridge in stages 2–4 are also outstanding. Finite artwork
 checks and the externally justified topology certificate remain as described

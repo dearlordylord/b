@@ -52,6 +52,8 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ("side-bridge.bend", "case (x, (y, d)): points(a, b, x, y, d)", "case (x, (y, d)): points(a, b, y, x, d)", "accepted_side_exact"),
+        ("side-bridge.bend", "A.exact_side(U32.to_nat(ax), U32.to_nat(ay), U32.to_nat(bx), U32.to_nat(by), x, y, d)", "A.exact_side(U32.to_nat(bx), U32.to_nat(by), U32.to_nat(ax), U32.to_nat(ay), x, y, d)", "accepted_side_exact"),
         ("topology.bend", "case P{x, y}: W{x, y, 1}", "case P{x, y}: W{x, y, 0}", "vertex_witness_exact"),
         ("sample-arithmetic.bend", "Nat.sub(64n, n)", "Nat.add(64n, n)", "numerator_limit"),
         ("sample-arithmetic.bend", "Word.sub(bits, sixty_four, n)", "Word.add(bits, sixty_four, n)", "sample_finish"),
@@ -123,6 +125,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif law == "accepted_side_exact":
+                proof_root = "SIDE_BRIDGE_PROOF.bend"
             elif law in {"numerator_limit", "sample_finish", "guarded_sample_exact", "vertex_witness_exact"}:
                 proof_root = "SAMPLE_ARITHMETIC_PROOF.bend"
             elif law in {"accepted_point_unrounded", "unrounded_point", "scaled_envelope"}:
@@ -151,6 +155,14 @@ def negative_controls(directory):
                 proof_root = "ARITHMETIC_PROOF.bend"
             output = bend(directory, proof_root, success=False)
             assert law in output, output
+            if law == "accepted_side_exact":
+                (directory / "side-counter.bend").write_text(
+                    "import Base\nimport ./topology.bend as T\nimport ./grid-scaling.bend as G\n"
+                    "import ./sample-arithmetic.bend as S\nimport ./side-bridge.bend as M\n"
+                    "def premises() -> {G.envelope(12n, T.P{1, 1}) && G.envelope(12n, T.P{2, 3}) && S.envelope(12n, T.W{1, 0, 1}) == True{} : Bool}:\n  {==}\n"
+                    "def actual() -> {T.side(T.P{1, 1}, T.P{2, 3}, T.W{1, 0, 1}) == LT{} : Cmp}:\n  {==}\n"
+                    "def wrong_model() -> {M.exact(T.P{1, 1}, T.P{2, 3}, T.W{1, 0, 1}) == GT{} : Cmp}:\n  {==}\n")
+                bend(directory, "side-counter.bend", "--verdict")
             if law == "numerator_limit":
                 (directory / "sample-counter.bend").write_text(
                     "import Base\nimport ./sample-arithmetic.bend as M\nimport ./word-arithmetic.bend as W\n"
@@ -288,6 +300,8 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        bend(directory, "side-bridge-tests.bend", "--verdict")
+        print("Generated-witness side comparison fixtures accepted")
         bend(directory, "sample-arithmetic-tests.bend", "--verdict")
         print("Production sampled-witness endpoints, interior points and envelopes accepted")
         bend(directory, "grid-scaling-tests.bend", "--verdict")

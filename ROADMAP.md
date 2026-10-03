@@ -119,6 +119,10 @@ are established. Partial milestones do not complete the objective.
   exact with denominator 1 and satisfy the same envelopes. Bounded natural
   search indices convert to accepted U32 weights.
 
-Still required for stage 1: audit and connect generated witness envelopes to
-actual side-call preconditions and bounded search callers.
+- Point/witness envelope predicates imply production side arithmetic guards.
+  Comparisons using generated samples and vertex witnesses agree with their
+  independent natural formulas; generated output bounds are derived internally.
+
+Still required for stage 1: audit bounded search callers and the remaining
+production arithmetic compositions.
 Stages 2–4 remain uncompleted.
