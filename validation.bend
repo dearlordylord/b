@@ -1,5 +1,6 @@
 import Base
 import ./core.bend as Core
+import ./word-sum3.bend as Arithmetic
 
 # Finite exact checks of the concrete artwork, distinct from generic proofs.
 # All coordinates are bounded before conversion to U32. A determinant side
@@ -31,7 +32,7 @@ def determinant_positive(a: Core.Point, b: Core.Point, c: Core.Point) -> Bool:
       +v = U32.from_nat(by)
       +r = U32.from_nat(cx)
       +s = U32.from_nat(cy)
-      U32.is_gt((x * v + u * s + r * y : U32), (y * u + v * r + s * x : U32))
+      U32.is_gt(Arithmetic.u32_sum3(x, v, u, s, r, y), Arithmetic.u32_sum3(y, u, v, r, s, x))
 
 def positive_quad(+a: Core.Point, +b: Core.Point, +c: Core.Point, +d: Core.Point) -> Bool:
   determinant_positive(a, b, c) && determinant_positive(b, c, d) && determinant_positive(c, d, a) && determinant_positive(d, a, b)

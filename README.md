@@ -30,7 +30,7 @@ python3 check.py
 `generate.bend`, checks the emitted SVG, and replaces `b.svg` only on success.
 The generator itself refuses to emit an SVG if its Bend artwork validation fails.
 
-`check.py` runs the 55-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 57-law proof gate, 200 literal arithmetic checks,
 seven executed validator boundary checks, compiling mutations that must fail
 proofs, invalid artworks that must be rejected before SVG emission, and Bend
 and independent Python topology fixtures. Python checks the output artifact;
@@ -168,7 +168,7 @@ proofs; its original license is retained in `LICENSE.mathlib`. See [NOTICE](NOTI
 ## Arithmetic programme (in progress)
 
 [ROADMAP.md](ROADMAP.md) records the autonomous four-stage programme. The
-current BendTT gate checks **55 public laws**, plus supporting lemmas.
+current BendTT gate checks **57 public laws**, plus supporting lemmas.
 Arithmetic results quantify over all inputs at arbitrary word widths; the U32
 operation laws cover every 32-bit constructor payload.
 
@@ -192,6 +192,9 @@ The proved arithmetic foundations are:
 - The actual Base division loop for divisor four agrees with the bit quotient
   and remainder. Its exact numerical partition is proved, and actual
   `U32.div(x, 4)` agrees with `Nat.div(value(x), 4)` for every U32 value.
+- The three-product sum used by the validation determinant is exact whenever
+  its full mathematical sum is below capacity; all intermediate bounds follow
+  from that single premise. The production determinant now uses this helper.
 
 The `word-*.bend` modules define these models, laws, proofs and fixtures;
 `arithmetic-*-proof.bend` contains supporting order and product algebra.
@@ -199,8 +202,12 @@ Fixtures invoke the theorems, cover all three-bit comparisons and complements,
 and include a bounded product whose unused shift overflows. Compiling mutations
 must fail the corresponding proof gate. The subtraction comparison-selector
 mutant fails in the shared `carry_step` lemma; the division remainder mutant
-fails in `bit_division_step`. These are shared-lemma rejections, rather than
-failures in the public law sections. Each kernel invocation has a five-second
+fails in `bit_division_step`; the product-operation mutant fails in `sum3_finish`.
+These are shared-lemma rejections, rather than
+failures in the public law sections. The U32 sum-wrapper mutant is checked
+against a literal instance of its law, with the premise independently accepted;
+Bend overflows its diagnostic printer on the full generic mutant mismatch.
+That printer crash is not counted as a passing mutation check. Each kernel invocation has a five-second
 limit. The seven concrete validator examples run as compiled native tests;
 they are finite executed checks, distinct from the universal BendTT laws.
 

@@ -40,6 +40,8 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ("word-sum3.bend", "Word.mul(n, e, f)", "Word.add(n, e, f)", "sum3_finish"),
+        ("word-sum3.bend", "sum3(32n, aw, bw, cw, dw, ew, fw)", "sum3(32n, aw, bw, cw, fw, ew, dw)", "literal_u32_sum3_exact"),
         ("word-division4.bend", "WCon{second(p, t), quotient(p, t)}", "WCon{head(p, t), quotient(p, t)}", "division4_loop_bits"),
         ("word-division4.bend", "case True{} True{}: 3", "case True{} True{}: 2", "bit_division_step"),
         ("word-subtraction.bend", "W.add_carry(n, a, Word.not(n, b), c)", "W.add_carry(n, a, b, c)", "subtraction_low_agrees"),
@@ -60,6 +62,17 @@ def negative_controls(directory):
         ("validation.bend", "Nat.is_eq(section_count(sections), 33n) && validate(sections)", "validate(sections)", "artwork_gate_sound"),
         ("topology.bend", "connected && (witnessed && (no_five && (ribbons &&", "True{} && (witnessed && (no_five && (ribbons &&", "topology_report_sound"),
     ]
+    # This is the U32 law's postcondition at a fixed payload assignment.
+    # Its premise is checked independently before mutation. The full generic
+    # mismatch diagnostic currently overflows Bend's printer on this mutant.
+    payload = [f"C.from_nat({v}n, 32n)" for v in (2, 3, 1, 2, 3, 1)]
+    exact = "S.exact(32n, " + ", ".join(payload) + ")"
+    actual = "S.u32_sum3(" + ", ".join("U32{" + p + "}" for p in payload) + ")"
+    (directory / "sum3-counter.bend").write_text(
+        "import Base\nimport ./word-sum3.bend as S\nimport ./word-conversion.bend as C\nimport ./word-arithmetic.bend as W\n"
+        f"def literal_u32_sum3_premise() -> {{Nat.is_lt({exact}, W.capacity(32n)) == True{{}} : Bool}}:\n  {{==}}\n"
+        f"def literal_u32_sum3_exact() -> {{U32.to_nat({actual}) == {exact} : Nat}}:\n  {{==}}\n")
+    bend(directory, "sum3-counter.bend", "--verdict")
     for file, old, new, law in controls:
         path = directory / file
         original = path.read_text()
@@ -68,7 +81,7 @@ def negative_controls(directory):
         try:
             # A mutant that cannot even compile is not a useful proof control.
             bend(directory, file, "--check-only")
-            output = bend(directory, "PROOF.bend", success=False)
+            output = bend(directory, "sum3-counter.bend" if law == "literal_u32_sum3_exact" else "PROOF.bend", success=False)
             assert law in output, output
         finally:
             path.write_text(original)
@@ -180,7 +193,9 @@ if __name__ == "__main__":
         for file in HERE.glob("*.bend"):
             shutil.copy2(file, directory / file.name)
         bend(directory, "PROOF.bend", "--verdict")
-        print("BendTT: all 55 public laws accepted")
+        print("BendTT: all 57 public laws accepted")
+        bend(directory, "word-sum3-tests.bend", "--verdict")
+        print("Composed three-product sum and overflow-boundary fixtures accepted")
         bend(directory, "word-division4-tests.bend", "--verdict")
         print("Actual division-by-four, quotient and remainder fixtures accepted")
         bend(directory, "word-subtraction-tests.bend", "--verdict")
@@ -205,7 +220,8 @@ if __name__ == "__main__":
         print("Bend topology fixtures accepted")
         print(f"Literal arithmetic checks: {literal_checks(directory)} accepted")
         print(f"Compiling mutations rejected by the proof gate: {negative_controls(directory)}")
-        print("Note: selector/remainder mutants fail in shared carry_step/bit_division_step lemmas")
+        print("Note: selector/remainder/product mutants fail in shared carry_step/bit_division_step/sum3_finish lemmas")
+        print("Note: U32 wrapper mutant uses a literal law instance with its premise checked; generic error printing overflows")
         print(f"Invalid artworks rejected by Bend before SVG emission: {bend_artwork_negative_controls(directory)}")
     root = ET.parse(HERE / "b.svg").getroot()
     print("Independent exact SVG geometry:", verify(root))

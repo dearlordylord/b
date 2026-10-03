@@ -66,5 +66,8 @@ are established. Partial milestones do not complete the objective.
 - Actual division by four, its quotient/remainder and agreement with Nat.div
   are proved. Four is the only U32 divisor used by the generator.
 
-Still required for stage 1: instantiate the arithmetic bounds for geometry, and connect each production
+- The validation determinant uses a proved three-product sum: one bound on
+  its complete exact sum suffices to rule out all intermediate overflows.
+
+Still required for stage 1: derive the bounds from coordinate guards, and connect each production
 geometric expression to its exact model. Stages 2–4 remain uncompleted.
