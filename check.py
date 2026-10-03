@@ -40,6 +40,7 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ("coordinate-sum.bend", "Nat.add(Nat.add(Nat.mul(a, b), Nat.mul(c, d)), Nat.mul(e, f))", "Nat.mul(8n, Nat.add(Nat.add(Nat.mul(a, b), Nat.mul(c, d)), Nat.mul(e, f)))", "sum_width_bound"),
         ("word-sum3.bend", "Word.mul(n, e, f)", "Word.add(n, e, f)", "sum3_finish"),
         ("word-sum3.bend", "sum3(32n, aw, bw, cw, dw, ew, fw)", "sum3(32n, aw, bw, cw, fw, ew, dw)", "literal_u32_sum3_exact"),
         ("word-division4.bend", "WCon{second(p, t), quotient(p, t)}", "WCon{head(p, t), quotient(p, t)}", "division4_loop_bits"),
@@ -193,7 +194,9 @@ if __name__ == "__main__":
         for file in HERE.glob("*.bend"):
             shutil.copy2(file, directory / file.name)
         bend(directory, "PROOF.bend", "--verdict")
-        print("BendTT: all 57 public laws accepted")
+        print("BendTT: all 59 public laws accepted")
+        bend(directory, "coordinate-sum-tests.bend", "--verdict")
+        print("Coordinate guard implies the 32-bit three-product bound")
         bend(directory, "word-sum3-tests.bend", "--verdict")
         print("Composed three-product sum and overflow-boundary fixtures accepted")
         bend(directory, "word-division4-tests.bend", "--verdict")
@@ -220,7 +223,7 @@ if __name__ == "__main__":
         print("Bend topology fixtures accepted")
         print(f"Literal arithmetic checks: {literal_checks(directory)} accepted")
         print(f"Compiling mutations rejected by the proof gate: {negative_controls(directory)}")
-        print("Note: selector/remainder/product mutants fail in shared carry_step/bit_division_step/sum3_finish lemmas")
+        print("Note: selector/remainder/product mutants fail in shared carry_step/bit_division_step/sum3_finish/sum_width_bound lemmas")
         print("Note: U32 wrapper mutant uses a literal law instance with its premise checked; generic error printing overflows")
         print(f"Invalid artworks rejected by Bend before SVG emission: {bend_artwork_negative_controls(directory)}")
     root = ET.parse(HERE / "b.svg").getroot()

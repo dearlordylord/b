@@ -30,7 +30,7 @@ python3 check.py
 `generate.bend`, checks the emitted SVG, and replaces `b.svg` only on success.
 The generator itself refuses to emit an SVG if its Bend artwork validation fails.
 
-`check.py` runs the 57-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 59-law proof gate, 200 literal arithmetic checks,
 seven executed validator boundary checks, compiling mutations that must fail
 proofs, invalid artworks that must be rejected before SVG emission, and Bend
 and independent Python topology fixtures. Python checks the output artifact;
@@ -168,7 +168,7 @@ proofs; its original license is retained in `LICENSE.mathlib`. See [NOTICE](NOTI
 ## Arithmetic programme (in progress)
 
 [ROADMAP.md](ROADMAP.md) records the autonomous four-stage programme. The
-current BendTT gate checks **57 public laws**, plus supporting lemmas.
+current BendTT gate checks **59 public laws**, plus supporting lemmas.
 Arithmetic results quantify over all inputs at arbitrary word widths; the U32
 operation laws cover every 32-bit constructor payload.
 
@@ -195,6 +195,9 @@ The proved arithmetic foundations are:
 - The three-product sum used by the validation determinant is exact whenever
   its full mathematical sum is below capacity; all intermediate bounds follow
   from that single premise. The production determinant now uses this helper.
+- Six natural coordinates bounded by 16000 imply that their three-product
+  sum is strictly below `2^32`, without an additional overflow premise.
+  The proof uses the 14-bit coordinate envelope and symbolic capacity algebra.
 
 The `word-*.bend` modules define these models, laws, proofs and fixtures;
 `arithmetic-*-proof.bend` contains supporting order and product algebra.
@@ -203,6 +206,8 @@ and include a bounded product whose unused shift overflows. Compiling mutations
 must fail the corresponding proof gate. The subtraction comparison-selector
 mutant fails in the shared `carry_step` lemma; the division remainder mutant
 fails in `bit_division_step`; the product-operation mutant fails in `sum3_finish`.
+The coordinate-sum mutant multiplies the sum by eight, making its bound
+false at the maximum coordinates; it fails in `sum_width_bound`.
 These are shared-lemma rejections, rather than
 failures in the public law sections. The U32 sum-wrapper mutant is checked
 against a literal instance of its law, with the premise independently accepted;

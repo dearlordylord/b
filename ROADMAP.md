@@ -69,5 +69,8 @@ are established. Partial milestones do not complete the objective.
 - The validation determinant uses a proved three-product sum: one bound on
   its complete exact sum suffices to rule out all intermediate overflows.
 
-Still required for stage 1: derive the bounds from coordinate guards, and connect each production
+- Coordinate guards at 16000 imply a strict 32-bit bound for a three-product
+  sum; the universal proof avoids enumerating coordinate values.
+
+Still required for stage 1: connect the guard-derived bounds and each production
 geometric expression to its exact model. Stages 2–4 remain uncompleted.
