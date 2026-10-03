@@ -166,6 +166,48 @@ def clip_weights_counter(directory):
     bend(directory, "clip-weights-counter.bend", "--verdict")
 
 
+def clip_halfplane_counter(directory, original, replacement):
+    p = "G.P{1n,4n,1n}"
+    k, l = "1n", "1n"
+    constant = replacement == "True{}"
+    if constant:
+        l = "3n"
+    elif original == "Nat.mul(l,Cut.first_weight(a,b,q))":
+        p, l = "G.P{3n,2n,1n}", "0n"
+    elif original == "Nat.mul(k,Cut.second_weight(a,b,p))":
+        k, l = "2n", "4n"
+    prelude = (
+        "import Base\nimport ./clip-halfplane.bend as M\nimport ./natural-cover.bend as N\n"
+        "import ./homogeneous-geometry.bend as G\nimport ./homogeneous-combination.bend as C\n"
+        "import ./halfplane-region.bend as Region\nimport ./strict-halfplane.bend as S\n"
+        "import ./segment-cut.bend as Cut\nimport ./triangle-coordinate.bend as Scale\n"
+        "import ./boolean-reflection.bend as B\n"
+        "def a() -> N.Point: N.P{0n,2n}\ndef b() -> N.Point: N.P{6n,2n}\n"
+        f"def p() -> G.Point: {p}\ndef q() -> G.Point: G.P{{5n,1n,1n}}\n"
+        f"def k() -> Nat: {k}\ndef l() -> Nat: {l}\n"
+        "def endpoint_premises() -> {Region.edge(a(),b(),p()) && S.negative(a(),b(),q()) == True{} : Bool}:\n  {==}\n")
+    if constant:
+        body = (
+            "def old_point_outside() -> {Region.edge(a(),b(),C.join(p(),q(),k(),l())) == False{} : Bool}:\n  {==}\n"
+            "def wrong_acceptance() -> {M.balance(a(),b(),p(),q(),k(),l()) == True{} : Bool}:\n  {==}\n"
+            "def refutes_public_classifier(h:{M.balance(a(),b(),p(),q(),k(),l()) == Region.edge(a(),b(),C.join(p(),q(),k(),l())) : Bool}) -> Empty:\n"
+            "  B.false_impossible(Equal.sym(Bool,True{},False{},h))\n")
+    else:
+        prelude += "def original_point_closed() -> {Region.edge(a(),b(),C.join(p(),q(),k(),l())) == True{} : Bool}:\n  {==}\n"
+        if original.startswith("W.rebase"):
+            body = (
+                "def wrong_same_point() -> {G.equivalent(C.join(p(),q(),k(),l()),M.rebased(a(),b(),p(),q(),k(),l())) == False{} : Bool}:\n  {==}\n"
+                "def refutes_public_exact(h:{M.rebased(a(),b(),p(),q(),k(),l()) == Scale.scaled(C.join(p(),q(),k(),l()),Cut.second_weight(a(),b(),p())) : G.Point}) -> Empty:\n"
+                "  B.false_impossible(Equal.cong(G.Point,Bool,x => G.equivalent(C.join(p(),q(),k(),l()),x),M.rebased(a(),b(),p(),q(),k(),l()),Scale.scaled(C.join(p(),q(),k(),l()),Cut.second_weight(a(),b(),p())),h))\n")
+        else:
+            body = (
+                "def wrong_balance() -> {M.balance(a(),b(),p(),q(),k(),l()) == False{} : Bool}:\n  {==}\n"
+                "def refutes_public_classifier(h:{M.balance(a(),b(),p(),q(),k(),l()) == Region.edge(a(),b(),C.join(p(),q(),k(),l())) : Bool}) -> Empty:\n"
+                "  B.false_impossible(h)\n")
+    (directory / "clip-halfplane-counter.bend").write_text(prelude + body)
+    bend(directory, "clip-halfplane-counter.bend", "--verdict")
+
+
 def negative_controls(directory):
     controls = [
         ("core.bend", "Seam{boundary_left(cell_start(cell)),",
@@ -180,6 +222,12 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ('clip-halfplane.bend', 'Nat.is_le(Nat.mul(l,Cut.first_weight(a,b,q)),Nat.mul(k,Cut.second_weight(a,b,p)))', 'True{}', 'closed_join_balance_exact'),
+        ('clip-halfplane.bend', 'Nat.is_le(Nat.mul(l,Cut.first_weight(a,b,q)),Nat.mul(k,Cut.second_weight(a,b,p)))', 'Nat.is_le(Nat.mul(k,Cut.second_weight(a,b,p)),Nat.mul(l,Cut.first_weight(a,b,q)))', 'closed_join_balance_exact'),
+        ('clip-halfplane.bend', 'Nat.mul(l,Cut.first_weight(a,b,q))', 'Nat.add(l,Cut.first_weight(a,b,q))', 'closed_join_balance_exact'),
+        ('clip-halfplane.bend', 'Nat.mul(k,Cut.second_weight(a,b,p))', 'Nat.add(k,Cut.second_weight(a,b,p))', 'closed_join_balance_exact'),
+        ('clip-halfplane.bend', 'W.rebase(p,q,k,l,Cut.second_weight(a,b,p),Cut.first_weight(a,b,q))', 'W.rebase(p,q,k,l,Cut.first_weight(a,b,q),Cut.second_weight(a,b,p))', 'halfplane_rebase_exact'),
+        ('clip-halfplane.bend', 'W.rebase(p,q,k,l,Cut.second_weight(a,b,p),Cut.first_weight(a,b,q))', 'W.rebase(p,q,k,0n,Cut.second_weight(a,b,p),Cut.first_weight(a,b,q))', 'halfplane_rebase_exact'),
         ('clip-weights.bend', 'Nat.sub(Nat.mul(k,w),Nat.mul(l,v))', 'Nat.sub(Nat.mul(l,v),Nat.mul(k,w))', 'retained_reconstruct'),
         ('clip-weights.bend', 'Nat.mul(k,w)', 'Nat.add(k,w)', 'retained_reconstruct'),
         ('clip-weights.bend', 'Nat.mul(l,v)', 'Nat.add(l,v)', 'retained_reconstruct'),
@@ -415,6 +463,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif file == "clip-halfplane.bend":
+                proof_root = "CLIP_HALFPLANE_PROOF.bend"
             elif file == "clip-weights.bend":
                 proof_root = "CLIP_WEIGHTS_PROOF.bend"
             elif file == "corner-candidate.bend":
@@ -508,6 +558,8 @@ def negative_controls(directory):
             except AssertionError as error:
                 raise AssertionError(f"Mutation {file}: {law} did not produce a proof diagnostic\n{error}") from error
             assert law in output, output
+            if file == "clip-halfplane.bend":
+                clip_halfplane_counter(directory, old, new)
             if file == "clip-weights.bend":
                 clip_weights_counter(directory)
             if file == "corner-candidate.bend":
@@ -665,6 +717,10 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        bend(directory, "clip-halfplane-tests.bend", "--verdict")
+        bend(directory, "clip-halfplane-boundary-tests.bend", "--verdict")
+        bend(directory, "clip-halfplane-guard-tests.bend", "--verdict")
+        print("Geometric one-sided clipping fixtures accepted: derived balance, equality, positive/zero gaps, actual membership and rejected outside/zero-scale cases")
         bend(directory, "clip-weights-tests.bend", "--verdict")
         bend(directory, "clip-weights-guard-tests.bend", "--verdict")
         print("Retained-segment rebase fixtures accepted: unequal denominators, interior/boundary/endpoint membership, saturation and zero-scale rejection")

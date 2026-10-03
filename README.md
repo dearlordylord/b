@@ -1826,12 +1826,13 @@ in public `retained_reconstruct` or `rebase_exact`. Each also has a literal
 refutation of public `rebase_valid` with all five premises checked true.
 These are handwritten proof controls, not a bend-falsify report.
 
-This is conditional algebra needed for segment clipping. It does not yet derive
-the balance condition from closed-halfplane membership, nor handle a retained
-endpoint whose halfplane gap w is zero. Those geometric obligations must be
-proved before claiming a clipping completeness theorem. The no-contained-corner
-intersection branch, triple-search completeness, independent complex enumeration
-and the actual SVG-fill/topological bridge remain open. Stages 2–4 are unfinished.
+This is conditional algebra needed for segment clipping. Its consumer must
+derive the balance condition and handle zero inside gap. The later
+`clip-halfplane.bend` owner now proves those obligations for weighted points
+in one-sided clipping. Full clipping iteration and geometric intersection
+completeness remain open, alongside triple-search completeness, independent
+complex enumeration and the actual SVG-fill/topological bridge. Stages 2–4
+are unfinished.
 
 Implementer self-review: the rebase equality covers the denominator alongside
 both coordinates. Positive old total, positive w and valid endpoints are
@@ -1863,3 +1864,68 @@ positive endpoint/result denominators and the actual segment-weight witness.
 native generation and independent geometry/topology checks under unchanged
 limits; shell tracing provided command diagnostics only.
 `git diff --exit-code -- b.svg` confirmed byte-identical output.
+
+### One-sided halfplane clipping of weighted points (stage 2, incomplete)
+
+`clip-halfplane.bend` connects the actual inside/outside determinant gaps to the
+retained-segment coefficients. Eight universal laws characterize `l*v <= k*w`
+as exactly closed-halfplane membership of the original weighted point, given a
+closed retained endpoint p and a strictly outside endpoint q. In particular,
+a closed original weighted point `k*p+l*q` supplies the balance required by
+rebasing. The proof expands both exact determinant sums, uses the
+proved endpoint gap reconstructions, and cancels their common weighted terms.
+No balance assumption is supplied by the caller.
+
+For positive inside gap w, the coefficient rebase preserves membership of the
+original weighted point in the segment between p and the actual cut. The public
+`rebased` calculation is pinned to exact common scaling and proved valid under
+its positive-gap/domain premises. For zero w, the derived balance and positive
+outside gap force l=0; a separate actual weight witness retains the old point
+without producing a zero-denominator result. `retained_member_all_gaps` combines
+both branches and proves one-sided membership preservation for every valid
+weighted point that remains in the closed halfplane. The primitive `rebased`
+calculation still requires its positive-gap guard for validity: at w=0 its raw
+scaled result is zero, and the boundary proof uses the separate certificate.
+
+Real BendTT accepted all eight laws and thirteen new fixture definitions covering
+derived balance, balance equality, positive-gap membership, explicit boundary
+membership, the combined law in both branches, actual positive rebase validity,
+exact components, rejection through the exact classifier, an outside original
+point with false balance, and invalid raw zero-gap rebase. Six compiling controls
+return constant True, reverse the balance inequality, replace either product
+by a sum, swap the geometry-bound rebase gaps, or drop the second old coefficient.
+Each fails at public `closed_join_balance_exact` or `halfplane_rebase_exact`,
+and each has a checked literal public-law refutation with its actual premises
+verified true. The constant-True control incorrectly accepts an outside point
+while both endpoint premises hold. The left-sum control uses a valid
+boundary point and zero outside coefficient; the right-sum control uses equal
+gap products. These are handwritten compiling controls, not bend-falsify.
+Integrated validation passed: 291 unique public laws across 44 roots, all fixture groups, 214 compiling mutation controls, invalid-artwork controls and independent SVG geometry/topology checks.
+
+This proves one-sided clipping for explicit homogeneous weighted points. It does
+not yet supply a full interval-clipping iterator, establish how its final
+endpoints correspond to the original side-pair candidate list, or prove the
+no-contained-corner intersection branch. Triple-search completeness,
+independent complex enumeration and the actual SVG-fill/topological bridge
+remain open. Stages 2–4 are unfinished.
+
+Implementer self-review: endpoint, original-point and outside decisions are
+separate premises; no numerical balance premise is substituted for them.
+The exact classifier handles both acceptance and rejection and prevents a
+constant-acceptance implementation from satisfying the public decision contract.
+Exact linear-form and gap facts come from their existing owners. Natural-order
+cancellation removes identical terms, with a checked symbolic recursive proof.
+The zero-gap branch derives the vanishing outside weight and supplies actual
+positive endpoint/result denominators and nonnegative retained coefficients.
+The positive branch reuses the existing coefficient proof, while public rebase
+validity follows the exact scale and positive old denominator. Existing native
+search and generation are unchanged. Future interval iteration must prove its
+own selection, provenance and representative-preservation obligations.
+
+
+Validation checkpoint: the first integrated attempt timed out in unchanged
+`INTERSECTION_SEARCH_PROOF.bend`; its exact separate repeat passed real BendTT
+under the same five-second limit. That attempt is a failed run. Before the next
+full run, the new balance law was strengthened to exact Boolean equivalence,
+with the original preservation law derived from it. The new rejection fixture
+and all six compiling/literal controls passed real BendTT. The complete retry passed with unchanged proof limits: 291 laws across 44 roots and 214 compiling controls. Generator regeneration also passed all 44 real proof roots, bounded native compilation and independent artifact checks. The generated SVG is byte-for-byte unchanged.
