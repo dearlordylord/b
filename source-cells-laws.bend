@@ -26,3 +26,28 @@ law cells_envelope:
   for +xs: List<&2, C.Section>
   for +hx: {T.sections_guard(xs) == True{} : Bool}
   {S.envelope(width, T.cells(xs)) == True{} : Bool}
+
+law appended_envelope:
+  for +width: Nat
+  for +xs: List<&2, T.Quad>
+  for +ys: List<&2, T.Quad>
+  for +hx: {S.envelope(width, xs) == True{} : Bool}
+  for hy: {S.envelope(width, ys) == True{} : Bool}
+  {S.envelope(width, List.append(&2, T.Quad, xs, ys)) == True{} : Bool}
+
+# A cell selected from an actual bounded list inherits its vertex bounds.
+law selected_envelope:
+  for +width: Nat
+  for +prefix: List<&2, T.Quad>
+  for +q: T.Quad
+  for +tail: List<&2, T.Quad>
+  for hx: {S.envelope(width, List.append(&2, T.Quad, prefix, Con{q, tail})) == True{} : Bool}
+  {M.quad_envelope(width, q) == True{} : Bool}
+
+# Filtering retains input cells, so even the query cell needs no bound here.
+law neighbors_envelope:
+  for +width: Nat
+  for +q: T.Quad
+  for +xs: List<&2, T.Quad>
+  for +hx: {S.envelope(width, xs) == True{} : Bool}
+  {S.envelope(width, T.neighbors(q, xs)) == True{} : Bool}

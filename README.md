@@ -34,7 +34,7 @@ commands; this avoids an expensive combined optimization step on shared
 machines. Other platforms retain Bend's native build command. Proof checks
 use the same five-second BendTT gate on every platform.
 
-`check.py` runs the 114-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 120-law proof gate, 200 literal arithmetic checks,
 seven executed validator boundary checks, three executed transverse cases,
 four executed cell-transverse cases and rejection beyond each source-coordinate limit,
 compiling mutations that must fail
@@ -487,8 +487,43 @@ independent SVG checks. `taskset -c 7,11 ./regenerate.sh` passed all sixteen
 roots and reproduced `b.svg` byte for byte. Every kernel check retained the
 five-second limit. This was implementer self-review, not independent review.
 
-**Stage 1 remains incomplete:** audit envelope propagation through concatenation and
-neighbor filtering, and connect the remaining production arithmetic compositions. Full
+The source-cells root now also proves that concatenation preserves every
+cell envelope, a cell selected after any list prefix inherits its envelope,
+and the actual `neighbors` filter retains bounded input cells. The query
+cell needs no bound for this preservation law: it affects selection, not
+which records the filter returns. This does not yet establish that the
+selection predicate denotes geometric intersection.
+
+The inside-arithmetic root adds three public laws. Production `inside` and
+`common` agree with independent natural-number side formulas under the actual
+quad and witness envelopes. The reference uses “not less than” for each
+closed half-plane comparison. An accepted `triangle_witness` consequently
+constructs a witness satisfying those natural formulas with a strictly
+positive natural denominator. This is arithmetic and half-plane predicate
+agreement, not yet a proof identifying a quad with its geometric polygon.
+
+Native fixtures cover concatenation, an unbounded query over bounded
+neighbors, interior/boundary/exterior classifications, denominator 64 and a
+rejected third cell. Three additional compiling controls corrupt envelope
+scanning or return the query instead of an input neighbor; the two scanner
+controls fail in the shared `walk_bound` helper. Skipping a scanner head
+admits an out-of-envelope cell, whose scanner premise was false before the
+mutation; this control checks scanner soundness rather than an originally
+accepted input. Four classifier controls reject boundary contact, omit an
+edge or third cell, or reverse denominator positivity. Three fail in shared
+`nonnegative_exact`, `inside_bounds`, and `natural_ready` helpers; the
+third-cell control fails in its public `common_arithmetic_exact` section.
+
+Validation of the filter/classifier arithmetic milestone:
+`taskset -c 7,11 python3 -u check.py` passed all 120 unique public laws across
+seventeen roots, every fixture group, all 74 compiling mutations and
+independent artifact checks. `taskset -c 7,11 ./regenerate.sh` also passed
+and preserved the SVG byte for byte. Every kernel invocation retained its
+five-second limit. Implementer self-review found no weakened arithmetic
+preconditions; geometric interpretation and the later stages remain open.
+
+**Stage 1 remains incomplete:** connect the remaining separation, outside,
+intersection and convexity arithmetic compositions, then audit all production callers. Full
 intersection/search soundness remains part of stage 2. Intersection
 correctness, enumeration correctness and the formal topological bridge in stages 2–4 are also outstanding. Finite artwork
 checks and the externally justified topology certificate remain as described

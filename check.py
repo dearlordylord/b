@@ -52,6 +52,13 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ("topology.bend", "def nonnegative(c: Cmp) -> Bool:\n  match c:\n    case LT{}: False{}\n    case EQ{}: True{}\n    case GT{}: True{}", "def nonnegative(c: Cmp) -> Bool:\n  match c:\n    case LT{}: False{}\n    case EQ{}: False{}\n    case GT{}: True{}", "nonnegative_exact"),
+        ("topology.bend", "nonnegative(side(d, a, w))", "True{}", "inside_bounds"),
+        ("topology.bend", "inside(w, a) && inside(w, b) && inside(w, c)", "inside(w, a) && inside(w, b) && True{}", "common_arithmetic_exact"),
+        ("inside-arithmetic.bend", "Nat.is_gt(U32.to_nat(Search.denominator(w)), 0n)", "Nat.is_gt(0n, U32.to_nat(Search.denominator(w)))", "natural_ready"),
+        ("source-cells.bend", "M.quad_envelope(width, h) && envelope(width, t)", "M.quad_envelope(width, h) && List.is_empty(&2, T.Quad, t)", "walk_bound"),
+        ("source-cells.bend", "M.quad_envelope(width, h) && envelope(width, t)", "True{} && envelope(width, t)", "walk_bound"),
+        ("topology.bend", "keep(meets(q, h), h, neighbors(q, t))", "keep(meets(q, h), q, neighbors(q, t))", "neighbors_envelope"),
         ("topology.bend", "Q{scaled(Core.boundary_left(a)), scaled(Core.boundary_left(b)), scaled(Core.boundary_right(b)), scaled(Core.boundary_right(a))}", "Q{scaled(Core.point_add(Core.boundary_left(a), Core.boundary_left(a))), scaled(Core.boundary_left(b)), scaled(Core.boundary_right(b)), scaled(Core.boundary_right(a))}", "raw_cell_envelope"),
         ("topology.bend", "def reverse(q: Quad) -> Quad:\n  match q:\n    case Q{a, b, c, d}: Q{d, c, b, a}", "def double_point(p: Point) -> Point:\n  match p:\n    case P{+x, y}: P{(x + x : U32), y}\ndef reverse(q: Quad) -> Quad:\n  match q:\n    case Q{a, b, c, d}: Q{double_point(d), c, b, a}", "reversed_fields"),
         ("source-cells.bend", "M.quad_envelope(width, h) && envelope(width, t)", "M.quad_envelope(width, h) && Bool.not(envelope(width, t))", "walk_bound"),
@@ -136,7 +143,9 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
-            elif law in {"raw_cell_envelope", "reversed_fields", "walk_bound"}:
+            elif law in {"nonnegative_exact", "inside_bounds", "common_arithmetic_exact", "natural_ready"}:
+                proof_root = "INSIDE_ARITHMETIC_PROOF.bend"
+            elif law in {"raw_cell_envelope", "reversed_fields", "walk_bound", "neighbors_envelope"}:
                 proof_root = "SOURCE_CELLS_PROOF.bend"
             elif law in {"segment_search_hit", "pair_search_hit", "all_pairs_hit", "vertex_search_hit", "triangle_search_ready", "triangle_witness_ready"}:
                 proof_root = "SEARCH_WITNESS_PROOF.bend"

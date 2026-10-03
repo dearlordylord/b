@@ -75,3 +75,30 @@ def L.cells_envelope(width, hw, xs, hx):
   match xs:
     case Nil{}: {==}
     case Con{+h, +t}: tail_bound(width, hw, t, h, section_head(h, t, hx), section_tail(h, t, hx))
+
+def cell_head(+width: Nat, +h: T.Quad, +t: List<&2, T.Quad>, hx: {S.envelope(width, Con{h, t}) == True{} : Bool}) -> {M.quad_envelope(width, h) == True{} : Bool}:
+  Pair.fst({M.quad_envelope(width, h) == True{} : Bool}, {S.envelope(width, t) == True{} : Bool}, B.and_split(M.quad_envelope(width, h), S.envelope(width, t), hx))
+def cell_tail(+width: Nat, +h: T.Quad, +t: List<&2, T.Quad>, hx: {S.envelope(width, Con{h, t}) == True{} : Bool}) -> {S.envelope(width, t) == True{} : Bool}:
+  Pair.snd({M.quad_envelope(width, h) == True{} : Bool}, {S.envelope(width, t) == True{} : Bool}, B.and_split(M.quad_envelope(width, h), S.envelope(width, t), hx))
+
+def L.appended_envelope(width, xs, ys, hx, hy):
+  match xs:
+    case Nil{}: hy
+    case Con{+h, +t}:
+      B.and_join(M.quad_envelope(width, h), S.envelope(width, List.append(&2, T.Quad, t, ys)), cell_head(width, h, t, hx), L.appended_envelope(width, t, ys, cell_tail(width, h, t, hx), hy))
+
+def L.selected_envelope(width, prefix, q, tail, hx):
+  match prefix:
+    case Nil{}: cell_head(width, q, tail, hx)
+    case Con{+h, +t}: L.selected_envelope(width, t, q, tail, cell_tail(width, h, List.append(&2, T.Quad, t, Con{q, tail}), hx))
+
+def kept_envelope(+width: Nat, hit: Bool, +q: T.Quad, +rest: List<&2, T.Quad>, hq: {M.quad_envelope(width, q) == True{} : Bool}, hr: {S.envelope(width, rest) == True{} : Bool}) -> {S.envelope(width, T.keep(hit, q, rest)) == True{} : Bool}:
+  match hit:
+    case False{}: hr
+    case True{}: B.and_join(M.quad_envelope(width, q), S.envelope(width, rest), hq, hr)
+
+def L.neighbors_envelope(width, q, xs, hx):
+  match xs:
+    case Nil{}: {==}
+    case Con{+h, +t}:
+      kept_envelope(width, T.meets(q, h), h, T.neighbors(q, t), cell_head(width, h, t, hx), L.neighbors_envelope(width, q, t, cell_tail(width, h, t, hx)))
