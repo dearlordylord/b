@@ -9,7 +9,7 @@ A steel-blue **B** made of three segmented arms, generated in [Bend](https://ben
 [SVG output](b.svg) · [PNG preview](preview.png) · [Generator](generate.bend) · [Laws](LAWS.bend) · [Proofs](PROOF.bend)
 
 The outlines and seam endpoints share the same coordinates. Each curved seam
-stays inside a convex section of its arm. BendTT checks the general algebraic
+stays inside a convex section of its arm. Bend checks the general algebraic
 proofs; Bend checks the concrete artwork before emitting SVG. An independent
 Python checker also inspects the resulting SVG.
 
@@ -23,7 +23,7 @@ below retain the state and evidence that applied when they were completed.
 ## Generate and check
 
 Requirements: Bend **2.0.34**, Clang 14+ for native compilation, Python 3, and GNU
-`timeout`. The proof gate additionally requires Bend's BendTT kernel for
+`timeout`. The proof gate additionally requires Bend's proof checker for
 `--verdict`; this repository does not install toolchains automatically.
 
 ```sh
@@ -33,13 +33,13 @@ cd b
 python3 check.py
 ```
 
-`regenerate.sh` checks the proofs with BendTT, compiles and executes
+`regenerate.sh` checks the proofs with Bend, compiles and executes
 `generate.bend`, checks the emitted SVG, and replaces `b.svg` only on success.
 The generator itself refuses to emit an SVG if its Bend artwork validation fails.
 On Linux, C emission and Clang `-O1` compilation are separate five-second
 commands; this avoids an expensive combined optimization step on shared
 machines. Other platforms retain Bend's native build command. Proof checks
-use the same five-second BendTT gate on every platform.
+use the same five-second Bend gate on every platform.
 
 `check.py` runs the 175-law proof gate, 200 literal arithmetic checks,
 seven executed validator boundary checks, three executed transverse cases,
@@ -181,7 +181,7 @@ proofs; its original license is retained in `LICENSE.mathlib`. See [NOTICE](NOTI
 ## Arithmetic programme (in progress)
 
 [ROADMAP.md](ROADMAP.md) records the autonomous four-stage programme. The
-current BendTT gate checks **104 unique public laws**, plus supporting lemmas.
+current Bend gate checks **104 unique public laws**, plus supporting lemmas.
 Arithmetic results quantify over all inputs at arbitrary word widths; the U32
 operation laws cover every 32-bit constructor payload.
 
@@ -276,7 +276,7 @@ against a literal instance of its law, with the premise independently accepted;
 Bend overflows its diagnostic printer on the full generic mutant mismatch.
 That printer crash is not counted as a passing mutation check. Each kernel
 invocation has a five-second limit. The seven concrete validator examples run as compiled native tests;
-they are finite executed checks, distinct from the universal BendTT laws.
+they are finite executed checks, distinct from the universal Bend laws.
 The three transverse examples also run natively: forward control, backward
 start tangent and backward end tangent. Both the actual predicate and exact
 model must give the independently specified Boolean result, with all point
@@ -332,7 +332,7 @@ eight, change the word product, or change the actual
 production denominator term; each is rejected by the proof gate.
 
 Validation of the witness milestone: all 85 laws across nine roots passed
-the real BendTT gate. The remaining gates passed in a separate driver omitting
+the real Bend gate. The remaining gates passed in a separate driver omitting
 only those already-checked roots, including all 45 compiling mutations.
 The final four witness fixtures and three witness mutations also passed a
 focused recheck; the eightfold sum mutant is falsified at width0 with all
@@ -374,7 +374,7 @@ Validation of the grid-scaling milestone: the ordinary complete
 `python3 check.py` passed all 91 unique laws across eleven roots, every fixture
 group, all 49 compiling mutations and the independent SVG checks. Every
 kernel invocation retained its five-second limit. The filter counterexample
-was checked by the real BendTT kernel in the mutated source tree.
+was checked by the real Bend kernel in the mutated source tree.
 `regenerate.sh` also passed every root and preserved the SVG byte for byte.
 
 The sample-arithmetic root adds ten public laws. Weights `(64-n)` and `n`
@@ -431,7 +431,7 @@ including rounded controls and degenerate sections.
 
 The source-coordinate limit now has one transparent definition in
 `coordinate-limit.bend`; a kernel-checked fixture pins it to 16000. This keeps
-repeated numeral expansions out of BendTT proof signatures. The independent mean and center model
+repeated numeral expansions out of Bend proof signatures. The independent mean and center model
 lives in `centroid-model-laws.bend` and `centroid-model-proof.bend`; shared
 centroid bounds live in `centroid-bounds-proof.bend`. Both centroid validation
 and the new transverse composition consume that proof. Its intermediate
@@ -1277,7 +1277,7 @@ sides. The guarded result then uses exact area reconstruction and the existing
 Nat cancellation owner. The proof does not introduce signed arithmetic, an
 unchecked polynomial normalizer or a new geometric axiom. The temporary host
 script used to write repeated proof terms is outside the trusted boundary:
-every emitted equality is checked by BendTT.
+every emitted equality is checked by Bend.
 
 [Ten fixtures](triangle-coordinate-tests.bend) exercise distinct x/y values,
 an unreduced fraction, a vertex, a zero coordinate, public validity, and the
@@ -1695,7 +1695,7 @@ existence over list concatenation, and show that an actual `Miss` certifies no
 valid candidate in that list. These laws require no strict-convexity premise;
 that premise belongs to the later hull and geometric-completeness consumers.
 
-Real BendTT accepted the new universal proof and four literal constructions:
+Real Bend accepted the new universal proof and four literal constructions:
 extraction of an actual witness after invalid/exterior entries, empty-list
 absence, an accepted appended candidate, and zero-denominator rejection.
 Four compiling controls replace OR by AND, skip the head candidate, classify
@@ -1758,7 +1758,7 @@ Five compiling controls remove each corner in turn or replace the outer OR
 with AND. Each fails at shared `corner_admissions`; each also has a separately
 checked literal refutation of public `corner_admission_exact` with its strict-q
 premise true and an actual admissible vertex present. These are handwritten
-proof controls, not a bend-falsify report. The new proof passed real BendTT
+proof controls, not a bend-falsify report. The new proof passed real Bend
 under the five-second limit with CPU affinity; an initial unrestricted run of
 the extended proof exceeded that limit and was not counted as passing. Crossing
 fixtures are separate from witness fixtures so their literal computation does
@@ -1793,7 +1793,7 @@ native-bridge groups with shared `quad-intersection-fixtures.bend` data.
 All 26 original fixture/helper definitions were verified present exactly once;
 no assertion or coordinate was removed or weakened. The five new corner-witness
 constructions run separately with shared `corner-candidate-fixtures.bend` data.
-Each separate group passed real BendTT under its unchanged five-second limit,
+Each separate group passed real Bend under its unchanged five-second limit,
 as did the final complete run. The self-review checked preserved test coverage,
 actual result extraction, guard placement and both candidate-list directions.
 
@@ -1816,7 +1816,7 @@ actual nonnegative-weight `InSegment(p,cut,oldPoint)` witness. Existing natural
 subtraction, arithmetic, raw scaling, point equality and homogeneous-join owners
 supply the facts. No ordinary rational averaging or denominator rounding occurs.
 
-Real BendTT accepted the five laws and seven fixture constructions/judgments:
+Real Bend accepted the five laws and seven fixture constructions/judgments:
 interior, zero-alpha boundary and zero-second-weight segment membership with
 unequal endpoint denominators; exact components; false balance guard; changed
 coordinates after saturated subtraction; and invalid zero-scale output.
@@ -1855,7 +1855,7 @@ counted as passing. The final complete run retained all five-second limits.
 The fourteen original segment-cut fixtures now run in raw-coordinate and
 witness-construction groups sharing `segment-cut-fixtures.bend`. All 19 original
 fixture/helper definitions were verified present exactly once; no assertion or
-coordinate was removed or weakened. Both groups passed separate real BendTT
+coordinate was removed or weakened. Both groups passed separate real Bend
 checks and the final complete run. Self-review covered guard placement, both
 zero-coefficient boundaries, all three reconstructed components, retained total,
 positive endpoint/result denominators and the actual segment-weight witness.
@@ -1887,7 +1887,7 @@ weighted point that remains in the closed halfplane. The primitive `rebased`
 calculation still requires its positive-gap guard for validity: at w=0 its raw
 scaled result is zero, and the boundary proof uses the separate certificate.
 
-Real BendTT accepted all eight laws and thirteen new fixture definitions covering
+Real Bend accepted all eight laws and thirteen new fixture definitions covering
 derived balance, balance equality, positive-gap membership, explicit boundary
 membership, the combined law in both branches, actual positive rebase validity,
 exact components, rejection through the exact classifier, an outside original
@@ -1924,11 +1924,11 @@ own selection, provenance and representative-preservation obligations.
 
 
 Validation checkpoint: the first integrated attempt timed out in unchanged
-`INTERSECTION_SEARCH_PROOF.bend`; its exact separate repeat passed real BendTT
+`INTERSECTION_SEARCH_PROOF.bend`; its exact separate repeat passed real Bend
 under the same five-second limit. That attempt is a failed run. Before the next
 full run, the new balance law was strengthened to exact Boolean equivalence,
 with the original preservation law derived from it. The new rejection fixture
-and all six compiling/literal controls passed real BendTT. The complete retry passed with unchanged proof limits: 291 laws across 44 roots and 214 compiling controls. Generator regeneration also passed all 44 real proof roots, bounded native compilation and independent artifact checks. The generated SVG is byte-for-byte unchanged.
+and all six compiling/literal controls passed real Bend. The complete retry passed with unchanged proof limits: 291 laws across 44 roots and 214 compiling controls. Generator regeneration also passed all 44 real proof roots, bounded native compilation and independent artifact checks. The generated SVG is byte-for-byte unchanged.
 
 
 ### Exact source-segment provenance (stage 2, incomplete)
@@ -2106,7 +2106,7 @@ reflection directly. Comparing import graphs against the published checkpoint
 reduces the intersection-search root from 129 modules/909 definitions to
 127 modules/866 definitions, without removing any public law from the overall
 47-root/302-law scope. The exact intersection-search and new boundary roots
-passed real BendTT after this change, at the same five-second limit. The subsequent complete integrated run passed all 302 laws, all fixture groups and 223 compiling controls. Regeneration subsequently passed all 47 real proof roots, bounded native compilation and independent artifact checks. The generated SVG is byte-for-byte unchanged.
+passed real Bend after this change, at the same five-second limit. The subsequent complete integrated run passed all 302 laws, all fixture groups and 223 compiling controls. Regeneration subsequently passed all 47 real proof roots, bounded native compilation and independent artifact checks. The generated SVG is byte-for-byte unchanged.
 
 
 Reflection dependency self-review: the generic Boolean disjunction congruence
@@ -2163,7 +2163,7 @@ mutation controls alter selection, reports, direction or endpoint validity.
 Each is required to fail a public proof and admit a checked literal refutation
 of the unfolded public law; selected controls additionally refute constructive
 membership or preservation with checked input premises. These are handwritten
-BendTT controls, not a run of an external mutation tool.
+Bend controls, not a run of an external mutation tool.
 
 Implementer self-review: clipping consumes the existing region, segment-cut
 and one-sided clipping owners; generic join reversal lives with homogeneous
@@ -2185,7 +2185,7 @@ counts are exact finite evidence, not the missing universal bridge.
 
 
 The subsequent `sh -x ./regenerate.sh` completed with exit 0: all 48 roots
-passed real BendTT at the unchanged five-second limit, followed by bounded
+passed real Bend at the unchanged five-second limit, followed by bounded
 native compilation, execution and independent artifact verification.
 `git diff --exit-code -- b.svg` confirms byte-for-byte preservation.
 Self-review found no additional violations in this clipping slice; complete
@@ -2217,7 +2217,7 @@ validity, all final constraints, a prior constraint, unequal denominators,
 exact quad membership and retained interior/boundary points. Thirteen compiling
 mutations cover forgotten sides, early termination, endpoint loss or creation,
 reversed halfplanes, constant predicates and a bypassed quad wrapper. Each
-failed a public-law proof and has a real BendTT-checked literal refutation of
+failed a public-law proof and has a real Bend-checked literal refutation of
 that law. These are handwritten controls, not external `bend-falsify`.
 
 Implementer self-review: the iterator owns traversal only; the existing clip
@@ -2234,7 +2234,7 @@ iterator; source-provenance and candidate-completeness bridges are still needed.
 
 Walk validation attempt: the first complete run timed out at the unchanged
 five-second limit in existing `TRIANGLE_AREA_PROOF.bend`; that run failed.
-The exact separate repeat passed real BendTT at the same limit. The complete
+The exact separate repeat passed real Bend at the same limit. The complete
 retry is pending. The new walk root, all three new fixture groups and all
 thirteen new compiling mutants/literal refutations passed locally beforehand.
 
@@ -2242,7 +2242,7 @@ thirteen new compiling mutants/literal refutations passed locally beforehand.
 The next complete walk run accepted all 331 laws across 49 roots and the new
 walk fixtures, then timed out in existing `quad-intersection-common-tests.bend`.
 That full run failed. The unchanged-limit separate fixture repeat passed real
-BendTT. Another complete same-limit retry is pending; no assertion, public law
+Bend. Another complete same-limit retry is pending; no assertion, public law
 or mutation was removed and no deadline was increased.
 
 
@@ -2265,7 +2265,7 @@ regeneration evidence is recorded below.
 
 
 Verified walk regeneration: `sh -x ./regenerate.sh` exited 0, with all 49
-real BendTT roots accepted at the unchanged five-second limit, bounded native
+real Bend roots accepted at the unchanged five-second limit, bounded native
 C emission/Clang compilation, execution and independent geometry/topology
 checks. `git diff --exit-code -- b.svg` confirms byte-for-byte preservation.
 The implementer self-review found no additional contract violations in this

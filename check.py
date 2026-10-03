@@ -1,4 +1,4 @@
-"""Run Bend/BendTT, negative controls, and independent SVG artifact checks."""
+"""Run Bend, negative controls, and independent SVG artifact checks."""
 import copy
 import re
 import shutil
@@ -976,7 +976,7 @@ if __name__ == "__main__":
         proof_roots, law_count = proof_scope(directory)
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
-        print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        print(f"Bend: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
         bend(directory, "interval-walk-raw-tests.bend", "--verdict")
         bend(directory, "interval-walk-valid-tests.bend", "--verdict")
         bend(directory, "interval-walk-member-tests.bend", "--verdict")
