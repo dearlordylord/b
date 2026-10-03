@@ -2271,3 +2271,811 @@ checks. `git diff --exit-code -- b.svg` confirms byte-for-byte preservation.
 The implementer self-review found no additional contract violations in this
 traversal slice. This is a verified stage-2 checkpoint, not completion of
 intersection completeness, independent enumeration or the topology bridge.
+
+
+### Tracked source endpoints through interval clipping
+
+`tracked-interval.bend` carries two natural coefficients and an origin tag
+for each endpoint. The tags identify the original left/right endpoint or the
+actual directed boundary used for a cut. New cut coefficients flatten the
+current endpoint combinations through the existing segment-provenance owner.
+The reversed mixed branch swaps the complete endpoint records together.
+
+Twenty-one public laws constrain the actual point evaluation, full cut record,
+branch choice, step, empty/cons traversal, initialization, quad wrapper and
+physical interpretation of labels. The erasure laws prove exact raw equality
+with the existing clipping step and iterator, including the homogeneous
+denominator; this is stronger than equality up to rescaling. Origin honesty
+is preserved through the actual traversal. Boundary tags assert the resulting
+point lies on the stored line, and source tags assert geometric equality with
+the named original endpoint. Exact reports prevent replacing this check with
+a constant Boolean.
+
+Constructive source-membership laws supply explicit `InSegment` witnesses for
+every valid evaluated endpoint and both final quad-clipping endpoints. The
+proof derives positive coefficient total from positive point denominator;
+zero/zero coefficients are ruled out by a checked zero-combination theorem.
+The source endpoints' positive denominators remain explicit premises. The
+member predicate belongs to the specification, not an implementation report.
+An empty result has no endpoints, while the earlier iterator's existence
+theorem and exact erasure prevent silently losing an accepted source point.
+
+Fifteen fixtures cover exact coefficients and tags after two cuts, reversed
+source order, retained source tags, late rejection, dishonest tags, zero
+denominators, raw erasure, honest final labels, unequal denominators, explicit
+source membership and corner-only contact. Fourteen compiling mutations alter
+coefficients, tag orientation, branch selection, traversal, initial weights,
+reports, side guards or the quad wrapper. Their public-law failures have
+Bend-checked refutations at literal inputs. These remain handwritten controls,
+not an external `bend-falsify` run. A local source-membership proof attempt
+reached the unchanged five-second limit and failed; its separate repeat passed
+under that limit. The final expanded root and fixture groups passed locally.
+
+Implementer self-review: traversal and metadata belong to the tracked interval
+owner; flattening coefficients reuses segment provenance, and unit/zero
+combination proofs live with homogeneous combination. The new core consumes
+existing cut and walk owners rather than duplicating their geometry. The later
+candidate consumer still needs the fact that a stored cut boundary separates
+the original source ends, followed by the direct-cut equivalence and complete
+search bridge. Honest line membership alone does not establish those facts.
+The production generator/search are unchanged; stages 2–4 remain unfinished.
+Full integrated validation and regeneration are pending for this checkpoint.
+
+
+Tracked-source validation: the first integrated run accepted all 352 public
+laws across 50 roots, then timed out at the unchanged five-second limit in
+`tracked-interval-tests.bend`. An exact separate repeat also timed out. Both
+attempts failed. The four original assertions are now partitioned into the
+erasure/honesty group and `tracked-interval-source-tests.bend`, with each
+assertion and proof preserved verbatim and required by `check.py`. No law,
+fixture premise, mutation or deadline was weakened. Integrated retry is pending.
+
+
+The partitioned fixture batch produced no accepted verdicts within the limits,
+and a separate tracked root attempt also exited 124. Those attempts failed.
+Inspection found that pure geometric proofs imported the native halfplane
+decoding proof for generic Boolean congruence and representation transport.
+The unchanged Boolean `four_cong` proof now lives in Boolean reflection; the
+old entry point forwards to it. Pure edge/region equivalence proofs now live in
+`halfplane-equivalence-proof.bend`, while the corresponding original halfplane
+public laws and helper entry points forward to those proofs. Strict-halfplane, quad
+geometry, quad hull and the interval iterator consume the pure owners directly.
+No public law or premise was removed. Comparing the tracked root import graphs
+before/after this cleanup reduces 134 modules/972 definitions to 128/937.
+
+The revised tracked root, all partitioned source fixture groups and the
+original full native `HALFPLANE_REGION_PROOF.bend` passed real Bend at the
+same five-second limit. The proof manifest still requires all 352 laws across
+50 roots, including native decoding laws. A full integrated retry is pending
+for the revised dependency graph; the trusted Base/arithmetic library is
+unchanged. This cleanup changes proof dependencies, not geometric predicates,
+the generator, source membership requirements or the mutation suite.
+
+
+The revised integrated run passed all roots and fixtures, then failed a mutation
+diagnostic assertion: the existing fourth-side-omission mutant now first fails
+in the extracted region-scale proof, before the old decoder diagnostic. That
+run failed. A scale-invariance theorem alone would not refute omission of a
+side, so the control now uses a literal of the original public
+`inside_halfplanes_decoded` law at a point outside exactly the fourth side.
+The original literal passed real Bend; the same compiling omission mutant
+failed that literal and admitted a Bend-checked refutation of the public-law
+instance. The suite still has 261 compiling controls and still checks the full
+native halfplane proof in its positive gate. A complete integrated retry is
+pending; this change strengthens the control's evidence instead of accepting
+a different diagnostic as evidence of the original public-law failure.
+
+
+The first full retry after the fourth-side literal-control fix timed out in
+existing `WITNESS_ARITHMETIC_PROOF.bend` at five seconds and failed before
+fixture/mutation checks. Its exact separate repeat passed at the same limit.
+Another complete unchanged-limit retry is pending.
+
+
+The next integrated retry timed out in existing `INTERSECTION_SEARCH_PROOF.bend`
+and failed. Separate normal-affinity and CPU-pinned repeats also exited 124.
+An archived published-HEAD comparison at the same five-second limit exited 124
+after printing `ALL PROOFS CHECK`; that comparison is failed, not accepted.
+The current-root comparison also exited 124.
+
+New unit/zero-coefficient proofs have now been factored into their own
+homogeneous-combination proof companion, `homogeneous-source-proof.bend`, so
+old geometric consumers do not import unrelated source-basis proofs. The
+original homogeneous-combination proof file is unchanged from published HEAD.
+Only edge/region equivalence was extracted from the halfplane owner; scale
+proofs retain their original implementation. The exact separate intersection
+search repeat subsequently exited 0 with `ALL PROOFS CHECK`, at the unchanged
+five-second limit. The full integrated retry is pending for this final graph.
+This is proof-dependency factoring; no law, premise, control or deadline was
+removed or increased.
+
+
+The final-graph integrated run accepted all 352 laws across 50 roots, then
+timed out in `tracked-interval-member-tests.bend` and failed. Its exact
+separate repeat passed with exit 0 under the same five-second limit. A full
+unchanged-code, unchanged-limit retry is pending; the fixture assertions and
+proofs are unchanged.
+
+
+The next integrated attempt timed out in existing `SOURCE_INSPECTION_PROOF.bend`
+and failed. Its separate five-second repeat also exited 124 without an
+accepted verdict. The full integrated retry remains pending. No failed attempt
+is counted as a successful proof gate.
+
+
+The next full integrated attempt timed out in the first existing `PROOF.bend`
+and failed. A CPUs-7/11 separate repeat also exited 124. The new laws and
+source fixtures have accepted local/current-graph kernel evidence above, but
+there is still no completed integrated gate for this checkpoint. Regeneration
+and publication remain pending; these timeouts are not reported as passing.
+
+
+### Source crossing checkpoint (unpublished)
+
+Four additional public laws in `source-crossing-laws.bend` classify both
+source endpoints exactly and derive original-source crossing from an accepted
+nonzero weighted combination and a strictly rejected combination. The
+positive-denominator version derives the required nonzero coefficient sum;
+no premise is assumed from trace metadata. `SOURCE_CROSSING_PROOF.bend`
+passed the real kernel with exit 0 and `ALL PROOFS CHECK` under `timeout 5`.
+A preceding verdict attempt exited 124; frontend-only acceptance was not
+counted as mathematical verification. The manifest now includes 356 public
+laws across 51 proof roots (scope validation passed).
+
+The generic positive-coefficient helper moved from the tracked-interval proof
+to `homogeneous-source-proof.bend`, where source crossing also consumes it.
+The tracked root's current-graph repeat timed out (124); its previous accepted
+21-law evidence predates this helper relocation. New source-crossing fixtures
+cover all four classifications, both directions, unequal denominators,
+validity-derived crossing and the zero-combination pitfall. Their verdict
+attempts timed out, so these fixtures are not recorded as passing.
+Four compiling-mutant controls and literal law refutations were added to the
+integrated harness; their validation remains pending until recorded below.
+
+The integrated attempts in this checkpoint failed at existing
+`SAMPLE_ARITHMETIC_PROOF.bend` and `ARITHMETIC_PROOF.bend`, respectively,
+because of the unchanged five-second subprocess limit. No complete integrated
+result, regeneration or publication is claimed. Stage 2 still needs a proof
+connecting each actual clipping boundary tag to the search's original-source
+candidate; stages 3 and 4 remain open.
+
+Implementer self-review: the new crossing contract describes physical source
+classifications and preserves the essential nonzero/validity premise. It does
+not infer candidate completeness from boundary labels or finite examples.
+The protected arithmetic core, SVG and compiler deadlines are unchanged.
+
+The first new source-crossing mutant passed its frontend compilation gate,
+but the subsequent expected-rejection proof invocation timed out. Therefore
+no new mutant/refutation pair has an accepted complete validation result yet;
+the controls stay required by the integrated harness.
+
+
+### Source-boundary correspondence (work in progress, unpublished)
+
+Five public laws were added in `source-boundary-laws.bend`: exact orientation
+selection, exact branches, projective equivalence of an on-line source
+combination to the direct original-source cut, crossing forced by actual
+valid clipping inputs, and equivalence of the actual new clipped endpoint
+to the direct original-source cut. Both source orientations are handled;
+closed boundary endpoints count as inside. The manifest scope check accepts
+361 unique laws across 52 roots. These five new laws are not yet kernel
+accepted: all current verdict attempts exited 124 under the unchanged
+five-second limit. An initial frontend diagnostic exposed a reversed equality
+orientation in the coefficient-swap helper; that call was corrected. Later
+frontend attempts also timed out and do not establish acceptance.
+
+Four source-boundary raw fixtures (forward/reverse orientation and boundary
+contact) passed with exit 0 and `ALL PROOFS CHECK` under `timeout 5`.
+Two proof fixtures exercise actual cut/source representative agreement with
+unequal denominators in both source orientations; their checks timed out,
+so they remain unverified and required by `check.py`.
+
+The closed-to-negative reflection helper now belongs to the strict-halfplane
+proof owner; interval clipping retains its old forwarding entry, and new
+crossing/boundary proofs avoid importing the entire clipping proof for this
+single implication. Exact tracked-cut coordinates and their boundary-line
+proof were extracted into `tracked-cut-proof.bend`; tracked interval and
+source-boundary proofs share this owner rather than duplicate the algebra.
+The updated graph still needs full verification, including the older 21-law
+tracked root and four-law crossing root previously accepted before these
+refactorings. No protected arithmetic source, SVG, law/control or timeout
+was removed or weakened. A host CPU sample showed high load and one idle
+allowed CPU; repeats pinned to that CPU still timed out, so affinity alone
+does not fix the pending proof gate.
+
+Implementer self-review: the new contract bridges actual cut construction
+and the exact oriented source representative, rather than trusting a label.
+It remains necessary to prove this correspondence for boundary labels retained
+through an entire valid clipping walk, then establish search completeness.
+Stages 2–4 and publication remain open. No new verdict timeout is counted
+as a passing proof or integrated result.
+
+After extracting the shared tracked-cut proof owner, the exact current
+`SOURCE_BOUNDARY_PROOF.bend --check-only` command completed with exit 0
+and frontend acceptance under `timeout 5`. This resolves the frontend
+uncertainty above; mathematical kernel acceptance remains a separate gate.
+
+The subsequent exact current `timeout 5 bend SOURCE_BOUNDARY_PROOF.bend
+--verdict` completed with exit 0 and `ALL PROOFS CHECK`: all five new
+source-boundary laws now have kernel acceptance in this shared-owner graph.
+The two source-boundary proof fixtures' next separate verdict attempt still
+exited 124, so their acceptance and the complete integrated run remain pending.
+The universal law acceptance is not reported as fixture/full-suite acceptance.
+
+All three new source-boundary controls passed their complete local gates:
+the original literal law instance was accepted, each mutated core compiled,
+the generic proof rejected `direct_exact` or `choose_exact` as expected,
+and Bend accepted the literal Empty refutation under the unchanged
+five-second limit. All four source-crossing decision controls likewise
+compiled, rejected `different_exact`, and had accepted literal refutations.
+These are repository-owned compiling mutants with kernel-checked witnesses;
+external bend-falsify was not run. `check.py` requires these seven controls
+and all earlier controls. The Python harness compiles and `git diff --check`
+passes. The tracked root's current shared-owner verdict repeat timed out;
+a new complete integrated attempt is in progress and is not yet counted.
+
+The full integrated attempt for this exact checkpoint failed on the existing
+`SAMPLE_ARITHMETIC_PROOF.bend --verdict` subprocess timeout at five seconds.
+It is not a successful full gate. Regeneration and publication remain pending;
+the source-boundary kernel acceptance and seven complete local mutation
+controls above remain the verified evidence for this turn.
+
+
+### Candidate correspondence through the complete clipping walk
+
+Seven new public laws in `tracked-candidates-laws.bend` pin the physical
+label, endpoint and complete report interpretation, establish initial
+correspondence, preserve it under every valid clipping step and arbitrary
+edge-list traversal, and specialize it to actual four-side quad clipping.
+Source tags mean projective equivalence to the named original endpoint.
+Boundary tags require both original-source crossing and projective equivalence
+to the direct original-source cut. Current validity is an explicit step/run
+premise and is propagated by the existing actual clipping validity theorem;
+positive original denominators establish the quad wrapper's initial validity.
+The implementation does not assume metadata to infer physical crossing.
+
+The exact current `timeout 5 bend TRACKED_CANDIDATES_PROOF.bend --verdict`
+completed with exit 0 and `ALL PROOFS CHECK`. Seven raw fixtures and two proof
+fixtures also passed separate real Bend verdict gates at the unchanged limit,
+including retained labels through a complete walk, reversed sources, unequal
+denominators, wrong-boundary rejection and a false span report. Earlier
+verdict/frontend attempts timed out and are not counted as passing.
+All seven new compiling mutants passed complete local gates: wrong source
+tags, omitted crossing, omitted projective equivalence, swapped coefficients,
+false empty-state and constant span report each compiled, rejected the expected
+physical public law, and admitted a kernel-checked literal Empty refutation.
+These are handwritten mutation controls; external bend-falsify was not run.
+The manifest scope check now accepts 368 unique laws across 53 roots.
+The integrated harness retains all old/new roots, fixtures and controls.
+
+Self-review: the invariant applies to actual retained endpoints through the
+entire walk, and the independent exact report laws reject constant-success
+implementations. The geometric bridge still needs to place each boundary label
+in the enumerated quad edge set and transport common-region admission to that
+actual search candidate; search completeness and stages 3–4 remain open.
+No SVG coordinate, proof premise, protected arithmetic definition or deadline
+changed. Complete verification, regeneration and publication remain pending.
+
+A separate terminology-only correction was published as `1c5d14e`: project
+prose, a comment and the checker's status text now use Bend. It changes no
+proof or algorithm. The correction was staged from the prior published versions,
+so unfinished proof work was not included in that commit. Origin clarification:
+the longer name appeared in the installed compiler's guide; attributing it to
+user dictation was incorrect. It remains omitted from project terminology.
+
+The complete integrated attempt for the candidate-invariant checkpoint failed
+at the existing `INTERSECTION_SEARCH_PROOF.bend --verdict` five-second
+subprocess timeout. No complete integrated result is claimed for this graph;
+local invariant, fixture and seven mutation-control acceptance above is the
+verified evidence. Regeneration and publication remain pending.
+
+
+### Directed origin occurrence through the clipping walk
+
+Seven laws in `tracked-origin-laws.bend` construct actual directed-edge list
+occurrences for boundary origins, establish edge-list self-membership and
+initial source origins, preserve allowed origins under cut/step/arbitrary
+walk, and specialize to the exact quad edge list. Occurrence is an explicit
+sum of a head equality or a recursive tail occurrence, with Empty for an empty
+list; boundary labels cannot claim membership by a constant Boolean report.
+Metadata membership is independent of geometric validity, while the earlier
+candidate invariant separately proves physical crossing and representative
+agreement under validity. These contracts compose without inferring geometry
+from metadata.
+
+The exact `timeout 5 bend TRACKED_ORIGIN_PROOF.bend --verdict` passed with
+exit 0 and `ALL PROOFS CHECK`. Four constructive fixtures passed the same real
+Bend gate: actual complete/reversed walks, the second directed quad side and
+a cut with that actual side occurrence. Initial binder/forward-call errors
+were corrected before this accepted gate. The scope manifest accepts
+375 unique laws across 54 roots. The directed-boundary mutation control was
+added to the integrated harness; its complete validation result is recorded
+separately below. The checker Python module compiles.
+
+The preceding complete 368-law/53-root retry failed at existing
+`VALIDATOR_NATURAL_PROOF.bend` on the unchanged five-second timeout. This is
+not a successful integrated gate and no intermediate acceptance substitutes
+for it. Regeneration and publication of proof work remain pending. The next
+mathematical obligation is to transport directed-edge occurrence into the
+actual search candidate list and common-region admission. Stage 2 remains
+open; stages 3–4 remain open. The SVG is unchanged.
+
+Directed-origin control result: the reversed-label core compiled and the
+public `cut_allowed` proof was rejected. The first counterexample file
+incorrectly imported unfilled law declarations and failed with seven TODOs;
+that invocation is not counted as an accepted refutation. Constructive
+occurrence/report definitions were then moved into their pure owner
+`tracked-origin.bend`, retaining forwarding type APIs in the law module.
+The literal refutation imports the pure owner, with no unfilled law claim.
+Its corrected complete local control passed compilation, expected public-law
+rejection and the real Bend literal Empty-refutation gate.
+
+Three anti-vacuity extractor laws were added: an occurrence in an empty list
+constructs Empty, endpoint reports expose the actual origin report, and span
+reports expose both actual endpoint reports. The current ten-law directed
+origin root passed real `--verdict` with exit 0 and `ALL PROOFS CHECK` under
+`timeout 5` after this owner extraction. The original fixture assertions are
+unchanged and all remain required. Manifest scope is now 378 laws/54 roots;
+no proof or control was removed or weakened. The source SVG is unchanged.
+
+The full integrated attempt for the 378-law/54-root origin checkpoint failed
+at existing `ARITHMETIC_PROOF.bend --verdict` on the unchanged five-second
+timeout. That is not a passing gate; no regeneration/publication is claimed.
+All ten new origin laws, four constructive fixtures and the complete directed
+boundary control have accepted local evidence recorded above. The harness now
+includes the additional directed-origin control in its reported total rather
+than excluding its separate invocation. Stage 2 still needs search-list
+membership/admission and full completeness; stages 3–4 remain open.
+
+
+### Exact occurrence in the actual search candidate list
+
+Fourteen new laws in `search-membership-laws.bend` construct exact point/edge
+occurrences, pin empty/head extraction, preserve occurrences through both list
+append directions, translate actual directed walk edges to search edges,
+prove the exact quad-edge translation, and carry a crossed source cut through
+actual `cut_branch`, `edge_cut`, `row`, `pairs` and `candidates`. The final
+boundary-origin law accepts an actual occurrence in the walk's quad edge list
+and produces an exact occurrence of the oriented direct cut in the production
+search's candidate list, given the original source edge occurrence and crossing.
+Membership retains raw homogeneous point equality; earlier boundary laws
+separately supply projective equivalence from retained traced endpoints.
+
+The exact current `timeout 5 bend SEARCH_MEMBERSHIP_PROOF.bend --verdict`
+passed with exit 0 and `ALL PROOFS CHECK`. Eight constructive fixtures passed
+real Bend at the same deadline: a fourth source-edge candidate, reversed
+source direction, translated second directed quad side, boundary contact,
+an actual constructed cut's origin occurrence, and its composed search-list
+membership (with the shared occurrence fixtures). The fixture module contains
+eight proof assertions plus shared data/helper definitions; all remain required.
+The manifest scope check accepts 392 public laws across 55 proof roots.
+
+Five new complete local mutation controls passed: skip a row head, drop a row
+tail, skip a pairs head, drop a pairs tail and omit all pair-cut candidates.
+Each original literal public-law instance and its premise witnesses passed
+before mutation; each mutant compiled and rejected the expected literal
+membership law; Bend accepted a literal Empty refutation under mutation.
+For omitted pair cuts, the refutation explicitly eliminates the remaining
+eight vertices using unequal raw coordinates. It does not infer failure only
+from a diagnostic helper. These are handwritten compiling controls, with no
+external bend-falsify claim. The integrated harness requires all five controls
+and includes them in its reported mutation count.
+
+Self-review: exact candidate occurrence is separated from candidate admission.
+No membership theorem claims an arbitrary cut lies in either common region;
+that guard and validity transport are the next bridge. These laws do not yet
+prove all geometric intersections have a candidate or complete stages 2–4.
+The protected arithmetic core, generator, SVG and deadlines are unchanged.
+Full integrated verification, regeneration and proof publication remain pending.
+
+The complete integrated attempt for this exact 392-law/55-root checkpoint
+failed at the existing `EDGE_ARITHMETIC_PROOF.bend --verdict` subprocess on
+the unchanged five-second deadline. This attempt is not a passing full gate.
+The fourteen new laws, eight constructive fixtures and five complete local
+mutation controls above retain their accepted evidence; regeneration and
+publication remain pending.
+
+
+### Admission transport and actual selected search witnesses
+
+Six laws in `search-admission-laws.bend` connect exact candidate occurrence
+and actual common-region admission to the list existence predicate and the
+actual selected search hit. They prove admission invariance under valid
+projective representatives, validity of an oriented direct cut from valid
+crossed source endpoints, and construction of the search witness from a
+boundary occurrence, original source edge occurrence and a valid equivalent
+point in both regions. The existential witness retains the actual `scan`
+result and its admission predicate; the returned point can be an earlier
+acceptable corner rather than the candidate used to establish existence.
+Membership by itself is not treated as geometric admission.
+
+The exact `timeout 5 bend SEARCH_ADMISSION_PROOF.bend --verdict` completed
+with exit 0 and `ALL PROOFS CHECK`. Four proof constructions and five raw
+judgments passed real Bend under the same deadline: boundary witnesses in
+both crossing directions, selected tail after an invalid prefix, projective
+admission equivalence, the actual earlier selected corner, rejection of a
+zero-denominator point, rejection of an exterior point, and a clockwise
+region rejection. An initial reverse-direction fixture incorrectly reversed
+the whole quad, making its closed region inadmissible; the compiler rejected
+that false premise. The reverse-direction positive fixture now uses a proper
+quad and its other directed source edge. The rejected clockwise example is
+retained explicitly as a negative raw assertion, not dropped or counted as
+passing a positive premise.
+
+Three complete local compiling mutation controls passed: skip the actual scan
+head, bypass a true admission and accept a false admission. Each original
+literal of the public occurrence-to-witness result and its occurrence/admission
+premises passed before mutation; the altered core compiled and rejected that
+literal; the real Bend checker then accepted the Empty refutation of the
+actual witness. The false-admission control exposes a selected zero-denominator
+head and contradicts the witness's admission predicate constructively.
+These are handwritten controls, with no external mutation-tool claim.
+The integrated harness requires all fixtures/controls and includes the three
+additional controls in its mutation total. Scope validation accepts
+398 unique public laws across 56 roots. The Python harness compiles.
+
+Self-review: both representative denominators are required for admission
+transport; direct validity is derived from real crossing and source validity;
+both common-region predicates remain explicit. No claim is made yet that every
+geometric intersection supplies the occurrence/correspondence premises.
+The next composition must derive these premises from retained actual clipping
+endpoints and source-region preservation, then close geometric search
+completeness. Stages 2–4 remain open. Full integrated verification,
+regeneration and proof publication remain pending. The source SVG and
+protected arithmetic definitions are unchanged.
+
+The integrated attempt for this exact checkpoint accepted all 398 public laws
+across all 56 roots using real Bend verdict checks under the unchanged
+five-second deadline. It then failed on the `tracked-candidates-tests.bend`
+fixture subprocess timeout. All preceding newly ordered fixture groups in
+that run completed before the failure. This is accepted full current-graph
+law evidence, not a complete integrated gate: remaining fixtures, mutation
+controls, regeneration and publication remain pending. The failed attempt
+is not reported as passing.
+
+The exact unchanged-limit standalone repeat of the two candidate proof fixtures
+also timed out. A one-assertion-per-file partition was tried; both isolated
+instances still exited 124, so partitioning was not treated as a fix. The two
+original result assertions are now checked by direct kernel normalization of
+the same concrete expressions, with unchanged coordinates, rather than by
+expanding the generic theorem at concrete coefficients. Both original positive
+source-denominator premises are retained as explicit kernel-checked assertions.
+The temporary partition was recombined without dropping either result. The
+fixture no longer imports the entire theorem dependency graph; the generic
+seven-law candidate proof still runs as a mandatory manifest root, alongside
+all other universal laws. This changes the proof strategy for finite examples,
+not their propositions or the universal theorem coverage.
+
+The revised `timeout 5 bend tracked-candidates-tests.bend --verdict` passed
+with exit 0 and `ALL PROOFS CHECK`. All four concrete assertions are required
+by the ordinary harness. These finite checked instances are not presented as
+universal proofs. A full unchanged-deadline retry is in progress.
+
+The next complete retry (with the unchanged propositions and revised concrete
+fixture proof strategy) failed at existing `WIDTH_RANGE_PROOF.bend --verdict`
+on the same five-second subprocess timeout, before completing the proof-root
+loop. This is a failed attempt, not a full successful result. The previously
+accepted 398-law current proof graph and the revised concrete fixture's accepted
+local check are the verified evidence; regeneration/publication remain pending.
+
+
+### Actual source-edge region preservation
+
+Seven laws in `source-edge-region-laws.bend` pin physical endpoint admission
+and the complete edge-list report, extract an edge's report from an actual
+list occurrence, prove all four edges of a strict quad have both endpoints
+inside that quad, expose the actual source endpoints' region predicates, and
+preserve that region predicate for nonnegative source combinations. They use
+the existing strict-corner theorem and shared homogeneous-combination theorem;
+source-region membership is derived from source edge occurrence, not assumed
+from a stored endpoint label. Positive denominator remains a separate condition:
+the all-zero combination can satisfy the arithmetic halfplane predicates but
+is not a valid geometric point and cannot pass search admission.
+
+The exact `timeout 5 bend SOURCE_EDGE_REGION_PROOF.bend --verdict` passed
+with exit 0 and `ALL PROOFS CHECK`. Four proof constructions and three raw
+judgments passed real Bend under the same deadline: all actual quad edges,
+the fourth source edge, a positive source mixture, a zero-first-weight endpoint,
+exterior-edge rejection, clockwise-region rejection and all-zero-mixture
+invalidity. Initial tuple duplication inference and the region-join argument
+order were corrected before the accepted gate; failed invocations are not
+counted as passing.
+
+Four complete local mutation controls passed: omit first endpoint containment,
+omit second endpoint containment, reject the empty list and skip a list head.
+The original literal public-law instance passed before each mutation; the
+mutant compiled and rejected that literal; the real Bend checker accepted
+the corresponding Empty refutation. The integrated harness requires all seven
+fixture assertions and all four controls, and includes them in the total.
+Scope validation accepts 405 public laws across 57 roots. The Python checker
+compiles, `git diff --check` passes, and the SVG is unchanged.
+
+Self-review: strict orientation and actual directed source-edge occurrence
+are explicit premises. The source mixture's region predicate is not equated
+to validity at zero total weight. The next composition must extract validity,
+inside-clip-region membership, candidate correspondence and boundary occurrence
+from actual retained endpoints, then supply this derived source-region predicate
+to the witness constructor. A further completeness step must handle source-end
+labels as well as boundary labels and produce such a retained boundary point
+from a common polygon point. Stages 2–4 remain open. Full integrated
+verification, regeneration and proof publication remain pending.
+
+The integrated attempt for the 405-law/57-root checkpoint accepted every
+public law and all newly ordered fixture groups, including source-region
+proofs, admission witnesses, membership, origins and candidate examples.
+It continued through the original tracked intervals, interval walk/clipping,
+segment-boundary/proportionality and source-provenance fixtures, then failed
+at existing `clip-halfplane-boundary-tests.bend --verdict` on the unchanged
+five-second timeout. This is stronger positive integration evidence, but not
+a complete successful gate. No mutation result, regeneration or publication
+is inferred from the partial run.
+
+The subsequent unchanged integrated retry stopped at
+`SCALED_COORDINATE_PROOF.bend` on the five-second timeout. An exact standalone
+repeat (`timeout 5 bend SCALED_COORDINATE_PROOF.bend --verdict`) then returned
+exit 0 and `ALL PROOFS CHECK`; this does not turn the failed integrated retry
+into a pass. Independent current-artifact checks (`python3 verify.py b.svg`
+and `python3 topology_verify.py b.svg`) both returned exit 0: 3 tubes,
+96 convex cells, 24 seams, and finite nerve counts [96, 146, 64, 15],
+one component and two holes. These remain finite artifact evidence, not the
+missing universal topology bridge. No proof deadline or protected arithmetic
+implementation was changed.
+
+Two additional universal origin laws now recover actual directed quad-edge
+occurrence from an equality identifying the left or right boundary-labelled
+endpoint of `Trace.clip_quad`. The proof transports `quad_allowed` along that
+exact state equality and extracts the appropriate constructive occurrence;
+it does not accept an occurrence premise supplied by the caller. Both laws
+passed `timeout 5 bend TRACKED_ORIGIN_PROOF.bend --verdict` (exit 0,
+`ALL PROOFS CHECK`). The mandatory existing `tracked-origin-tests.bend` now
+contains both actual retained endpoints of the two-cut fixture, including their
+exact coefficients and directed boundary tags; its real five-second gate also
+returned exit 0 and `ALL PROOFS CHECK`.
+
+Self-review: these laws extract occurrence only, without asserting validity,
+inside membership or a search witness. They work for arbitrary homogeneous
+source points because origin tracking itself has no denominator premise.
+The existing reversed-origin mutation control remains required by the harness,
+but was not rerun for this addition; no new mutation result or complete suite
+pass is claimed. Subsequent composition must still derive candidate correspondence,
+positive denominator and both region predicates for the retained endpoint.
+Stages 2–4 and publication of this proof checkpoint remain incomplete.
+
+Two universal candidate laws now extract both original-source crossing and
+projective equivalence to the direct boundary cut from an equality identifying
+the actual left or right retained boundary endpoint. They require positive
+original source denominators, transport `quad_candidates` along the exact
+clip-state equality, split the endpoint report, and split the boundary label's
+physical interpretation. No crossing or equivalence premise is supplied by
+the caller. `timeout 5 bend TRACKED_CANDIDATES_PROOF.bend --verdict` returned
+exit 0 and `ALL PROOFS CHECK`. The two actual endpoints, with exact coefficients
+(2,6) and (36,12), invoke the generic laws in the new mandatory
+`tracked-candidates-retained-tests.bend`; its identical five-second real gate
+also returned exit 0 and `ALL PROOFS CHECK`. Existing fixture groups remain
+required; no deadline was changed.
+
+Self-review: extracted projective equivalence is distinct from raw-coordinate
+equality, as required for differently scaled homogeneous points. The source
+denominator guards are explicit. This does not yet establish a retained point's
+positive denominator or containment in both quads; those must still be derived
+before composing the actual search witness. Existing candidate mutation controls
+remain required but have not been rerun on this addition; publication and the
+full integrated gate remain pending. Stages 2–4 remain open.
+
+The universal `retained_closed_valid` law derives positive denominators and
+clip-region containment for both actual retained endpoints from positive
+source denominators and the exact clip-state equality. Its proof transports
+the existing real interval-walk `quad_closed_valid` result through `quad_erases`,
+then through the retained-state equality, and splits both conjunctions. An
+initial rewrite had the wrong orientation and failed; the corrected symmetric
+rewrite passed `timeout 5 bend TRACKED_INTERVAL_PROOF.bend --verdict` with
+exit 0 and `ALL PROOFS CHECK`. The new mandatory
+`tracked-interval-retained-tests.bend` invokes this law on both exact retained
+endpoints and passed its real five-second gate with exit 0 and
+`ALL PROOFS CHECK`. `git diff --check` passed.
+
+Self-review: no strict-quad premise is needed for validity and containment
+in the clipping halfplanes; strictness remains necessary for the separately
+derived source-region theorem used by witness composition. This law asserts
+no retained endpoints when clipping returns Lost: the Segment equality is an
+explicit premise. No new mutation result or full integrated pass is claimed.
+The source-region membership and actual search-witness composition remain next;
+stages 2–4 and publication of this checkpoint remain open.
+
+The new `retained-witness` owner composes both actual boundary endpoints
+into `E.Witness(Search.candidates(q,r),q,r)`. Its two universal laws require
+only directed source-edge occurrence in `r`, strict orientation of `r`, and
+an exact equality identifying the retained boundary endpoint of that source
+edge clipped into `q`. They derive boundary-edge occurrence, original-source
+crossing, projective direct-cut correspondence, positive endpoint denominator,
+clip-region containment and source-region containment through the respective
+shared owners. No caller-supplied geometric/admission premises remain.
+A structural occurrence-copy helper supplies two constructive uses of the
+linear source-edge occurrence. The initial attempt to duplicate the Type
+premise directly was rejected and replaced with this structural proof; an
+initial tuple-pattern syntax error was corrected before accepted verification.
+`timeout 5 bend RETAINED_WITNESS_PROOF.bend --verdict` and the mandatory
+`retained-witness-tests.bend` each returned exit 0 and `ALL PROOFS CHECK`.
+The tests invoke both generic laws on the exact two-cut endpoint coefficients.
+The new root is included in the proof manifest and the fixture in `check.py`;
+`git diff --check` passed.
+
+Self-review: the conclusion concerns the actual search selection witness; it
+does not assert that the search selects the particular retained endpoint.
+Search may select an earlier admitted candidate. Completeness from arbitrary
+common points and source-end labels is still missing, as is the topology
+bridge; stages 2–4 remain open. Mutation controls have not been rerun on this
+composition, and full integrated verification/publication remain pending.
+
+The integrated 412-law/58-root attempt accepted every public law and every
+geometric proof fixture through homogeneous combinations, including all new
+retained-endpoint/witness groups. It then failed the unchanged five-second
+`clang -O1` deadline for the native `search-witness-tests` executable. No full
+gate is claimed. A standalone rebuild of the exact same Bend fixture emitted
+C, compiled with `clang -O0`, and ran its original `search-witness-tests: True`
+assertion successfully; all three commands returned exit 0 within their
+individual five-second deadlines. The harness now uses -O0 for this test-only
+executable. The production generator retains -O1. No Bend proof gate, time
+limit, fixture input or assertion changed. Self-review: compiler optimization
+is unnecessary for correctness of the native assertions; this change addresses
+build work under the existing deadline, not proof acceptance.
+
+The subsequent integrated retry with the test-only -O0 build change stopped
+at `TRIANGLE_AREA_PROOF.bend` on the unchanged five-second deadline, before
+any whole-root success report. No full pass is claimed. The four source-edge
+region mutation controls were then rerun independently on an isolated copy
+of the current Bend sources. `source_edge_region_controls` returned 4 and
+the driver exited 0: each original law instance accepted, each compiling
+mutant rejected that instance, and each literal Empty refutation accepted.
+The integrated harness still requires these controls. This is current local
+mutation evidence, not a substitute for its full remaining checks.
+
+The current isolated source snapshot also passed all custom search controls:
+`search_admission_controls` returned 3, `search_membership_controls` returned
+5 and `tracked_origin_controls` returned 1; the sequential driver exited 0.
+Together with the four source-region controls, this rerun supplies 13 current
+mutation controls with unchanged per-command deadlines. Their original literal
+instances, mutant compile/rejection gates and constructive Empty refutations
+remain enforced by the existing control implementations. It does not claim
+all dynamically assembled legacy controls, regeneration or publication.
+
+The universal `search-membership.source_edge_vertices` law now extracts
+actual search-vertex occurrences for both endpoints of any actual directed
+quad edge. The proof enumerates all four edge positions, transports exact
+edge equality through the endpoint projections, and constructs the two
+vertex occurrences; an impossible tail is eliminated constructively.
+`timeout 5 bend SEARCH_MEMBERSHIP_PROOF.bend --verdict` returned exit 0 and
+`ALL PROOFS CHECK`. The existing mandatory `search-membership-tests.bend`
+now invokes the law at all four positions, including the wrap-around edge,
+and its real five-second gate likewise returned exit 0 and
+`ALL PROOFS CHECK`.
+
+Self-review: this law concerns exact list membership only; no strict geometry
+or region claim is implied. Duplicate coordinates and degenerate quads do
+not invalidate it, because occurrence is constructive and not uniqueness.
+It supplies the missing actual-vertex enumeration fact for retained source
+labels. No additional mutation result or complete suite pass is claimed.
+Stages 2–4 and publication remain incomplete.
+
+The retained-witness owner now covers every left-endpoint origin.
+`retained_endpoint_witness` splits SourceLeft, SourceRight and Boundary;
+source labels derive actual vertex membership from `source_edge_vertices`,
+transport the retained point's admission to that valid embedded vertex, and
+construct the actual full candidate-search witness. Boundary labels reuse the
+proved directed-cut constructor. `clipped_source_witness` needs no supplied
+endpoint or origin: nonempty actual `Walk.clip_quad` of a directed source edge
+in a strict source quad implies an actual full-search witness, via trace erasure
+and constructive case elimination. `source_member_witness` further derives
+this nonempty result from a constructive common point on the actual source
+edge and clip-region containment. These are three additional universal laws.
+
+The current `timeout 5 bend RETAINED_WITNESS_PROOF.bend --verdict` returned
+exit 0 and `ALL PROOFS CHECK`. Mandatory `retained-witness-tests.bend` covers
+both explicit boundary endpoints, nonempty two-cut clipping, retained
+SourceLeft, retained SourceRight, and a common source-edge midpoint; its real
+five-second gate also returned exit 0 and `ALL PROOFS CHECK`. Scope audit
+reports 416 public laws across 58 roots.
+
+Self-review: strictness is required only for the source quad in these laws.
+The common-point law requires actual source-edge membership, not merely an
+interior common point. Nonempty clipping is no longer a conclusion inferred
+from examples or a caller-supplied candidate correspondence. General polygon
+intersection completeness still requires deriving a common boundary/source-edge
+point from arbitrary common hull membership. The independent complex enumeration
+and real-fill topology bridge remain open. No new mutation/full-suite success,
+regeneration or publication is claimed for this addition.
+
+The integrated 416-law/58-root attempt stopped at
+`SEARCH_ADMISSION_PROOF.bend` on the unchanged five-second timeout. An exact
+standalone `timeout 5 bend SEARCH_ADMISSION_PROOF.bend --verdict` also exited
+124, without an accepted verdict. Earlier local/integrated acceptance is not
+claimed as a current full gate. Read-only `bend --help` exposed no worker or
+thread tuning option; the installed compiler was not modified. This repeated
+local timing failure warrants investigating this proof owner's dependency
+closure before further unchanged full-suite retries. No proof deadline was
+raised, proof omitted, regeneration run or change published.
+
+Dependency refactoring isolates pure scan soundness in `scan-sound-proof.bend`.
+The existing public `intersection-search.scan_hit_sound` law forwards to this
+same proof; `candidate-existence` consumes the pure owner directly instead of
+the complete geometry-search proof. Measured transitive candidate-existence
+source closure decreased from 131 files to 21, removing 110 dependencies;
+no public law, search implementation or assertion changed. Its real root
+gate passed. Initial local admission/search/retained gates still timed out
+and are not counted as passing.
+
+A second pure owner, `strict-complement-proof.bend`, contains the original
+Boolean double-negation/closed-halfplane complement derivation and its rejected
+edge-to-strict-negative implication. The public strict law and old helper API
+forward to it; admission consumes this small owner instead of the full native
+strict-separation proof. The subsequent real five-second gates for
+SEARCH_ADMISSION_PROOF, STRICT_HALFPLANE_PROOF, RETAINED_WITNESS_PROOF,
+INTERSECTION_SEARCH_PROOF and search-admission-tests all returned exit 0 and
+`ALL PROOFS CHECK`. `git diff --check` passed.
+
+Self-review: original universal soundness proofs were moved, not replaced by
+literal instances or unchecked postulates. Public API wrappers and all proof
+manifest roots remain required. Pure candidate-list existence no longer needs
+quad hull or native SAT proofs; complement reflection no longer pulls in the
+native arithmetic bridge for one Boolean implication. The shared owners remain
+imported by their original public proof roots, so their statements are checked
+by the full graph. A new complete integrated gate and publication are pending.
+
+The integrated attempt after scan/complement dependency refactoring stopped
+at `INTERVAL_CLIP_PROOF.bend` on the unchanged five-second deadline. The
+manifest audit still reports 416 public laws across 58 roots, the SVG diff
+is empty, and no full gate/publication is claimed. An isolated current-source
+rerun of `search_admission_controls` returned 3 with driver exit 0, confirming
+that original literal instances, compiling mutant rejection and Empty
+refutations still pass after removing the full geometry-search dependency
+from candidate existence. Read-only inspection shows interval clipping still
+consumes the full strict-halfplane owner for weighted negativity and the
+strict/closed contradiction, beyond the newly isolated complement helper.
+That remaining pure/native dependency boundary is the next factoring target.
+
+Pure strict geometry is now owned by `strict-geometry-proof.bend`: the
+original weighted-negativity, hull-separation and strict/closed contradiction
+derivations are explicitly typed shared proofs. The original strict public
+laws forward to them, while native arithmetic/decoding stays in the full
+strict proof owner. Interval clipping and original-source crossing consume
+this pure owner directly instead of loading native SAT proofs. No public
+law or geometric implementation changed. Initial standalone pure/interval
+gates timed out and are not passes; subsequent real five-second gates for
+STRICT_HALFPLANE_PROOF, SOURCE_CROSSING_PROOF, INTERVAL_CLIP_PROOF and
+RETAINED_WITNESS_PROOF returned exit 0 and `ALL PROOFS CHECK`. The actual
+interval-clip-member, source-crossing and retained-witness fixture gates also
+returned exit 0 and `ALL PROOFS CHECK`. Scope remains 416 laws/58 roots.
+
+Self-review: the shared file imports no native strict law module; its proof
+statements preserve the original guards and conclusions. The original
+public laws remain in the full graph and still check the native bridge.
+Full integrated verification, regeneration and publication remain pending.
+
+## Published handoff checkpoint
+
+At the user's explicit request to publish the current work, leave follow-up,
+push everything and finish this conversation, further implementation is
+deferred to https://github.com/dearlordylord/b/issues/1. This is a partial
+formalization checkpoint, not completion of all four original stages.
+
+The latest integrated run accepted all **416 public laws across 58 roots**
+with real Bend `--verdict` under the unchanged five-second per-command
+deadline. It then timed out at `tracked-candidates-retained-tests.bend`; the
+whole `check.py` gate did **not** pass. Individual earlier fixture and mutation
+results above retain their exact scopes. Regeneration was not rerun for this
+checkpoint. Current `python3 proof_scope.py`, `python3 verify.py b.svg` and
+`python3 topology_verify.py b.svg` returned exit 0; the SVG is unchanged from
+HEAD. Artifact results: 3 tubes, 24 seams, 96 convex cells, finite nerve counts
+[96, 146, 64, 15], one component, two holes and Euler characteristic -1.
+Those artifact checks do not prove the missing continuous-topology bridge.
+
+Self-review: shared scan/complement/strict-geometry proof owners preserve
+public statements and guards, and public wrappers retain their consumers.
+Retained endpoint laws derive occurrence, crossing, projective correspondence,
+validity and both-region membership rather than accepting those conclusions
+as caller assumptions. All origins now construct an actual search witness;
+a common point on an actual source edge also does so. General common-point
+completeness, production triple completeness, independent complex enumeration
+and the actual real/PL fill topology bridge remain open in the follow-up.
+No full-suite pass, complete regeneration or completion of stages 2–4 is
+claimed. Publication of this explicitly partial state is user-authorized.

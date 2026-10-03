@@ -10,7 +10,7 @@ import ./homogeneous-combination.bend as C
 import ./homogeneous-combination-laws.bend as CL
 import ./homogeneous-combination-proof.bend as CP
 import ./halfplane-region.bend as Region
-import ./halfplane-region-proof.bend as RP
+import ./halfplane-equivalence-proof.bend as RP
 import ./segment-cut.bend as Cut
 import ./boolean-reflection.bend as B
 

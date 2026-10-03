@@ -414,8 +414,415 @@ def interval_walk_counter(directory, original, replacement):
     bend(directory, "interval-walk-counter.bend", "--verdict")
 
 
+def tracked_interval_counter(directory, original, replacement):
+    """Refute unfolded public trace laws with checked literal coordinates/tags."""
+    prelude = (
+        "import Base\nimport ./tracked-interval.bend as M\nimport ./natural-cover.bend as N\n"
+        "import ./homogeneous-geometry.bend as G\nimport ./halfplane-region.bend as Region\n"
+        "import ./interval-clip.bend as Clip\nimport ./interval-walk.bend as Walk\n"
+        "import ./segment-cut.bend as Cut\nimport ./boolean-reflection.bend as B\n"
+        "def p() -> G.Point: G.P{0n,2n,1n}\ndef q() -> G.Point: G.P{4n,2n,1n}\n"
+        "def left() -> M.Endpoint: M.End{1n,0n,M.SourceLeft{}}\n"
+        "def right() -> M.Endpoint: M.End{0n,1n,M.SourceRight{}}\n"
+        "def state() -> M.Traced: M.Segment{left(),right()}\n"
+        "def edge() -> Walk.Edge: Walk.Halfplane{N.P{1n,3n},N.P{1n,1n}}\n"
+        "def box() -> N.Quad: N.Q{N.P{1n,1n},N.P{3n,1n},N.P{3n,3n},N.P{1n,3n}}\n"
+        "def present(state:M.Traced) -> Bool:\n  match state:\n    case M.Lost{}: False{}\n    case M.Segment{l,r}: True{}\n"
+        "def first(end:M.Endpoint) -> Nat:\n  match end:\n    case M.End{k,l,o}: k\n"
+        "def second(end:M.Endpoint) -> Nat:\n  match end:\n    case M.End{k,l,o}: l\n"
+        "def trace_first(state:M.Traced) -> Nat:\n  match state:\n    case M.Lost{}: 9n\n    case M.Segment{l,r}: first(l)\n"
+        "def start_y(origin:M.Origin) -> Nat:\n  match origin:\n    case M.SourceLeft{}: 9n\n    case M.SourceRight{}: 9n\n    case M.Boundary{a,b}: point_y(a)\n"
+        "def point_y(p:N.Point) -> Nat:\n  match p:\n    case N.P{x,y}: y\n"
+        "def endpoint_y(end:M.Endpoint) -> Nat:\n  match end:\n    case M.End{k,l,o}: start_y(o)\n")
+    # Respect Bend's declaration-before-use rule for the report helper.
+    point_y = "def point_y(p:N.Point) -> Nat:\n  match p:\n    case N.P{x,y}: y\n"
+    prelude = prelude.replace(point_y, "").replace("def start_y", point_y + "def start_y")
+    type_name, reporter, reverse = "M.Traced", "x => present(x)", False
+    if original.startswith("Source.first") or original.startswith("Source.second") or original.startswith("End{Source.first"):
+        actual = "M.cut_endpoint(N.P{3n,1n},N.P{3n,3n},p(),q(),left(),right())"
+        expected = "M.End{2n,6n,M.Boundary{N.P{3n,1n},N.P{3n,3n}}}"
+        type_name = "M.Endpoint"
+        reporter = ("x => Nat.is_eq(first(x),2n)" if original.startswith("Source.first") else
+                    "x => Nat.is_eq(second(x),6n)" if original.startswith("Source.second") else
+                    "x => Nat.is_eq(endpoint_y(x),1n)")
+    elif original.startswith("case True{} True{}"):
+        actual = "M.choose(N.P{1n,3n},N.P{1n,1n},p(),q(),left(),right(),True{},True{})"
+        expected = "state()"
+    elif original.startswith("case False{} False{}"):
+        actual = "M.choose(N.P{1n,3n},N.P{1n,1n},p(),q(),left(),right(),False{},False{})"
+        expected, reverse = "M.Lost{}", True
+    elif original.startswith("case False{} True{}"):
+        actual = "M.choose(N.P{1n,3n},N.P{1n,1n},p(),q(),left(),right(),False{},True{})"
+        expected = "M.Segment{right(),M.cut_endpoint(N.P{1n,3n},N.P{1n,1n},p(),q(),right(),left())}"
+        reporter = "x => Nat.is_eq(trace_first(x),0n)"
+    elif original == "case []: state":
+        actual, expected = "M.run(p(),q(),[],state())", "state()"
+    elif original == "run(p,q,rest,step(p,q,edge,state))":
+        actual = "M.run(p(),q(),[edge()],state())"
+        expected = "M.run(p(),q(),[],M.step(p(),q(),edge(),state()))"
+        reporter = "x => Walk.closed([edge()],M.erase(p(),q(),x))"
+    elif original == "case End{k,l,origin}: C.join(p,q,k,l)":
+        actual, expected = "M.point(p(),q(),left())", "p()"
+        type_name, reporter = "G.Point", "x => G.equivalent(x,p())"
+    elif original.startswith("Segment{End{1n,0n"):
+        actual, expected = "M.initial()", "state()"
+        reporter = "x => Nat.is_eq(trace_first(x),1n)"
+    elif original == "case Boundary{a,b}: Cut.on_line(a,b,r)":
+        actual = "M.origin_honest(p(),q(),p(),M.Boundary{N.P{1n,3n},N.P{1n,1n}})"
+        expected = "Cut.on_line(N.P{1n,3n},N.P{1n,1n},p())"
+        type_name, reporter, reverse = "Bool", "x => x", True
+    elif original == "endpoint_honest(p,q,left) && endpoint_honest(p,q,right)":
+        actual = "M.honest(p(),q(),M.Segment{M.End{0n,1n,M.SourceLeft{}},right()})"
+        expected = "G.equivalent(q(),p()) && G.equivalent(q(),q())"
+        type_name, reporter, reverse = "Bool", "x => x", True
+    elif original.startswith("choose(a,b,p,q,left,right,Region.edge"):
+        actual = "M.step(p(),q(),edge(),state())"
+        expected = "M.choose(N.P{1n,3n},N.P{1n,1n},p(),q(),left(),right(),False{},True{})"
+        reporter = "x => Walk.closed([edge()],M.erase(p(),q(),x))"
+    elif original == "run(p,q,Walk.quad_edges(quad),initial())":
+        actual = "M.clip_quad(p(),q(),box())"
+        expected = "M.run(p(),q(),Walk.quad_edges(box()),M.initial())"
+        reporter = "x => Walk.closed(Walk.quad_edges(box()),M.erase(p(),q(),x))"
+    else:
+        raise AssertionError((original,replacement))
+    proof = f"Equal.cong({type_name},Bool,{reporter},{actual},{expected},h)"
+    if reverse:
+        proof = f"Equal.sym(Bool,True{{}},False{{}},{proof})"
+    body = f"def refutes_public_literal(h:{{{actual} == {expected} : {type_name}}}) -> Empty:\n  B.false_impossible({proof})\n"
+    (directory / "tracked-interval-counter.bend").write_text(prelude + body)
+    bend(directory, "tracked-interval-counter.bend", "--verdict")
+
+
+def halfplane_fourth_literal(directory, refute=False):
+    """Literal of inside_halfplanes_decoded; omission has a physical counterexample."""
+    prelude = (
+        "import Base\nimport ./halfplane-region.bend as M\nimport ./inside-arithmetic.bend as I\n"
+        "import ./topology.bend as T\nimport ./natural-cover.bend as N\nimport ./boolean-reflection.bend as B\n"
+        "def quad() -> T.Quad: T.Q{T.P{1,1},T.P{3,1},T.P{3,3},T.P{1,3}}\n")
+    equality = "{I.inside(T.W{0,2,1},quad()) == M.contains(M.decode_witness(T.W{0,2,1}),N.decode_quad(quad())) : Bool}"
+    if refute:
+        body = f"def refutes_public_decoded_law(h:{equality}) -> Empty:\n  B.false_impossible(h)\n"
+        name = "halfplane-fourth-refutation.bend"
+    else:
+        body = f"def inside_halfplanes_decoded_literal() -> {equality}:\n  {{==}}\n"
+        name = "halfplane-fourth-literal.bend"
+    (directory / name).write_text(prelude + body)
+    return name
+
+
+def source_edge_region_controls(directory):
+    """Physical endpoint and list reports cannot omit a required condition."""
+    path = directory / 'source-edge-region.bend'
+    original = path.read_text()
+    controls = [
+        ('Region.contains(Q.embed(a),quad) && Region.contains(Q.embed(b),quad)', 'True{} && Region.contains(Q.embed(b),quad)', 'edge_exact', False),
+        ('Region.contains(Q.embed(a),quad) && Region.contains(Q.embed(b),quad)', 'Region.contains(Q.embed(a),quad) && True{}', 'edge_exact', True),
+        ('case []: True{}', 'case []: False{}', 'all_nil', False),
+        ('edge_inside(head,quad) && all_inside(rest,quad)', 'all_inside(rest,quad)', 'all_cons', False),
+    ]
+    base = ('import Base\nimport ./source-edge-region.bend as M\nimport ./search-admission-fixtures.bend as F\n'
+            'import ./intersection-search.bend as S\nimport ./natural-cover.bend as N\n'
+            'import ./quad-geometry.bend as Q\nimport ./halfplane-region.bend as Region\n'
+            'import ./boolean-reflection.bend as B\n')
+    for old,new,law,second in controls:
+        assert original.count(old) == 1
+        if law == 'edge_exact':
+            a,b = ('F.c()', 'N.P{9n,9n}') if second else ('N.P{9n,9n}', 'F.c()')
+            equality = f'{{M.edge_inside(S.E{{{a},{b}}},F.r()) == Region.contains(Q.embed({a}),F.r()) && Region.contains(Q.embed({b}),F.r()) : Bool}}'
+        elif law == 'all_nil':
+            equality = '{M.all_inside([],F.r()) == True{} : Bool}'
+        else:
+            equality = '{M.all_inside([S.E{N.P{9n,9n},F.c()}],F.r()) == M.edge_inside(S.E{N.P{9n,9n},F.c()},F.r()) && M.all_inside([],F.r()) : Bool}'
+        name = 'source-edge-region-literal.bend'
+        (directory / name).write_text(base + f'def {law}_literal() -> {equality}: {{==}}\n')
+        bend(directory,name,'--verdict')
+        path.write_text(original.replace(old,new))
+        try:
+            bend(directory,'source-edge-region.bend','--check-only')
+            output = bend(directory,name,success=False)
+            assert law + '_literal' in output,output
+            proof = 'h' if law == 'all_nil' else 'Equal.sym(Bool,True{},False{},h)'
+            (directory / 'source-edge-region-counter.bend').write_text(base + f'def refutes_{law}(h:{equality}) -> Empty: B.false_impossible({proof})\n')
+            bend(directory,'source-edge-region-counter.bend','--verdict')
+        finally:
+            path.write_text(original)
+    return len(controls)
+
+
+def search_admission_controls(directory):
+    """Presence/admission must produce an admissible actual selected hit."""
+    path = directory / 'intersection-search.bend'
+    original = path.read_text()
+    controls = [
+        ('choose(h, admit(h, q, r), scan(t, q, r))', 'scan(t, q, r)', False),
+        ('case True{}: Hit{p}', 'case True{}: fallback', False),
+        ('case False{}: fallback', 'case False{}: Hit{p}', True),
+    ]
+    base = (
+        'import Base\nimport ./search-admission-fixtures.bend as F\n'
+        'import ./search-membership.bend as M\nimport ./candidate-existence.bend as E\n'
+        'import ./intersection-search.bend as S\nimport ./homogeneous-geometry.bend as G\n'
+        'import ./halfplane-region.bend as Region\nimport ./boolean-reflection.bend as B\n')
+    for old,new,invalid_prefix in controls:
+        assert original.count(old) == 1
+        points = '[G.P{0n,0n,0n},F.point()]' if invalid_prefix else '[F.point()]'
+        occurrence = 'Inr{Inl{{==}}}' if invalid_prefix else 'Inl{{==}}'
+        premise = (f'def checked_occurrence() -> M.PointOccurs(F.point(),{points}): {occurrence}\n'
+                   'def checked_admission() -> {S.admit(F.point(),F.q(),F.r()) == True{} : Bool}: {==}\n')
+        witness_type = f'E.Witness({points},F.q(),F.r())'
+        name = 'search-admission-literal.bend'
+        (directory / name).write_text(base + premise + f'def occurs_witness_literal() -> {witness_type}: (F.point(),({{==}},{{==}}))\n')
+        bend(directory,name,'--verdict')
+        path.write_text(original.replace(old,new))
+        try:
+            bend(directory,'intersection-search.bend','--check-only')
+            output = bend(directory,name,success=False)
+            assert 'occurs_witness_literal' in output, output
+            if not invalid_prefix:
+                helpers = (
+                    f'def hit_impossible(+point:G.Point,h:{{S.scan({points},F.q(),F.r()) == S.Hit{{point}} : S.SearchResult}}) -> Empty:\n'
+                    f'  B.false_impossible(Equal.cong(S.SearchResult,Bool,result => E.found(result),S.scan({points},F.q(),F.r()),S.Hit{{point}},h))\n'
+                    f'def refutes_occurs_witness(w:{witness_type}) -> Empty:\n'
+                    '  match w:\n    case (point,(he,ha)): hit_impossible(point,he)\n')
+            else:
+                helpers = (
+                    'def admitted_positive(+point:G.Point,h:{S.admit(point,F.q(),F.r()) == True{} : Bool}) -> {G.positive_denominator(point) == True{} : Bool}:\n'
+                    '  Pair.fst({G.positive_denominator(point) == True{} : Bool},{Region.contains(point,F.q()) == True{} : Bool},B.and_split(G.positive_denominator(point),Region.contains(point,F.q()),Pair.fst({G.positive_denominator(point) && Region.contains(point,F.q()) == True{} : Bool},{Region.contains(point,F.r()) == True{} : Bool},B.and_split(G.positive_denominator(point) && Region.contains(point,F.q()),Region.contains(point,F.r()),h))))\n'
+                    'def result_positive(result:S.SearchResult) -> Bool:\n  match result:\n    case S.Miss{}: False{}\n    case S.Hit{point}: G.positive_denominator(point)\n'
+                    f'def hit_impossible(+point:G.Point,he:{{S.scan({points},F.q(),F.r()) == S.Hit{{point}} : S.SearchResult}},ha:{{S.admit(point,F.q(),F.r()) == True{{}} : Bool}}) -> Empty:\n'
+                    f'  B.false_impossible(Equal.trans(Bool,False{{}},G.positive_denominator(point),True{{}},Equal.cong(S.SearchResult,Bool,result => result_positive(result),S.scan({points},F.q(),F.r()),S.Hit{{point}},he),admitted_positive(point,ha)))\n'
+                    f'def refutes_occurs_witness(w:{witness_type}) -> Empty:\n'
+                    '  match w:\n    case (point,(he,ha)): hit_impossible(point,he,ha)\n')
+            (directory / 'search-admission-counter.bend').write_text(base + premise + helpers)
+            bend(directory,'search-admission-counter.bend','--verdict')
+        finally:
+            path.write_text(original)
+    return len(controls)
+
+
+def search_membership_controls(directory):
+    """Literal public membership instances detect lost heads/tails/cut groups."""
+    path = directory / 'intersection-search.bend'
+    original = path.read_text()
+    controls = [
+        ('List.append(&2, G.Point, edge_cut(line, h), row(line, t))', 'row(line, t)', 'row_member', False),
+        ('List.append(&2, G.Point, edge_cut(line, h), row(line, t))', 'edge_cut(line, h)', 'row_member', True),
+        ('List.append(&2, G.Point, row(h, segments), pairs(t, segments))', 'pairs(t, segments)', 'pairs_member', False),
+        ('List.append(&2, G.Point, row(h, segments), pairs(t, segments))', 'row(h, segments)', 'pairs_member', True),
+        ('List.append(&2, G.Point, vertices(q), List.append(&2, G.Point, vertices(r), pairs(edges(q), edges(r))))', 'List.append(&2, G.Point, vertices(q), vertices(r))', 'candidate_member', False),
+    ]
+    base = (
+        'import Base\nimport ./intersection-search.bend as S\nimport ./search-membership.bend as M\n'
+        'import ./source-boundary.bend as Boundary\nimport ./source-crossing.bend as Cross\n'
+        'import ./quad-geometry.bend as Q\nimport ./natural-cover.bend as N\n'
+        'import ./homogeneous-geometry.bend as G\nimport ./boolean-reflection.bend as B\n'
+        'def a() -> N.Point: N.P{1n,1n}\ndef b() -> N.Point: N.P{3n,1n}\n'
+        'def c() -> N.Point: N.P{2n,4n}\ndef d() -> N.Point: N.P{2n,0n}\n'
+        'def line() -> S.Edge: S.E{a(),b()}\ndef segment() -> S.Edge: S.E{c(),d()}\n'
+        'def miss() -> S.Edge: S.E{N.P{1n,5n},N.P{3n,5n}}\n'
+        'def point() -> G.Point: Boundary.direct(a(),b(),Q.embed(c()),Q.embed(d()))\n'
+        'def q() -> N.Quad: N.Q{a(),b(),N.P{3n,3n},N.P{1n,3n}}\n'
+        'def r() -> N.Quad: N.Q{d(),N.P{4n,0n},N.P{4n,4n},c()}\n')
+    for old, new, law, tail in controls:
+        assert original.count(old) == 1
+        if law == 'row_member':
+            segments = '[miss(),segment()]' if tail else '[segment()]'
+            post = f'M.PointOccurs(point(),S.row(line(),{segments}))'
+            edge_witness = 'Inr{Inl{{==}}}' if tail else 'Inl{{==}}'
+            premises = (f'def checked_segment_premise() -> M.EdgeOccurs(segment(),{segments}): {edge_witness}\n'
+                        'def checked_cut_premise() -> M.PointOccurs(point(),S.edge_cut(line(),segment())): Inl{{==}}\n')
+        elif law == 'pairs_member':
+            lines = '[miss(),line()]' if tail else '[line()]'
+            post = f'M.PointOccurs(point(),S.pairs({lines},[segment()]))'
+            edge_witness = 'Inr{Inl{{==}}}' if tail else 'Inl{{==}}'
+            premises = (f'def checked_line_premise() -> M.EdgeOccurs(line(),{lines}): {edge_witness}\n'
+                        'def checked_row_premise() -> M.PointOccurs(point(),S.row(line(),[segment()])): Inl{{==}}\n')
+        else:
+            post = 'M.PointOccurs(point(),S.candidates(q(),r()))'
+            premises = ('def checked_line_premise() -> M.EdgeOccurs(line(),S.edges(q())): Inl{{==}}\n'
+                        'def checked_segment_premise() -> M.EdgeOccurs(segment(),S.edges(r())): Inr{Inr{Inr{Inl{{==}}}}}\n'
+                        'def checked_crossing_premise() -> {Cross.crosses(a(),b(),Q.embed(c()),Q.embed(d())) == True{} : Bool}: {==}\n')
+        witness = 'Inr{' * 9 + 'Inl{{==}}' + '}' * 9 if law == 'candidate_member' else 'Inl{{==}}'
+        name = 'search-membership-literal.bend'
+        (directory / name).write_text(base + premises + f'def {law}_literal() -> {post}: {witness}\n')
+        bend(directory, name, '--verdict')
+        path.write_text(original.replace(old,new))
+        try:
+            bend(directory, 'intersection-search.bend', '--check-only')
+            output = bend(directory, name, success=False)
+            assert law + '_literal' in output, output
+            if law != 'candidate_member':
+                refutation = f'def refutes_{law}_literal(h:{post}) -> Empty: h\n'
+            else:
+                vertices = ['Q.embed(a())','Q.embed(b())','Q.embed(N.P{3n,3n})','Q.embed(N.P{1n,3n})','Q.embed(d())','Q.embed(N.P{4n,0n})','Q.embed(N.P{4n,4n})','Q.embed(c())']
+                refutation = ('def x(p:G.Point) -> Nat:\n  match p:\n    case G.P{x,y,d}: x\n'
+                              'def reject_8(h:M.PointOccurs(point(),[])) -> Empty: h\n')
+                for index in reversed(range(8)):
+                    xs = '[' + ','.join(vertices[index:]) + ']'
+                    head = vertices[index]
+                    refutation += (f'def reject_{index}(h:M.PointOccurs(point(),{xs})) -> Empty:\n'
+                                   '  match h:\n'
+                                   f'    case Inl{{eq}}: B.false_impossible(Equal.sym(Bool,True{{}},False{{}},Equal.cong(G.Point,Bool,p => Nat.is_eq(x(p),16n),point(),{head},eq)))\n'
+                                   f'    case Inr{{tail}}: reject_{index+1}(tail)\n')
+                refutation += f'def refutes_{law}_literal(h:{post}) -> Empty: reject_0(h)\n'
+            (directory / 'search-membership-counter.bend').write_text(base + premises + refutation)
+            bend(directory, 'search-membership-counter.bend', '--verdict')
+        finally:
+            path.write_text(original)
+    return len(controls)
+
+
+def tracked_origin_controls(directory):
+    """Reversing the stored directed boundary refutes actual occurrence."""
+    path = directory / 'tracked-interval.bend'
+    original = path.read_text()
+    old = 'End{Source.first(k,m,v,w),Source.second(l,n,v,w),Boundary{a,b}}'
+    new = 'End{Source.first(k,m,v,w),Source.second(l,n,v,w),Boundary{b,a}}'
+    assert original.count(old) == 1
+    path.write_text(original.replace(old,new))
+    try:
+        bend(directory, 'tracked-interval.bend', '--check-only')
+        output = bend(directory, 'TRACKED_ORIGIN_PROOF.bend', success=False)
+        assert 'cut_allowed' in output, output
+        (directory / 'tracked-origin-counter.bend').write_text(
+            "import Base\nimport ./tracked-origin.bend as L\nimport ./tracked-interval.bend as Trace\n"
+            "import ./interval-walk.bend as Walk\nimport ./natural-cover.bend as N\n"
+            "import ./homogeneous-geometry.bend as G\nimport ./boolean-reflection.bend as B\n"
+            "def a() -> N.Point: N.P{0n,1n}\ndef b() -> N.Point: N.P{4n,1n}\n"
+            "def x(p:N.Point) -> Nat:\n  match p:\n    case N.P{x,y}: x\n"
+            "def start(edge:Walk.Edge) -> Nat:\n  match edge:\n    case Walk.Halfplane{a,b}: x(a)\n"
+            "def refutes_directed_occurrence(h:L.Occurs(Walk.Halfplane{b(),a()},[Walk.Halfplane{a(),b()}])) -> Empty:\n"
+            "  match h:\n"
+            "    case Inl{he}: B.false_impossible(Equal.cong(Walk.Edge,Bool,e => Nat.is_eq(start(e),0n),Walk.Halfplane{b(),a()},Walk.Halfplane{a(),b()},he))\n"
+            "    case Inr{empty}: empty\n"
+            "def refutes_cut_allowed(h:L.EndpointAllowed([Walk.Halfplane{a(),b()}],Trace.cut_endpoint(a(),b(),G.P{0n,2n,1n},G.P{4n,0n,1n},Trace.End{1n,0n,Trace.SourceLeft{}},Trace.End{0n,1n,Trace.SourceRight{}}))) -> Empty:\n"
+            "  refutes_directed_occurrence(h)\n")
+        bend(directory, 'tracked-origin-counter.bend', '--verdict')
+    finally:
+        path.write_text(original)
+    return 1
+
+
+def tracked_candidates_counter(directory, old):
+    """Refute the physical label/endpoint/report law literal for a mutant."""
+    prelude = (
+        "import Base\nimport ./tracked-candidates.bend as M\nimport ./tracked-interval.bend as Trace\n"
+        "import ./source-crossing.bend as Cross\nimport ./source-boundary.bend as Boundary\n"
+        "import ./natural-cover.bend as N\nimport ./homogeneous-geometry.bend as G\n"
+        "import ./boolean-reflection.bend as B\n"
+        "def p() -> G.Point: G.P{0n,2n,1n}\ndef q() -> G.Point: G.P{4n,0n,1n}\n"
+        "def a() -> N.Point: N.P{0n,1n}\ndef b() -> N.Point: N.P{4n,1n}\n")
+    reverse = False
+    if old == 'case Trace.SourceLeft{}: G.equivalent(r,p)':
+        actual = 'M.label(p(),q(),p(),Trace.SourceLeft{})'
+        expected = 'G.equivalent(p(),p())'
+    elif old == 'case Trace.SourceRight{}: G.equivalent(r,q)':
+        actual = 'M.label(p(),q(),q(),Trace.SourceRight{})'
+        expected = 'G.equivalent(q(),q())'
+    elif old == 'Cross.crosses(a,b,p,q) && G.equivalent(r,Boundary.direct(a,b,p,q))':
+        actual = 'M.label(p(),p(),p(),Trace.Boundary{a(),b()})'
+        expected = 'Cross.crosses(a(),b(),p(),p()) && G.equivalent(p(),Boundary.direct(a(),b(),p(),p()))'
+        reverse = True
+    elif old == 'G.equivalent(r,Boundary.direct(a,b,p,q))':
+        actual = 'M.label(p(),q(),p(),Trace.Boundary{a(),b()})'
+        expected = 'Cross.crosses(a(),b(),p(),q()) && G.equivalent(p(),Boundary.direct(a(),b(),p(),q()))'
+        reverse = True
+    elif old == 'label(p,q,C.join(p,q,k,l),origin)':
+        actual = 'M.endpoint(p(),q(),Trace.End{1n,0n,Trace.SourceLeft{}})'
+        expected = 'G.equivalent(Trace.point(p(),q(),Trace.End{1n,0n,Trace.SourceLeft{}}),p())'
+    elif old == 'case Trace.Lost{}: True{}':
+        actual = 'M.candidates(p(),q(),Trace.Lost{})'
+        expected = 'True{}'
+    else:
+        actual = 'M.candidates(p(),q(),Trace.Segment{Trace.End{0n,1n,Trace.SourceLeft{}},Trace.End{0n,1n,Trace.SourceRight{}}})'
+        expected = 'G.equivalent(q(),p()) && G.equivalent(q(),q())'
+        reverse = True
+    equality = f'{{{actual} == {expected} : Bool}}'
+    witness = 'Equal.sym(Bool,True{},False{},h)' if reverse else 'h'
+    (directory / 'tracked-candidates-counter.bend').write_text(
+        prelude + f'def refutes_physical_law(h:{equality}) -> Empty:\n  B.false_impossible({witness})\n')
+    bend(directory, 'tracked-candidates-counter.bend', '--verdict')
+
+
+def source_boundary_counter(directory, old, refute=True):
+    """Literal projection of choose_exact/direct_exact with a valid cut."""
+    prelude = (
+        "import Base\nimport ./source-boundary.bend as M\nimport ./segment-cut.bend as Cut\n"
+        "import ./natural-cover.bend as N\nimport ./homogeneous-geometry.bend as G\n"
+        "import ./halfplane-region.bend as Region\nimport ./boolean-reflection.bend as B\n"
+        "def a() -> N.Point: N.P{0n,1n}\ndef b() -> N.Point: N.P{4n,1n}\n"
+        "def p() -> G.Point: G.P{0n,2n,1n}\ndef q() -> G.Point: G.P{4n,0n,1n}\n")
+    if old == 'choose(a,b,p,q,Region.edge(a,b,p))':
+        actual = 'M.direct(a(),b(),q(),p())'
+        expected = 'M.choose(a(),b(),q(),p(),Region.edge(a(),b(),q()))'
+        tag = 'direct_exact'
+    elif old == 'case True{}: Cut.point(a,b,p,q)':
+        actual = 'M.choose(a(),b(),p(),q(),True{})'
+        expected = 'Cut.point(a(),b(),p(),q())'
+        tag = 'choose_exact'
+    else:
+        actual = 'M.choose(a(),b(),q(),p(),False{})'
+        expected = 'Cut.point(a(),b(),p(),q())'
+        tag = 'choose_exact'
+    equality = f'{{{actual} == {expected} : G.Point}}'
+    if refute:
+        body = (f'def refutes_{tag}(h:{equality}) -> Empty:\n'
+                f'  B.false_impossible(Equal.cong(G.Point,Bool,r => G.positive_denominator(r),{actual},{expected},h))\n')
+    else:
+        body = f'def literal_{tag}() -> {equality}: {{==}}\n'
+    name = 'source-boundary-counter.bend'
+    (directory / name).write_text(prelude + body)
+    bend(directory, name, '--verdict')
+
+
+def source_crossing_counter(directory, old):
+    """Refute the public different_exact literal for each decision mutant."""
+    flags = {
+        'case True{} False{}: True{}': ('True{}', 'False{}', 'True{}'),
+        'case False{} True{}: True{}': ('False{}', 'True{}', 'True{}'),
+        'case True{} True{}: False{}': ('True{}', 'True{}', 'False{}'),
+        'case False{} False{}: False{}': ('False{}', 'False{}', 'False{}'),
+    }
+    cp, cq, expected = flags[old]
+    equality = f"{{M.different({cp},{cq}) == ({cp} && Bool.not({cq})) || (Bool.not({cp}) && {cq}) : Bool}}"
+    proof = "h" if expected == "True{}" else "Equal.sym(Bool,True{},False{},h)"
+    (directory / "source-crossing-counter.bend").write_text(
+        "import Base\nimport ./source-crossing.bend as M\nimport ./boolean-reflection.bend as B\n"
+        f"def refutes_different_exact(h:{equality}) -> Empty:\n  B.false_impossible({proof})\n")
+    bend(directory, "source-crossing-counter.bend", "--verdict")
+
+
 def negative_controls(directory):
     controls = [
+        ('tracked-candidates.bend', 'case Trace.SourceLeft{}: G.equivalent(r,p)', 'case Trace.SourceLeft{}: G.equivalent(r,q)', 'label_exact'),
+        ('tracked-candidates.bend', 'case Trace.SourceRight{}: G.equivalent(r,q)', 'case Trace.SourceRight{}: G.equivalent(r,p)', 'label_exact'),
+        ('tracked-candidates.bend', 'Cross.crosses(a,b,p,q) && G.equivalent(r,Boundary.direct(a,b,p,q))', 'True{} && G.equivalent(r,Boundary.direct(a,b,p,q))', 'label_exact'),
+        ('tracked-candidates.bend', 'G.equivalent(r,Boundary.direct(a,b,p,q))', 'True{}', 'label_exact'),
+        ('tracked-candidates.bend', 'label(p,q,C.join(p,q,k,l),origin)', 'label(p,q,C.join(p,q,l,k),origin)', 'endpoint_exact'),
+        ('tracked-candidates.bend', 'case Trace.Lost{}: True{}', 'case Trace.Lost{}: False{}', 'candidates_exact'),
+        ('tracked-candidates.bend', 'endpoint(p,q,left) && endpoint(p,q,right)', 'True{}', 'candidates_exact'),
+        ('source-boundary.bend', 'choose(a,b,p,q,Region.edge(a,b,p))', 'choose(a,b,p,q,True{})', 'direct_exact'),
+        ('source-boundary.bend', 'case True{}: Cut.point(a,b,p,q)', 'case True{}: Cut.point(a,b,q,p)', 'choose_exact'),
+        ('source-boundary.bend', 'case False{}: Cut.point(a,b,q,p)', 'case False{}: Cut.point(a,b,p,q)', 'choose_exact'),
+        ('source-crossing.bend', 'case True{} False{}: True{}', 'case True{} False{}: False{}', 'different_exact'),
+        ('source-crossing.bend', 'case False{} True{}: True{}', 'case False{} True{}: False{}', 'different_exact'),
+        ('source-crossing.bend', 'case True{} True{}: False{}', 'case True{} True{}: True{}', 'different_exact'),
+        ('source-crossing.bend', 'case False{} False{}: False{}', 'case False{} False{}: True{}', 'different_exact'),
+        ('tracked-interval.bend', 'Source.first(k,m,v,w)', 'Source.second(l,n,v,w)', 'cut_exact'),
+        ('tracked-interval.bend', 'Source.second(l,n,v,w)', 'Source.first(k,m,v,w)', 'cut_exact'),
+        ('tracked-interval.bend', 'End{Source.first(k,m,v,w),Source.second(l,n,v,w),Boundary{a,b}}', 'End{Source.first(k,m,v,w),Source.second(l,n,v,w),Boundary{b,a}}', 'cut_exact'),
+        ('tracked-interval.bend', 'case True{} True{}: Segment{left,right}', 'case True{} True{}: Lost{}', 'choose_exact'),
+        ('tracked-interval.bend', 'case False{} False{}: Lost{}', 'case False{} False{}: Segment{left,right}', 'choose_exact'),
+        ('tracked-interval.bend', 'case False{} True{}: Segment{right,cut_endpoint(a,b,p,q,right,left)}', 'case False{} True{}: Segment{left,cut_endpoint(a,b,p,q,right,left)}', 'choose_exact'),
+        ('tracked-interval.bend', 'case []: state', 'case []: Lost{}', 'run_nil'),
+        ('tracked-interval.bend', 'run(p,q,rest,step(p,q,edge,state))', 'run(p,q,rest,state)', 'run_cons'),
+        ('tracked-interval.bend', 'case End{k,l,origin}: C.join(p,q,k,l)', 'case End{k,l,origin}: C.join(p,q,l,k)', 'point_exact'),
+        ('tracked-interval.bend', 'Segment{End{1n,0n,SourceLeft{}},End{0n,1n,SourceRight{}}}', 'Segment{End{2n,0n,SourceLeft{}},End{0n,1n,SourceRight{}}}', 'initial_exact'),
+        ('tracked-interval.bend', 'case Boundary{a,b}: Cut.on_line(a,b,r)', 'case Boundary{a,b}: True{}', 'origin_exact'),
+        ('tracked-interval.bend', 'endpoint_honest(p,q,left) && endpoint_honest(p,q,right)', 'True{}', 'honest_exact'),
+        ('tracked-interval.bend', 'choose(a,b,p,q,left,right,Region.edge(a,b,point(p,q,left)),Region.edge(a,b,point(p,q,right)))', 'choose(a,b,p,q,left,right,True{},Region.edge(a,b,point(p,q,right)))', 'step_exact'),
+        ('tracked-interval.bend', 'run(p,q,Walk.quad_edges(quad),initial())', 'initial()', 'quad_exact'),
+
         ('interval-walk.bend', 'case []: result', 'case []: Clip.Gone{}', 'run_nil'),
         ('interval-walk.bend', 'run(rest,step(edge,result))', 'run(rest,result)', 'run_cons'),
         ('interval-walk.bend', 'run(rest,step(edge,result))', 'step(edge,result)', 'run_cons'),
@@ -693,7 +1100,10 @@ def negative_controls(directory):
         f"def literal_u32_sum3_premise() -> {{Nat.is_lt({exact}, W.capacity(32n)) == True{{}} : Bool}}:\n  {{==}}\n"
         f"def literal_u32_sum3_exact() -> {{U32.to_nat({actual}) == {exact} : Nat}}:\n  {{==}}\n")
     bend(directory, "sum3-counter.bend", "--verdict")
+    bend(directory, halfplane_fourth_literal(directory), "--verdict")
     for file, old, new, law in controls:
+        if file == "source-boundary.bend":
+            source_boundary_counter(directory, old, refute=False)
         path = directory / file
         original = path.read_text()
         assert original.count(old) == 1, (file, old)
@@ -703,6 +1113,16 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif file == "halfplane-region.bend" and old == "&& edge(d, a, p)":
+                proof_root = "halfplane-fourth-literal.bend"
+            elif file == "tracked-candidates.bend":
+                proof_root = "TRACKED_CANDIDATES_PROOF.bend"
+            elif file == "source-boundary.bend":
+                proof_root = "SOURCE_BOUNDARY_PROOF.bend"
+            elif file == "source-crossing.bend":
+                proof_root = "SOURCE_CROSSING_PROOF.bend"
+            elif file == "tracked-interval.bend":
+                proof_root = "TRACKED_INTERVAL_PROOF.bend"
             elif file == "interval-walk.bend":
                 proof_root = "INTERVAL_WALK_PROOF.bend"
             elif file == "interval-clip.bend":
@@ -808,6 +1228,16 @@ def negative_controls(directory):
             except AssertionError as error:
                 raise AssertionError(f"Mutation {file}: {law} did not produce a proof diagnostic\n{error}") from error
             assert law in output, output
+            if file == "halfplane-region.bend" and old == "&& edge(d, a, p)":
+                bend(directory, halfplane_fourth_literal(directory, refute=True), "--verdict")
+            if file == "tracked-candidates.bend":
+                tracked_candidates_counter(directory, old)
+            if file == "source-boundary.bend":
+                source_boundary_counter(directory, old)
+            if file == "source-crossing.bend":
+                source_crossing_counter(directory, old)
+            if file == "tracked-interval.bend":
+                tracked_interval_counter(directory, old, new)
             if file == "interval-walk.bend":
                 interval_walk_counter(directory, old, new)
             if file == "interval-clip.bend":
@@ -977,6 +1407,25 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"Bend: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        bend(directory, "source-edge-region-raw-tests.bend", "--verdict")
+        bend(directory, "source-edge-region-tests.bend", "--verdict")
+        bend(directory, "retained-witness-tests.bend", "--verdict")
+        bend(directory, "search-admission-raw-tests.bend", "--verdict")
+        bend(directory, "search-admission-tests.bend", "--verdict")
+        bend(directory, "search-membership-tests.bend", "--verdict")
+        bend(directory, "tracked-origin-tests.bend", "--verdict")
+        bend(directory, "tracked-candidates-raw-tests.bend", "--verdict")
+        bend(directory, "tracked-candidates-tests.bend", "--verdict")
+        bend(directory, "tracked-candidates-retained-tests.bend", "--verdict")
+        bend(directory, "source-boundary-raw-tests.bend", "--verdict")
+        bend(directory, "source-boundary-tests.bend", "--verdict")
+        bend(directory, "source-crossing-tests.bend", "--verdict")
+        bend(directory, "tracked-interval-raw-tests.bend", "--verdict")
+        bend(directory, "tracked-interval-tests.bend", "--verdict")
+        bend(directory, "tracked-interval-source-tests.bend", "--verdict")
+        bend(directory, "tracked-interval-member-tests.bend", "--verdict")
+        bend(directory, "tracked-interval-retained-tests.bend", "--verdict")
+        print("Tracked interval fixtures accepted: exact source coefficients, boundary tags, reversed cuts, raw erasure, honest labels, fractions and constructive source membership")
         bend(directory, "interval-walk-raw-tests.bend", "--verdict")
         bend(directory, "interval-walk-valid-tests.bend", "--verdict")
         bend(directory, "interval-walk-member-tests.bend", "--verdict")
@@ -1040,13 +1489,14 @@ if __name__ == "__main__":
         bend(directory, "homogeneous-combination-tests.bend", "--verdict")
         print("Homogeneous combination fixtures accepted: unequal denominators, boundary, zero weights and affine mean")
         executable = directory / "search-witness-tests"
-        # Match regenerate.sh: keep C emission and native compilation bounded
-        # separately, avoiding Bend's default optimizer on this large fixture.
+        # Bound C emission and native compilation separately. This assertion
+        # executable needs no optimization; avoid optimizer work under the
+        # same five-second deadline. The production generator keeps -O1.
         if sys.platform.startswith("linux"):
             source = directory / "search-witness-tests.c"
             build = subprocess.run(["bend", "search-witness-tests.bend", "-o", str(source)], cwd=directory, capture_output=True, text=True, timeout=5)
             assert build.returncode == 0, build.stdout + build.stderr
-            build = subprocess.run(["clang", "-O1", "-pthread", str(source), "-lm", "-o", str(executable)], cwd=directory, capture_output=True, text=True, timeout=5)
+            build = subprocess.run(["clang", "-O0", "-pthread", str(source), "-lm", "-o", str(executable)], cwd=directory, capture_output=True, text=True, timeout=5)
         else:
             build = subprocess.run(["bend", "search-witness-tests.bend", "-o", str(executable)], cwd=directory, capture_output=True, text=True, timeout=5)
         assert build.returncode == 0, build.stdout + build.stderr
@@ -1115,7 +1565,11 @@ if __name__ == "__main__":
         assert result.returncode == 0 and "topology-tests: True" in result.stdout, result.stdout + result.stderr
         print("Bend topology fixtures accepted")
         print(f"Literal arithmetic checks: {literal_checks(directory)} accepted")
-        print(f"Compiling mutations rejected by the proof gate: {negative_controls(directory)}")
+        source_region_control_count = source_edge_region_controls(directory)
+        admission_control_count = search_admission_controls(directory)
+        membership_control_count = search_membership_controls(directory)
+        origin_control_count = tracked_origin_controls(directory)
+        print(f"Compiling mutations rejected by the proof gate: {negative_controls(directory) + origin_control_count + membership_control_count + admission_control_count + source_region_control_count}")
         print("Note: selector/remainder/product mutants fail in shared carry_step/bit_division_step/sum3_finish/sum_width_bound/width_bound/finish lemmas")
         print("Note: U32 wrapper mutant uses a literal law instance with its premise checked; generic error printing overflows")
         print(f"Invalid artworks rejected by Bend before SVG emission: {bend_artwork_negative_controls(directory)}")

@@ -1,3 +1,5 @@
+import ./halfplane-equivalence-proof.bend as Equivalence
+import ./boolean-reflection.bend as B
 import ./search-witness.bend as Search
 import Base
 import ./halfplane-region.bend as M
@@ -18,11 +20,7 @@ def L.edge_halfplane_decoded(a, b, w):
   match a b:
     case T.P{ax, ay} T.P{bx, by}: edge_values(ax, ay, bx, by, w)
 def four_cong(+a: Bool, +b: Bool, +c: Bool, +d: Bool, +u: Bool, +v: Bool, +w: Bool, +z: Bool, ha: {a == u : Bool}, hb: {b == v : Bool}, hc: {c == w : Bool}, hd: {d == z : Bool}) -> {a && b && c && d == u && v && w && z : Bool}:
-  %ha : {a && b && c && d == _ && v && w && z : Bool}
-  %hb : {a && b && c && d == a && _ && w && z : Bool}
-  %hc : {a && b && c && d == a && b && _ && z : Bool}
-  %hd : {a && b && c && d == a && b && c && _ : Bool}
-  {==}
+  B.four_cong(a,b,c,d,u,v,w,z,ha,hb,hc,hd)
 def L.inside_halfplanes_decoded(w, q):
   match q:
     case T.Q{+a, +b, +c, +d}:
@@ -37,12 +35,9 @@ def L.region_positive_scale(p, q, k):
     case N.Q{+a, +b, +c, +d}:
       four_cong(M.edge(a, b, H.scale(p, k)), M.edge(b, c, H.scale(p, k)), M.edge(c, d, H.scale(p, k)), M.edge(d, a, H.scale(p, k)), M.edge(a, b, p), M.edge(b, c, p), M.edge(c, d, p), M.edge(d, a, p), edge_scaled(p, a, b, k), edge_scaled(p, b, c, k), edge_scaled(p, c, d, k), edge_scaled(p, d, a, k))
 def edge_equivalent(+p: H.Point, +r: H.Point, a: N.Point, b: N.Point, +hp: {H.positive_denominator(p) == True{} : Bool}, +hr: {H.positive_denominator(r) == True{} : Bool}, +hs: {H.equivalent(p, r) == True{} : Bool}) -> {M.edge(a, b, p) == M.edge(a, b, r) : Bool}:
-  match a b:
-    case N.P{ax, ay} N.P{bx, by}: HL.equivalent_point_closed_halfplane(ax, ay, bx, by, p, r, hp, hr, hs)
-def L.region_equivalent_point(p, r, q, hp, hr, hs):
-  match q:
-    case N.Q{+a, +b, +c, +d}:
-      four_cong(M.edge(a, b, p), M.edge(b, c, p), M.edge(c, d, p), M.edge(d, a, p), M.edge(a, b, r), M.edge(b, c, r), M.edge(c, d, r), M.edge(d, a, r), edge_equivalent(p, r, a, b, hp, hr, hs), edge_equivalent(p, r, b, c, hp, hr, hs), edge_equivalent(p, r, c, d, hp, hr, hs), edge_equivalent(p, r, d, a, hp, hr, hs))
+  Equivalence.edge_equivalent(p,r,a,b,hp,hr,hs)
+def L.region_equivalent_point(p,r,q,hp,hr,hs):
+  Equivalence.region_equivalent_point(p,r,q,hp,hr,hs)
 def L.common_halfplanes_decoded(w, a, b, c):
   %L.inside_halfplanes_decoded(w, a) : {I.common(w, a, b, c) == _ && M.contains(M.decode_witness(w), N.decode_quad(b)) && M.contains(M.decode_witness(w), N.decode_quad(c)) : Bool}
   %L.inside_halfplanes_decoded(w, b) : {I.common(w, a, b, c) == I.inside(w, a) && _ && M.contains(M.decode_witness(w), N.decode_quad(c)) : Bool}

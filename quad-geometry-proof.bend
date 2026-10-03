@@ -6,7 +6,6 @@ import ./homogeneous-geometry.bend as G
 import ./halfplane-region.bend as Region
 import ./homogeneous-geometry-proof.bend as GP
 import ./homogeneous-combination-proof.bend as CP
-import ./halfplane-region-proof.bend as RP
 import ./coordinate-sum.bend as Sum
 import ./facts.bend as F
 import ./boolean-reflection.bend as B
@@ -76,6 +75,6 @@ def decoded_turn(+a: T.Point, +b: T.Point, +c: T.Point) -> {Sat.positive(a, b, c
 def L.strict_quad_decoded(q):
   match q:
     case T.Q{+a, +b, +c, +d}:
-      RP.four_cong(Sat.positive(a, b, c), Sat.positive(b, c, d), Sat.positive(c, d, a), Sat.positive(d, a, b), M.turn(N.decode_point(a), N.decode_point(b), N.decode_point(c)), M.turn(N.decode_point(b), N.decode_point(c), N.decode_point(d)), M.turn(N.decode_point(c), N.decode_point(d), N.decode_point(a)), M.turn(N.decode_point(d), N.decode_point(a), N.decode_point(b)), decoded_turn(a, b, c), decoded_turn(b, c, d), decoded_turn(c, d, a), decoded_turn(d, a, b))
+      B.four_cong(Sat.positive(a, b, c), Sat.positive(b, c, d), Sat.positive(c, d, a), Sat.positive(d, a, b), M.turn(N.decode_point(a), N.decode_point(b), N.decode_point(c)), M.turn(N.decode_point(b), N.decode_point(c), N.decode_point(d)), M.turn(N.decode_point(c), N.decode_point(d), N.decode_point(a)), M.turn(N.decode_point(d), N.decode_point(a), N.decode_point(b)), decoded_turn(a, b, c), decoded_turn(b, c, d), decoded_turn(c, d, a), decoded_turn(d, a, b))
 def L.production_corners_inside(width, hw, q, hq, h):
   L.strict_quad_corners_inside(N.decode_quad(q), Equal.trans(Bool, M.strict_quad(N.decode_quad(q)), Sat.strictly_convex(q), True{}, Equal.sym(Bool, Sat.strictly_convex(q), M.strict_quad(N.decode_quad(q)), L.strict_quad_decoded(q)), Equal.trans(Bool, Sat.strictly_convex(q), T.strictly_convex(q), True{}, Equal.sym(Bool, T.strictly_convex(q), Sat.strictly_convex(q), SL.strictly_convex_arithmetic_exact(width, hw, q, hq)), h)))

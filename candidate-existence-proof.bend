@@ -2,8 +2,7 @@ import Base
 import ./candidate-existence-laws.bend as L
 import ./candidate-existence.bend as M
 import ./intersection-search.bend as S
-import ./intersection-search-laws.bend as SL
-import ./intersection-search-proof.bend as SP
+import ./scan-sound-proof.bend as Scan
 import ./natural-cover.bend as N
 import ./homogeneous-geometry.bend as G
 import ./boolean-reflection.bend as B
@@ -20,7 +19,7 @@ def L.scan_found_exact(xs,q,r):
 def result_witness(+xs:List<&2,G.Point>,+q:N.Quad,+r:N.Quad,result:S.SearchResult,+he:{S.scan(xs,q,r) == result : S.SearchResult},h:{M.found(result) == True{} : Bool}) -> M.Witness(xs,q,r):
   match result:
     case S.Miss{}: B.absurd(M.Witness(xs,q,r),B.false_impossible(h))
-    case S.Hit{+p}: (p,(he,SL.scan_hit_sound(xs,q,r,p,he)))
+    case S.Hit{+p}: (p,(he,Scan.scan_hit_sound(xs,q,r,p,he)))
 def L.valid_candidate_witness(xs,q,r,h):
   result_witness(xs,q,r,S.scan(xs,q,r),{==},Equal.trans(Bool,M.found(S.scan(xs,q,r)),M.any_valid(xs,q,r),True{},L.scan_found_exact(xs,q,r),h))
 def L.find_found_exact(q,r):

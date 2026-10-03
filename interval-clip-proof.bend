@@ -13,8 +13,7 @@ import ./segment-cut-proof.bend as CutP
 import ./clip-halfplane-laws.bend as ClipL
 import ./clip-halfplane-proof.bend as ClipP
 import ./strict-halfplane.bend as S
-import ./strict-halfplane-laws.bend as SL
-import ./strict-halfplane-proof.bend as SP
+import ./strict-geometry-proof.bend as SP
 import ./boolean-reflection.bend as B
 import ./facts.bend as F
 
@@ -39,7 +38,7 @@ def L.present_report_exact(result):
     case M.Gone{}: {==}
     case M.Span{p,q}: {==}
 def negative_from_false(+a:N.Point,+b:N.Point,+p:G.Point,h:{Region.edge(a,b,p) == False{} : Bool}) -> {S.negative(a,b,p) == True{} : Bool}:
-  Equal.trans(Bool,S.negative(a,b,p),Bool.not(Region.edge(a,b,p)),True{},SL.negative_closed_complement(a,b,p),Equal.cong(Bool,Bool,x => Bool.not(x),Region.edge(a,b,p),False{},h))
+  SP.negative_from_false(a,b,p,h)
 def cmp_eq_closed(side:Cmp,h:{Cmp.is_eq(side) == True{} : Bool}) -> {Bool.not(Cmp.is_lt(side)) == True{} : Bool}:
   match side:
     case LT{}: B.absurd({Bool.not(Cmp.is_lt(LT{})) == True{} : Bool},B.false_impossible(h))
@@ -77,7 +76,7 @@ def present_cases(+a:N.Point,+b:N.Point,+p:G.Point,+q:G.Point,+cp:Bool,+cq:Bool)
 def L.clip_present_exact(a,b,p,q):
   present_cases(a,b,p,q,Region.edge(a,b,p),Region.edge(a,b,q))
 def outside_weighted_impossible(+a:N.Point,+b:N.Point,+p:G.Point,+q:G.Point,+k:Nat,+l:Nat,hp:{Region.edge(a,b,p) == False{} : Bool},hq:{Region.edge(a,b,q) == False{} : Bool},hs:{Nat.is_gt(Nat.add(k,l),0n) == True{} : Bool},h:{Region.edge(a,b,C.join(p,q,k,l)) == True{} : Bool}) -> Empty:
-  SP.strict_closed_impossible(a,b,C.join(p,q,k,l),h,SL.negative_weighted_join(a,b,p,q,k,l,negative_from_false(a,b,p,hp),negative_from_false(a,b,q,hq),hs))
+  SP.strict_closed_impossible(a,b,C.join(p,q,k,l),h,SP.negative_weighted_join(a,b,p,q,k,l,negative_from_false(a,b,p,hp),negative_from_false(a,b,q,hq),hs))
 def retained_cases(+a:N.Point,+b:N.Point,+p:G.Point,+q:G.Point,+k:Nat,+l:Nat,cp:Bool,cq:Bool,hcp:{Region.edge(a,b,p) == cp : Bool},hcq:{Region.edge(a,b,q) == cq : Bool},hs:{Nat.is_gt(Nat.add(k,l),0n) == True{} : Bool},h:{Region.edge(a,b,C.join(p,q,k,l)) == True{} : Bool}) -> {M.present(M.choose(a,b,p,q,cp,cq)) == True{} : Bool}:
   match cp cq:
     case True{} True{}: {==}

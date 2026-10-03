@@ -11,8 +11,7 @@ import ./homogeneous-combination.bend as C
 import ./homogeneous-combination-laws.bend as CL
 import ./homogeneous-combination-proof.bend as CP
 import ./halfplane-region.bend as Region
-import ./halfplane-region-laws.bend as RL
-import ./halfplane-region-proof.bend as RP
+import ./halfplane-equivalence-proof.bend as RP
 import ./facts.bend as F
 
 def add_cong(+a: Nat, +b: Nat, +c: Nat, +d: Nat, ha: {a == c : Nat}, hb: {b == d : Nat}) -> {Nat.add(a, b) == Nat.add(c, d) : Nat}:
@@ -49,7 +48,7 @@ def L.hull_point_positive(q, p, member):
   match member:
     case (k, (l, (m, (n, (hw, (hp, he)))))): hp
 def hull_weights(+q: N.Quad, +p: G.Point, +k: Nat, +l: Nat, +m: Nat, +n: Nat, hw: {Nat.is_gt(M.weight_total(k, l, m, n), 0n) == True{} : Bool}, hp: {G.positive_denominator(p) == True{} : Bool}, he: {G.equivalent(p, M.weighted(q, k, l, m, n)) == True{} : Bool}, h: {Q.corners_inside(q) == True{} : Bool}) -> {Region.contains(p, q) == True{} : Bool}:
-  Equal.trans(Bool, Region.contains(p, q), Region.contains(M.weighted(q, k, l, m, n), q), True{}, RL.region_equivalent_point(p, M.weighted(q, k, l, m, n), q, hp, L.weighted_quad_positive(q, k, l, m, n, hw), he), L.weighted_quad_inside(q, k, l, m, n, h))
+  Equal.trans(Bool, Region.contains(p, q), Region.contains(M.weighted(q, k, l, m, n), q), True{}, RP.region_equivalent_point(p, M.weighted(q, k, l, m, n), q, hp, L.weighted_quad_positive(q, k, l, m, n, hw), he), L.weighted_quad_inside(q, k, l, m, n, h))
 def L.hull_point_inside(q, p, h, member):
   match member:
     case (k, (l, (m, (n, (hw, (hp, he)))))): hull_weights(q, p, k, l, m, n, hw, hp, he, h)

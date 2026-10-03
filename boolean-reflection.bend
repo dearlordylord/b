@@ -52,3 +52,10 @@ def nat_eq_reflexive(+a: Nat) -> {Nat.is_eq(a, a) == True{} : Bool}:
 def nat_eq_complete(+a: Nat, +b: Nat, h: {a == b : Nat}) -> {Nat.is_eq(a, b) == True{} : Bool}:
   %h : {Nat.is_eq(a, _) == True{} : Bool}
   nat_eq_reflexive(a)
+
+def four_cong(+a: Bool, +b: Bool, +c: Bool, +d: Bool, +u: Bool, +v: Bool, +w: Bool, +z: Bool, ha: {a == u : Bool}, hb: {b == v : Bool}, hc: {c == w : Bool}, hd: {d == z : Bool}) -> {a && b && c && d == u && v && w && z : Bool}:
+  %ha : {a && b && c && d == _ && v && w && z : Bool}
+  %hb : {a && b && c && d == a && _ && w && z : Bool}
+  %hc : {a && b && c && d == a && b && _ && z : Bool}
+  %hd : {a && b && c && d == a && b && c && _ : Bool}
+  {==}

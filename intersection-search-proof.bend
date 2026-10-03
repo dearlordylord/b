@@ -12,28 +12,10 @@ import ./quad-intersection-proof.bend as IP
 import ./quad-barycentric-laws.bend as BL
 import ./quad-barycentric-proof.bend as BP
 import ./source-cells-proof.bend as Fields
+import ./scan-sound-proof.bend as Scan
 
-def is_hit(result: M.SearchResult) -> Bool:
-  match result:
-    case M.Miss{}: False{}
-    case M.Hit{p}: True{}
-def payload(result: M.SearchResult) -> G.Point:
-  match result:
-    case M.Miss{}: G.P{0n, 0n, 0n}
-    case M.Hit{p}: p
-
-def choice_sound(+head: G.Point, +p: G.Point, +q: N.Quad, +r: N.Quad, allowed: Bool, +fallback: M.SearchResult, he: {allowed == M.admit(head, q, r) : Bool}, ih: {fallback == M.Hit{p} : M.SearchResult} -> {M.admit(p, q, r) == True{} : Bool}, accepted: {M.choose(head, allowed, fallback) == M.Hit{p} : M.SearchResult}) -> {M.admit(p, q, r) == True{} : Bool}:
-  match allowed:
-    case False{}: ih(accepted)
-    case True{}:
-      Equal.trans(Bool, M.admit(p, q, r), M.admit(head, q, r), True{}, Equal.cong(G.Point, Bool, x => M.admit(x, q, r), p, head, Equal.sym(G.Point, head, p, Equal.cong(M.SearchResult, G.Point, payload, M.Hit{head}, M.Hit{p}, accepted))), Equal.sym(Bool, True{}, M.admit(head, q, r), he))
-
-def L.scan_hit_sound(xs, q, r, p, h):
-  match xs:
-    case Nil{}:
-      B.absurd({M.admit(p, q, r) == True{} : Bool}, B.false_impossible(Equal.cong(M.SearchResult, Bool, is_hit, M.Miss{}, M.Hit{p}, h)))
-    case Con{+head, +tail}:
-      choice_sound(head, p, q, r, M.admit(head, q, r), M.scan(tail, q, r), {==}, ht => L.scan_hit_sound(tail, q, r, p, ht), h)
+def L.scan_hit_sound(xs,q,r,p,h):
+  Scan.scan_hit_sound(xs,q,r,p,h)
 
 def L.find_hit_sound(q, r, p, h):
   L.scan_hit_sound(M.candidates(q, r), q, r, p, h)
