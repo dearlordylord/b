@@ -80,6 +80,35 @@ def strict_halfplane_counter(directory, replacement):
     bend(directory, "strict-halfplane-counter.bend", "--verdict")
 
 
+def intersection_counter(directory, original, replacement):
+    """Expose a false unconditional decoder equation on strictly convex quads."""
+    box = [(5, 5), (15, 5), (15, 15), (5, 15)]
+    right = [(16, 10), (17, 9), (18, 10), (17, 11)]
+    left = [(2, 10), (3, 9), (4, 10), (3, 11)]
+    if original.startswith("Bool.not"):
+        operation = "meets"
+        if replacement == "Bool.not(outside(q, r))":
+            q, r, reference, mutant = right, box, "False{}", "True{}"
+        elif " && " in replacement:
+            q, r, reference, mutant = box, right, "False{}", "True{}"
+        else:
+            q, r, reference, mutant = box, box, "True{}", "False{}"
+    else:
+        operation = "outside"
+        q, r = box, (left if "S.separated(d, a, r)" not in replacement and "N.Q{" not in replacement else right)
+        reference, mutant = "True{}", "False{}"
+    natural = lambda points: "N.Q{" + ", ".join(f"N.P{{{x}n, {y}n}}" for x, y in points) + "}"
+    native = lambda points: "T.Q{" + ", ".join(f"T.P{{{x}, {y}}}" for x, y in points) + "}"
+    nq, nr, tq, tr = natural(q), natural(r), native(q), native(r)
+    (directory / "intersection-counter.bend").write_text(
+        "import Base\nimport ./quad-intersection.bend as M\nimport ./natural-cover.bend as N\n"
+        "import ./quad-geometry.bend as Q\nimport ./sat-arithmetic.bend as Sat\nimport ./topology.bend as T\n"
+        f"def strict_inputs() -> {{Q.strict_quad({nq}) && Q.strict_quad({nr}) == True{{}} : Bool}}:\n  {{==}}\n"
+        f"def reference_decision() -> {{Sat.{operation}({tq}, {tr}) == {reference} : Bool}}:\n  {{==}}\n"
+        f"def wrong_model_decision() -> {{M.{operation}({nq}, {nr}) == {mutant} : Bool}}:\n  {{==}}\n")
+    bend(directory, "intersection-counter.bend", "--verdict")
+
+
 def negative_controls(directory):
     controls = [
         ("core.bend", "Seam{boundary_left(cell_start(cell)),",
@@ -92,6 +121,14 @@ def negative_controls(directory):
          "Nat.add(Nat.mul(Nat.mul(v, v), start), 1n)", "seam_inside_cell_coordinate"),
         ("geometry.bend", "F.weight_total(u, v)",
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
+    ]
+    controls += [
+        ('quad-intersection.bend', 'S.separated(a, b, r) || S.separated(b, c, r) || S.separated(c, d, r) || S.separated(d, a, r)', 'S.separated(a, b, r) || S.separated(b, c, r) || S.separated(c, d, r)', 'outside_decoded'),
+        ('quad-intersection.bend', 'S.separated(a, b, r) || S.separated(b, c, r) || S.separated(c, d, r) || S.separated(d, a, r)', 'S.separated(a, b, r) || S.separated(c, d, r) || S.separated(d, a, r)', 'outside_decoded'),
+        ('quad-intersection.bend', 'S.separated(a, b, r) || S.separated(b, c, r) || S.separated(c, d, r) || S.separated(d, a, r)', 'S.separated(a, b, N.Q{a, b, c, d}) || S.separated(b, c, N.Q{a, b, c, d}) || S.separated(c, d, N.Q{a, b, c, d}) || S.separated(d, a, N.Q{a, b, c, d})', 'outside_decoded'),
+        ('quad-intersection.bend', 'Bool.not(outside(q, r) || outside(r, q))', 'Bool.not(outside(q, r))', 'meets_decoded'),
+        ('quad-intersection.bend', 'Bool.not(outside(q, r) || outside(r, q))', 'Bool.not(outside(q, r) && outside(r, q))', 'meets_decoded'),
+        ('quad-intersection.bend', 'Bool.not(outside(q, r) || outside(r, q))', 'outside(q, r) || outside(r, q)', 'meets_decoded'),
     ]
     controls += [
         ('strict-halfplane.bend', 'Cmp.is_lt(G.side(ax, ay, bx, by, p))', 'Cmp.is_gt(G.side(ax, ay, bx, by, p))', 'negative_closed_complement'),
@@ -289,6 +326,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif file == "quad-intersection.bend":
+                proof_root = "QUAD_INTERSECTION_PROOF.bend"
             elif file == "strict-halfplane.bend":
                 proof_root = "STRICT_HALFPLANE_PROOF.bend"
             elif file == "quad-barycentric.bend":
@@ -370,6 +409,8 @@ def negative_controls(directory):
             except AssertionError as error:
                 raise AssertionError(f"Mutation {file}: {law} did not produce a proof diagnostic\n{error}") from error
             assert law in output, output
+            if file == "quad-intersection.bend":
+                intersection_counter(directory, old, new)
             if file == "strict-halfplane.bend":
                 strict_halfplane_counter(directory, new)
             if file == "quad-barycentric.bend":
@@ -519,6 +560,8 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        bend(directory, "quad-intersection-tests.bend", "--verdict")
+        print("Global intersection fixtures accepted: one-sided separation, common points, edge/corner contact, native rejection and symmetry")
         bend(directory, "strict-halfplane-tests.bend", "--verdict")
         print("Strict separation fixtures accepted: contact, zero pairs, alternate fractions, hull exclusion and native bridge")
         bend(directory, "quad-barycentric-tests.bend", "--verdict")

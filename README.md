@@ -1472,3 +1472,82 @@ milestone does not claim SAT completeness or the unfinished topological link.
 `taskset -c 7,11 ./regenerate.sh` passed all proof roots, native compilation,
 generation and independent geometry/topology checks under the existing limits.
 `git diff --exit-code -- b.svg` confirmed byte-identical output.
+
+### Stage 2: common hull points cannot be rejected by `meets`
+
+[Intersection model](quad-intersection.bend), [ten laws](quad-intersection-laws.bend)
+and [proof root](QUAD_INTERSECTION_PROOF.bend) assemble every side of both quads.
+`outside(q,r)` is the disjunction of the four strict separating-side tests;
+`meets(q,r)` negates `outside(q,r) || outside(r,q)`. The independent
+`CommonPoint(q,r)` type carries one valid rational point and two explicit
+four-weight hull-membership witnesses, rather than defining an intersection as
+that Boolean decision.
+
+`hull_region_not_outside` proves that a point passing all four closed sides of
+one quad and belonging to the other's convex hull defeats every separating
+side. It does not require a convexity premise for the first quad beyond the
+supplied inside-point evidence. The proof decomposes the four closed-side
+judgments and uses the previous strict hull exclusion owner. Each hypothetical
+separator produces `Empty`; an explicit Boolean case split therefore proves
+that side test false, and the four-side disjunction is false.
+
+For two strictly positive-turn quads, `common_hull_meets` proves
+`CommonPoint(q,r) -> meets(q,r)=true`. It unpacks both hull witnesses, reuses the
+existing corner-containment and hull-in-region proofs, and applies the preceding
+side result in both directions. It keeps the same point throughout; independent
+scalar weights and their Boolean certificates may be reused, while the
+existential membership values are consumed once. `rejected_meets_excludes`
+turns a false decision into a checked function from supposed common-point
+membership to `Empty`.
+
+The decoded `outside` and `meets` laws pin the exact native-coordinate
+reference to this geometric composition. Under the existing width-12 arithmetic
+envelopes, `production_meets_exact` connects the actual U32 decision to it.
+The two production common-point/exclusion laws also consume explicit native
+strict-convexity premises. Thus a bounded production rejection cannot discard
+a genuine common hull point in this domain. Natural and native input-order
+symmetry are separately proved; the native symmetry is Boolean composition
+and does not need arithmetic envelopes.
+
+[Eighteen fixture judgments/constructions](quad-intersection-tests.bend) cover
+one-sided separation in either input order, decoded decisions, overlapping
+hulls, an unreduced common-point fraction, edge and corner contact, same-quad
+membership, both rejection functions, actual native contact decisions and both
+symmetry laws. A box `(5,5),(15,5),(15,15),(5,15)` and the diamond
+`(16,10),(17,9),(18,10),(17,11)` are separated by a box side, but no diamond
+side separates the entire box. This exposes dropping one input's side tests
+or changing their disjunction to conjunction. The invalid projective origin
+`(0,0,0)` passes both quads' closed half-plane predicates even for that disjoint
+pair, but its denominator is not positive; it is not an allowed `CommonPoint`.
+
+Six compiling controls omit the closing or second edge, test each quad against
+itself, omit the reverse-quad test, replace the global disjunction by
+conjunction, or drop the final negation. They first fail in public
+`outside_decoded` or `meets_decoded`. Each also has an independently checked
+literal false instance of the corresponding unconditional decoder equation,
+with strict convexity verified for both inputs. The last control rejects an
+identical quad pair; the others incorrectly admit a disjoint pair. These are
+handwritten compiling proof controls, not an external bend-falsify report.
+
+The implication `meets=true -> CommonPoint` is still unproved: it needs a
+constructive existence argument when no side separates. This milestone proves
+correctness of rejection, rather than claiming the full intersection
+characterization. Finite triple-search completeness, independent complex
+enumeration and the actual SVG-fill/topological bridge remain open. Stages
+2–4 are unfinished.
+
+Validation: `taskset -c 7,11 python3 -u check.py` passed all 250 public laws
+across 38 proof roots, the eighteen new fixture judgments/constructions and
+existing groups, 178 compiling mutation controls, all six new literal mutant
+counterexamples and independent artifact checks. Every kernel invocation kept
+the five-second limit. Implementer self-review found no violations of the
+stated contracts: it traced all four cyclic sides, both quad orders, the same
+common point in both hull witnesses, positive denominators and totals, each
+closed-side contradiction, Boolean rejection and symmetry, and the native
+arithmetic/convexity bridges. The new owner composes existing strict-side,
+hull-in-region and arithmetic owners. It introduces no existence assumption or
+unchecked geometric axiom. The future existence/enumeration consumers still
+need the explicitly missing true-decision-to-common-point direction.
+`taskset -c 7,11 ./regenerate.sh` also passed all proof roots, native compilation,
+generation and independent geometry/topology checks under the existing limits.
+`git diff --exit-code -- b.svg` confirmed byte-identical output.
