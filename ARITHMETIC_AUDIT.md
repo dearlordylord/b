@@ -16,9 +16,9 @@ production behavior.
 | Production path | Current kernel contract | Remaining obligation |
 | --- | --- | --- |
 | `core.cell_center` | Centroid model, bounded centroid and validated centroid-mean laws | Connect any downstream composite check still lacking a natural model |
-| `validation.determinant_positive` | `accepted_points_determinant` in `coordinate-runtime-laws.bend` | `source-convexity-laws.bend` now composes `positive_quad`, `convex_quad`, `cell_convex`; propagate actual accepted source guards through the validator traversal |
-| `validation.width_squared` | `accepted_points_width` in `coordinate-width-laws.bend` | `width-range-laws.bend` now composes `width_in_range`/`section_width` with natural bounds; connect accepted section traversal |
-| `validation.dot`, `cell_transverse` | Accepted point dot law and `source_corners_transverse_exact` | Audit composition into the full cell validator and source traversal |
+| `validation.determinant_positive` | `accepted_points_determinant` in `coordinate-runtime-laws.bend` | `source-convexity-laws.bend` now composes `positive_quad`, `convex_quad`, `cell_convex`; `validator-natural-laws.bend` now propagates actual guards through the validator traversal; geometric characterization remains stage 2 |
+| `validation.width_squared` | `accepted_points_width` in `coordinate-width-laws.bend` | `width-range-laws.bend` now composes `width_in_range`/`section_width` with natural bounds; `validator-natural-laws.bend` now connects accepted section traversal |
+| `validation.dot`, `cell_transverse` | Accepted point dot law and `source_corners_transverse_exact` | `validator-natural-laws.bend` now composes into the full cell validator and source traversal |
 | `topology.scaled` | Grid round-trip, scaled coordinate exactness and envelopes | Geometric scale correspondence belongs to stage 2 |
 | `topology.cells`, append, selected cells and neighbors | `source-cells-laws.bend` envelope preservation | Connect these facts throughout the actual inspection traversal |
 | `topology.sample`, vertex witnesses and search weights | Sample arithmetic, denominator, bounds and search-hit laws | Geometric interpretation of found witnesses belongs to stage 2 |
@@ -33,8 +33,9 @@ The low-level Word/U32 laws prove conversions, arithmetic and comparisons;
 they do not prove that a production caller supplies their premises. Source
 and filter envelope laws supply part of that missing bridge. A full audit
 must connect the actual accepted input, recursive traversal and each called
-arithmetic predicate, including the unscaled validator compositions listed
-above. Stage 1 is therefore still incomplete.
+arithmetic predicate. The unscaled validator now has full arithmetic agreement via
+`validator_arithmetic_exact`; the topology traversal still needs its
+composed bridge. Stage 1 is therefore still incomplete.
 
 The search is intentionally conservative. A successful search now carries a
 bounded witness with positive denominator and exact natural half-plane

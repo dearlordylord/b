@@ -8,6 +8,7 @@ import ./sat-arithmetic.bend as Sat
 import ./edge-arithmetic.bend as Edge
 import ./source-convexity.bend as Convex
 import ./validation.bend as V
+import ./validator-natural.bend as ValidatorNat
 
 def same(a: Bool, b: Bool) -> Bool:
   Bool.not(Bool.xor(a, b))
@@ -39,8 +40,11 @@ def source_convexity_cases() -> Bool:
 def width_range_cases() -> Bool:
   Bool.not(V.width_in_range(3239999)) && V.width_in_range(3240000) && V.width_in_range(6760000) && Bool.not(V.width_in_range(6760001)) && V.section_width(C.Section{C.Pt{0n, 0n}, C.Pt{1800n, 0n}}) && V.section_width(C.Section{C.Pt{0n, 0n}, C.Pt{2600n, 0n}}) && Bool.not(V.section_width(C.Section{C.Pt{0n, 0n}, C.Pt{1799n, 0n}})) && Bool.not(V.section_width(C.Section{C.Pt{0n, 0n}, C.Pt{2601n, 0n}})) && Bool.not(V.section_width(C.Section{C.Pt{16000n, 0n}, C.Pt{16000n, 0n}}))
 
+def validator_natural_cases() -> Bool:
+  same(V.validate([]), ValidatorNat.validate([], 3240000, 6760000)) && same(V.validate([C.Section{C.Pt{0n, 0n}, C.Pt{0n, 2000n}}]), ValidatorNat.validate([C.Section{C.Pt{0n, 0n}, C.Pt{0n, 2000n}}], 3240000, 6760000)) && same(V.validate([C.Section{C.Pt{0n, 0n}, C.Pt{0n, 2000n}}, C.Section{C.Pt{2000n, 0n}, C.Pt{2000n, 2000n}}]), ValidatorNat.validate([C.Section{C.Pt{0n, 0n}, C.Pt{0n, 2000n}}, C.Section{C.Pt{2000n, 0n}, C.Pt{2000n, 2000n}}], 3240000, 6760000)) && same(V.validate([C.Section{C.Pt{16001n, 0n}, C.Pt{16001n, 2000n}}]), ValidatorNat.validate([C.Section{C.Pt{16001n, 0n}, C.Pt{16001n, 2000n}}], 3240000, 6760000)) && Bool.not(ValidatorNat.validate([], 3240000, 6760000)) && Bool.not(ValidatorNat.validate([C.Section{C.Pt{16001n, 0n}, C.Pt{16001n, 2000n}}], 3240000, 6760000))
+
 def cases() -> Bool:
-  width_range_cases() && source_convexity_cases() && edge_cases() && sat_cases() && classifier_cases() && source_cases() && filtered_cases() && same(T.segment_search(0n, T.P{0, 0}, T.P{8, 8}, inside_box(), inside_box(), inside_box()), False{}) && T.segment_search(1n, T.P{0, 0}, T.P{8, 8}, inside_box(), inside_box(), inside_box()) && T.segment_search(63n, T.P{0, 0}, T.P{8, 8}, inside_box(), inside_box(), inside_box()) && T.pair_search([T.P{8, 8}], T.P{0, 0}, inside_box(), inside_box(), inside_box()) && T.all_pairs([T.P{0, 0}, T.P{8, 8}], inside_box(), inside_box(), inside_box()) && T.vertex_search([T.P{4, 4}], inside_box(), inside_box(), inside_box()) && same(T.triangle_search([], inside_box(), inside_box(), inside_box()), False{}) && T.triangle_witness(inside_box(), inside_box(), inside_box()) && same(T.triangle_witness(box(0, 0, 2, 2), box(10, 0, 12, 2), box(20, 0, 22, 2)), False{}) && M.quad_envelope(12n, inside_box()) && same(U32.is_gt(M.denominator(T.sample(T.P{0, 0}, T.P{8, 8}, 1)), 0), True{}) && U32.is_eq(M.denominator(T.witness(T.P{4, 4})), 1)
+  validator_natural_cases() && width_range_cases() && source_convexity_cases() && edge_cases() && sat_cases() && classifier_cases() && source_cases() && filtered_cases() && same(T.segment_search(0n, T.P{0, 0}, T.P{8, 8}, inside_box(), inside_box(), inside_box()), False{}) && T.segment_search(1n, T.P{0, 0}, T.P{8, 8}, inside_box(), inside_box(), inside_box()) && T.segment_search(63n, T.P{0, 0}, T.P{8, 8}, inside_box(), inside_box(), inside_box()) && T.pair_search([T.P{8, 8}], T.P{0, 0}, inside_box(), inside_box(), inside_box()) && T.all_pairs([T.P{0, 0}, T.P{8, 8}], inside_box(), inside_box(), inside_box()) && T.vertex_search([T.P{4, 4}], inside_box(), inside_box(), inside_box()) && same(T.triangle_search([], inside_box(), inside_box(), inside_box()), False{}) && T.triangle_witness(inside_box(), inside_box(), inside_box()) && same(T.triangle_witness(box(0, 0, 2, 2), box(10, 0, 12, 2), box(20, 0, 22, 2)), False{}) && M.quad_envelope(12n, inside_box()) && same(U32.is_gt(M.denominator(T.sample(T.P{0, 0}, T.P{8, 8}, 1)), 0), True{}) && U32.is_eq(M.denominator(T.witness(T.P{4, 4})), 1)
 
 def main() -> IO(Unit):
   do IO<Unit>:

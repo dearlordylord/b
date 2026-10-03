@@ -52,6 +52,10 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ('validator-natural.bend', 'Transverse.exact(cell) &&', 'True{} &&', 'bounded_cell_arithmetic_exact'),
+        ('validator-natural.bend', 'cell_valid(lower, upper, C.Cell{previous, h}) && cells_valid(t, h, lower, upper)', 'cell_valid(lower, upper, C.Cell{previous, h}) && True{}', 'bounded_cells_arithmetic_exact'),
+        ('validator-natural.bend', 'Width.section_width(lower, upper, h) && cells_valid(t, h, lower, upper)', 'True{} && cells_valid(t, h, lower, upper)', 'bounded_nonempty_arithmetic_exact'),
+        ('validator-natural.bend', 'case False{}: False{}', 'case False{}: True{}', 'gate_exact'),
         ('validation.bend', 'U32.is_le(3240000, n)', 'U32.is_gt(3240000, n)', 'width_in_range_arithmetic_exact'),
         ('validation.bend', 'U32.is_le(n, 6760000)', 'U32.is_le(n, 6760001)', 'width_in_range_arithmetic_exact'),
         ('validation.bend', 'width_in_range(width_squared(Core.boundary_left(s), Core.boundary_right(s)))', 'width_in_range(width_squared(Core.boundary_left(s), Core.boundary_left(s)))', 'section_width_arithmetic_exact'),
@@ -159,6 +163,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif law in {"bounded_cell_arithmetic_exact", "bounded_cells_arithmetic_exact", "bounded_nonempty_arithmetic_exact", "gate_exact"}:
+                proof_root = "VALIDATOR_NATURAL_PROOF.bend"
             elif law in {"width_in_range_arithmetic_exact", "section_width_arithmetic_exact"}:
                 proof_root = "WIDTH_RANGE_PROOF.bend"
             elif law in {"positive_quad_arithmetic_exact", "convex_quad_arithmetic_exact", "cell_convex_arithmetic_exact"}:

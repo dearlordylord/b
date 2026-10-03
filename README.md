@@ -34,7 +34,7 @@ commands; this avoids an expensive combined optimization step on shared
 machines. Other platforms retain Bend's native build command. Proof checks
 use the same five-second BendTT gate on every platform.
 
-`check.py` runs the 136-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 140-law proof gate, 200 literal arithmetic checks,
 seven executed validator boundary checks, three executed transverse cases,
 four executed cell-transverse cases and rejection beyond each source-coordinate limit,
 compiling mutations that must fail
@@ -641,3 +641,32 @@ selection, fixtures and root/mutation registration. No production behavior
 changed. The initial stack-overflow formulation is excluded from evidence;
 the committed symbolic formulation passed the real kernel. Accepted source
 traversal and later geometric/topological obligations remain open.
+
+Natural validator composition: four public laws connect a bounded cell, the
+recursive adjacent-cell fold, the nonempty fold and the full `validate`
+entry point with `validator-natural.bend`. The reference replaces word
+convexity, transverse checks and width comparisons with the separately
+proved natural predicates. It reuses the existing Nat-only centroid, endpoint
+and coordinate-filter checks; it is an arithmetic reference, not an
+independent geometric specification. List-head and tail bounds are extracted
+from the actual `sections_bounded` filter at each recursive step. The full
+entry-point agreement covers arbitrary lists, including guard failure, and
+needs no caller-supplied bounds premise. Threshold arguments remain pinned
+to the production constants. Native fixtures compare empty, singleton,
+two-section and out-of-range inputs. Four compiling model mutations omit a
+transverse check, recursive tail or first width, or accept a failed guard;
+rejection occurs in the three composition law sections and the shared
+`gate_exact` helper. This closes the unscaled traversal arithmetic bridge,
+not geometric correctness or the topology traversal bridge.
+
+Validation of full unscaled validator arithmetic composition:
+`taskset -c 7,11 python3 -u check.py` passed 140 unique public laws across
+twenty-two roots, all fixture groups, 94 compiling mutations and independent
+artifact checks. `taskset -c 7,11 ./regenerate.sh` passed with the five-second
+limit on every kernel invocation and preserved `b.svg` byte for byte.
+Implementer self-review covered the distinction between reused Nat-only
+checks and replaced word checks, recursive head/tail bound extraction, the
+previous/current section relation, empty and failed-guard branches, pinned
+thresholds and gate integration. No production behavior or caller-supplied
+overflow premise was added. The topology traversal arithmetic bridge and
+stages 2–4 remain open.
