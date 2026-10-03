@@ -273,6 +273,88 @@ def segment_boundary_counter(directory, replacement):
     bend(directory, "segment-boundary-counter.bend", "--verdict")
 
 
+def interval_clip_counter(directory, original, replacement):
+    """Refute a literal public table/report law, with retained-point premises where relevant."""
+    prelude = (
+        "import Base\nimport ./interval-clip.bend as M\nimport ./natural-cover.bend as N\n"
+        "import ./homogeneous-geometry.bend as G\nimport ./homogeneous-combination.bend as C\n"
+        "import ./segment-cut.bend as Cut\nimport ./halfplane-region.bend as Region\n"
+        "import ./boolean-reflection.bend as B\n"
+        "def a() -> N.Point: N.P{0n,1n}\ndef b() -> N.Point: N.P{1n,1n}\n"
+        "def box() -> N.Quad: N.Q{N.P{0n,0n},N.P{3n,0n},N.P{3n,3n},N.P{0n,3n}}\n"
+        "def membership(result:M.ClipResult,-r:G.Point) -> Type:\n  match result:\n    case M.Gone{}: Empty\n    case M.Span{p,q}: Cut.InSegment(p,q,r)\n")
+    extra = ""
+    if original.startswith("case Gone{}: False"):
+        actual, expected = "M.present(M.Gone{})", "False{}"
+        proof = "B.false_impossible(Equal.sym(Bool,True{},False{},h))"
+        kind = "Bool"
+    elif original.startswith("Region.contains"):
+        prelude += "def p() -> G.Point: G.P{0n,3n,1n}\ndef q() -> G.Point: G.P{1n,0n,1n}\n"
+        actual = "M.in_region(box(),M.Span{p(),q()})"
+        expected = "Region.contains(p(),box()) && Region.contains(q(),box())"
+        if replacement == "True{}":
+            actual = "M.in_region(box(),M.Span{G.P{0n,4n,1n},q()})"
+            expected = "Region.contains(G.P{0n,4n,1n},box()) && Region.contains(q(),box())"
+            proof = "B.false_impossible(Equal.sym(Bool,True{},False{},h))"
+        else:
+            proof = "B.false_impossible(h)"
+            extra = (
+                "def preservation_premises() -> {Region.contains(p(),box()) && Region.contains(q(),box()) == True{} : Bool}:\n  {==}\n"
+                "def refutes_region_preservation(h:{M.in_region(box(),M.clip(a(),b(),p(),q())) == True{} : Bool}) -> Empty:\n  B.false_impossible(h)\n")
+        kind = "Bool"
+    elif original.startswith("(G.positive_denominator"):
+        prelude += "def p() -> G.Point: G.P{0n,1n,0n}\ndef q() -> G.Point: G.P{0n,3n,1n}\n"
+        actual = "M.closed_valid(a(),b(),M.Span{p(),q()})"
+        expected = "(G.positive_denominator(p()) && G.positive_denominator(q())) && (Region.edge(a(),b(),p()) && Region.edge(a(),b(),q()))"
+        kind = "Bool"
+        proof = "B.false_impossible(Equal.sym(Bool,True{},False{},h))"
+    else:
+        p, q, cp, cq = "G.P{0n,3n,1n}", "G.P{1n,0n,1n}", "True{}", "False{}"
+        expected = "M.Span{p(),Cut.point(a(),b(),p(),q())}"
+        reporter = "x => M.closed_valid(a(),b(),x)"
+        flipped = False
+        if original.startswith("case True{} True"):
+            q, cp, cq = "G.P{1n,2n,1n}", "True{}", "True{}"
+            expected, reporter = "M.Span{p(),q()}", "x => M.present(x)"
+            extra = (
+                "def retained_premises() -> {(G.positive_denominator(p()) && G.positive_denominator(q())) && (Nat.is_gt(Nat.add(1n,1n),0n) && Region.edge(a(),b(),C.join(p(),q(),1n,1n))) == True{} : Bool}:\n  {==}\n"
+                "def refutes_retained_present(h:{M.present(M.clip(a(),b(),p(),q())) == True{} : Bool}) -> Empty:\n  B.false_impossible(h)\n"
+                "def refutes_retained_member(h:membership(M.clip(a(),b(),p(),q()),C.join(p(),q(),1n,1n))) -> Empty:\n  h\n")
+        elif original.startswith("case False{} False"):
+            p, cp, cq = "G.P{0n,0n,1n}", "False{}", "False{}"
+            expected, reporter, flipped = "M.Gone{}", "x => M.present(x)", True
+            extra = (
+                "def refutes_present_exact(h:{M.present(M.clip(a(),b(),p(),q())) == Region.edge(a(),b(),p()) || Region.edge(a(),b(),q()) : Bool}) -> Empty:\n"
+                "  B.false_impossible(Equal.sym(Bool,True{},False{},h))\n")
+        elif original.startswith("case False{} True"):
+            p, q, cp, cq = "G.P{1n,0n,1n}", "G.P{0n,3n,1n}", "False{}", "True{}"
+            expected = "M.Span{q(),Cut.point(a(),b(),q(),p())}"
+        prelude += f"def p() -> G.Point: {p}\ndef q() -> G.Point: {q}\n"
+        prelude += f"def actual_flags() -> {{Region.edge(a(),b(),p()) == {cp} : Bool}} & {{Region.edge(a(),b(),q()) == {cq} : Bool}}:\n  ({{==}},{{==}})\n"
+        if original.startswith("choose("):
+            actual = "M.clip(a(),b(),p(),q())"
+        else:
+            actual = f"M.choose(a(),b(),p(),q(),{cp},{cq})"
+        reflected = f"Equal.cong(M.ClipResult,Bool,{reporter},{actual},{expected},h)"
+        proof = (f"B.false_impossible(Equal.sym(Bool,True{{}},False{{}},{reflected}))" if flipped
+                 else f"B.false_impossible({reflected})")
+        kind = "M.ClipResult"
+        if original.startswith("case True{} False"):
+            extra += (
+                "def valid_endpoint_premises() -> {G.positive_denominator(p()) && G.positive_denominator(q()) == True{} : Bool}:\n  {==}\n"
+                "def refutes_closed_valid(h:{M.closed_valid(a(),b(),M.clip(a(),b(),p(),q())) == True{} : Bool}) -> Empty:\n  B.false_impossible(h)\n")
+            if "G.P{1n,0n,0n}" in replacement:
+                extra += (
+                    "def preservation_premises() -> {Region.contains(p(),box()) && Region.contains(q(),box()) == True{} : Bool}:\n  {==}\n"
+                    "def retained_premises() -> {Nat.is_gt(Nat.add(1n,1n),0n) && Region.edge(a(),b(),C.join(p(),q(),1n,1n)) == True{} : Bool}:\n  {==}\n"
+                    "def refutes_region_preservation(h:{M.in_region(box(),M.clip(a(),b(),p(),q())) == True{} : Bool}) -> Empty:\n  B.false_impossible(h)\n"
+                    "def refutes_retained_member(member:membership(M.clip(a(),b(),p(),q()),C.join(p(),q(),1n,1n))) -> Empty:\n"
+                    "  match member:\n    case (k,(l,(ht,(hp,(hq,(hr,equivalent)))))): B.false_impossible(hq)\n")
+    (directory / "interval-clip-counter.bend").write_text(
+        prelude + extra + f"def refutes_public_exact(h:{{{actual} == {expected} : {kind}}}) -> Empty:\n  {proof}\n")
+    bend(directory, "interval-clip-counter.bend", "--verdict")
+
+
 def negative_controls(directory):
     controls = [
         ("core.bend", "Seam{boundary_left(cell_start(cell)),",
@@ -287,6 +369,17 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ('interval-clip.bend', 'case True{} True{}: Span{p,q}', 'case True{} True{}: Gone{}', 'choose_exact'),
+        ('interval-clip.bend', 'case False{} False{}: Gone{}', 'case False{} False{}: Span{p,q}', 'choose_exact'),
+        ('interval-clip.bend', 'case True{} False{}: Span{p,Cut.point(a,b,p,q)}', 'case True{} False{}: Span{p,q}', 'choose_exact'),
+        ('interval-clip.bend', 'case False{} True{}: Span{q,Cut.point(a,b,q,p)}', 'case False{} True{}: Span{q,Cut.point(a,b,p,q)}', 'choose_exact'),
+        ('interval-clip.bend', 'choose(a,b,p,q,Region.edge(a,b,p),Region.edge(a,b,q))', 'choose(a,b,p,q,Region.edge(a,b,p),True{})', 'clip_exact'),
+        ('interval-clip.bend', 'case Gone{}: False{}', 'case Gone{}: True{}', 'present_report_exact'),
+        ('interval-clip.bend', '(G.positive_denominator(p) && G.positive_denominator(q)) && (Region.edge(a,b,p) && Region.edge(a,b,q))', 'True{}', 'closed_report_exact'),
+        ('interval-clip.bend', '(G.positive_denominator(p) && G.positive_denominator(q)) && (Region.edge(a,b,p) && Region.edge(a,b,q))', 'Region.edge(a,b,p) && Region.edge(a,b,q)', 'closed_report_exact'),
+        ('interval-clip.bend', 'Region.contains(p,r) && Region.contains(q,r)', 'True{}', 'region_report_exact'),
+        ('interval-clip.bend', 'Region.contains(p,r) && Region.contains(q,r)', 'False{}', 'region_report_exact'),
+        ('interval-clip.bend', 'case True{} False{}: Span{p,Cut.point(a,b,p,q)}', 'case True{} False{}: Span{p,G.P{1n,0n,0n}}', 'choose_exact'),
         ('segment-boundary.bend', 'P.proportional(k,l,Cut.first_weight(a,b,q),Cut.second_weight(a,b,p))', 'True{}', 'ratio_on_line_exact'),
         ('segment-boundary.bend', 'P.proportional(k,l,Cut.first_weight(a,b,q),Cut.second_weight(a,b,p))', 'P.proportional(k,l,Cut.second_weight(a,b,p),Cut.first_weight(a,b,q))', 'ratio_on_line_exact'),
         ('segment-boundary.bend', 'Cut.first_weight(a,b,q)', 'Cut.second_weight(a,b,q)', 'ratio_on_line_exact'),
@@ -537,6 +630,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif file == "interval-clip.bend":
+                proof_root = "INTERVAL_CLIP_PROOF.bend"
             elif file == "segment-boundary.bend":
                 proof_root = "SEGMENT_BOUNDARY_PROOF.bend"
             elif file == "segment-proportional.bend":
@@ -638,6 +733,8 @@ def negative_controls(directory):
             except AssertionError as error:
                 raise AssertionError(f"Mutation {file}: {law} did not produce a proof diagnostic\n{error}") from error
             assert law in output, output
+            if file == "interval-clip.bend":
+                interval_clip_counter(directory, old, new)
             if file == "segment-boundary.bend":
                 segment_boundary_counter(directory, new)
             if file == "segment-proportional.bend":
@@ -803,6 +900,11 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        bend(directory, "interval-clip-raw-tests.bend", "--verdict")
+        bend(directory, "interval-clip-valid-tests.bend", "--verdict")
+        bend(directory, "interval-clip-member-tests.bend", "--verdict")
+        bend(directory, "interval-clip-boundary-tests.bend", "--verdict")
+        print("Interval clipping fixtures accepted: all decisions, validity, region preservation, forward/reverse membership and zero-gap endpoints")
         bend(directory, "segment-boundary-raw-tests.bend", "--verdict")
         bend(directory, "segment-boundary-tests.bend", "--verdict")
         bend(directory, "segment-boundary-witness-tests.bend", "--verdict")

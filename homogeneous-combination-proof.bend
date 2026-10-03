@@ -99,3 +99,9 @@ def convex_mixture_fields(+x: Nat, +y: Nat, +d: Nat, +u: Nat, +v: Nat, +e: Nat, 
 def L.region_convex_mixture(p, q, r, k, l, hpd, hqd, hw, hp, hq):
   match p q:
     case G.P{x, y, d} G.P{u, v, e}: convex_mixture_fields(x, y, d, u, v, e, r, k, l, hpd, hqd, hw, hp, hq)
+
+# Exact endpoint/weight reversal for an undirected homogeneous segment.
+def join_reversed(+p:G.Point,+q:G.Point,+k:Nat,+l:Nat) -> {M.join(q,p,l,k) == M.join(p,q,k,l) : G.Point}:
+  match p q:
+    case G.P{+x,+y,+d} G.P{+u,+v,+e}:
+      GP.point_equal(Nat.add(Nat.mul(u,l),Nat.mul(x,k)),Nat.add(Nat.mul(v,l),Nat.mul(y,k)),Nat.add(Nat.mul(e,l),Nat.mul(d,k)),Nat.add(Nat.mul(x,k),Nat.mul(u,l)),Nat.add(Nat.mul(y,k),Nat.mul(v,l)),Nat.add(Nat.mul(d,k),Nat.mul(e,l)),F.add_comm(Nat.mul(u,l),Nat.mul(x,k)),F.add_comm(Nat.mul(v,l),Nat.mul(y,k)),F.add_comm(Nat.mul(e,l),Nat.mul(d,k)))

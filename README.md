@@ -2137,3 +2137,56 @@ five-second proof/compilation limits. The independent artifact checks report
 simplex counts [96, 146, 64, 15]). `git diff --exit-code -- b.svg` confirms the
 SVG is byte-for-byte unchanged. This is a verified implementation checkpoint,
 not completion of stages 2–4 or a universal topological bridge.
+
+
+### Constructive interval clipping step
+
+`interval-clip.bend` implements one closed-halfplane clipping step. It keeps
+both inside endpoints, removes an entirely outside interval, or retains the
+inside endpoint and the computed boundary cut. The reversed mixed case places
+the inside endpoint first; it does not preserve endpoint order. A later iterator
+must carry and swap original-source coefficients and boundary labels explicitly.
+
+Ten public laws require the actual four-way selection, exact validity, region
+and presence reports, valid closed output endpoints, preservation of a second
+convex region, and retention of every closed weighted input point with positive
+total weight. Retention supplies an explicit `InSegment` witness for the actual
+output; its membership predicate belongs to the law specification. An empty
+output has no membership witness. The proof covers both mixed directions and
+zero boundary gaps. Exact report laws prevent constant Boolean reports from
+satisfying preservation laws vacuously. A shared homogeneous-combination proof
+establishes exact reversal of endpoints and weights.
+
+Sixteen fixture assertions exercise selection, cut coordinates, invalid
+denominators, preservation, membership and zero-gap cases. Eleven compiling
+mutation controls alter selection, reports, direction or endpoint validity.
+Each is required to fail a public proof and admit a checked literal refutation
+of the unfolded public law; selected controls additionally refute constructive
+membership or preservation with checked input premises. These are handwritten
+BendTT controls, not a run of an external mutation tool.
+
+Implementer self-review: clipping consumes the existing region, segment-cut
+and one-sided clipping owners; generic join reversal lives with homogeneous
+combination. The law-owned membership predicate constrains the real selected
+result. This step adds no trusted axioms and changes neither the generator nor
+the SVG. The full integrated check and regeneration passed for this checkpoint. This is one clipping step, not the four-halfplane iterator, complete
+intersection search, independent enumeration or a universal topology bridge.
+Stages 2–4 remain open.
+
+
+Interval-clipping validation: the first integrated attempt timed out in the
+unchanged `WIDTH_PROOF.bend` at five seconds and is recorded as failed. The
+exact separate repeat passed at the same limit. The complete unchanged-limit
+retry of `python3 -u check.py` exited 0: 312 public laws across 48 roots, all
+fixture groups, 234 compiling mutation controls and the invalid-artwork,
+independent artifact and topology negative controls. The artifact still has
+3 tubes, 96 convex cells, 24 seams, one component and two holes. Those topology
+counts are exact finite evidence, not the missing universal bridge.
+
+
+The subsequent `sh -x ./regenerate.sh` completed with exit 0: all 48 roots
+passed real BendTT at the unchanged five-second limit, followed by bounded
+native compilation, execution and independent artifact verification.
+`git diff --exit-code -- b.svg` confirms byte-for-byte preservation.
+Self-review found no additional violations in this clipping slice; complete
+iteration, provenance selection and the stages 2–4 bridges remain outstanding.
