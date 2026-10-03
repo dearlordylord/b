@@ -34,7 +34,7 @@ commands; this avoids an expensive combined optimization step on shared
 machines. Other platforms retain Bend's native build command. Proof checks
 use the same five-second BendTT gate on every platform.
 
-`check.py` runs the 127-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 130-law proof gate, 200 literal arithmetic checks,
 seven executed validator boundary checks, three executed transverse cases,
 four executed cell-transverse cases and rejection beyond each source-coordinate limit,
 compiling mutations that must fail
@@ -568,3 +568,27 @@ covered the five public contracts, their existing bounded vertex-side
 dependency, Boolean composition helpers, native fixture integration and
 mutation routing. No production behavior or arithmetic premise changed.
 The caller audit and geometric proofs remain open.
+
+Edge identity arithmetic: three additional public laws connect
+`point_equal`, `reverse_edge`, and `shared_edge` to natural coordinate
+equality and the corresponding Boolean formulas. They cover every U32
+value and therefore need no coordinate guard. The later ribbon-connectivity
+proof can consume these contracts; this milestone does not itself prove
+connectivity. Native fixtures cover the maximum U32 coordinate, a single
+coordinate mismatch, opposite/same winding, a shared edge, a gap and point
+contact. Three compiling mutations weaken equality or omit candidate edges;
+the corresponding public law sections reject them.
+
+The [production arithmetic audit](ARITHMETIC_AUDIT.md) records current
+caller coverage and the remaining unscaled-validator compositions and
+accepted-input traversal bridges. Stage 1 remains incomplete.
+
+Validation of the edge-identity milestone:
+`taskset -c 7,11 python3 -u check.py` passed 130 unique public laws across
+nineteen roots, all fixture groups, 84 compiling mutations and independent
+artifact checks. `taskset -c 7,11 ./regenerate.sh` passed and preserved
+`b.svg` byte for byte; each kernel invocation retained its five-second limit.
+Implementer self-review covered equality conversion, reversed-edge ordering,
+the four candidate edges, proof dependencies, root/mutation registration
+and the entry-point coverage audit. No production behavior or coordinate
+restriction was added. The caller audit identifies further required work.

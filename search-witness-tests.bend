@@ -5,6 +5,7 @@ import ./inside-arithmetic.bend as N
 import ./source-cells.bend as S
 import ./core.bend as C
 import ./sat-arithmetic.bend as Sat
+import ./edge-arithmetic.bend as Edge
 
 def same(a: Bool, b: Bool) -> Bool:
   Bool.not(Bool.xor(a, b))
@@ -27,8 +28,11 @@ def classifier_cases() -> Bool:
 def sat_cases() -> Bool:
   same(T.meets(box(0, 0, 4, 4), box(4, 0, 8, 4)), Sat.meets(box(0, 0, 4, 4), box(4, 0, 8, 4))) && same(T.meets(box(0, 0, 4, 4), box(5, 0, 8, 4)), Sat.meets(box(0, 0, 4, 4), box(5, 0, 8, 4))) && same(T.outside(box(0, 0, 4, 4), box(5, 0, 8, 4)), Sat.outside(box(0, 0, 4, 4), box(5, 0, 8, 4))) && same(T.strictly_convex(box(0, 0, 4, 4)), Sat.strictly_convex(box(0, 0, 4, 4))) && same(T.strictly_convex(T.reverse(box(0, 0, 4, 4))), Sat.strictly_convex(T.reverse(box(0, 0, 4, 4)))) && same(T.strictly_convex(box(0, 0, 0, 4)), Sat.strictly_convex(box(0, 0, 0, 4))) && same(T.orientation(box(0, 0, 4, 4)), Sat.orientation(box(0, 0, 4, 4))) && same(T.orientation(T.reverse(box(0, 0, 4, 4))), Sat.orientation(T.reverse(box(0, 0, 4, 4)))) && Sat.meets(box(0, 0, 4, 4), box(4, 0, 8, 4)) && Sat.meets(box(0, 0, 4, 4), box(4, 4, 8, 8)) && Bool.not(Sat.meets(box(0, 0, 4, 4), box(5, 0, 8, 4))) && Bool.not(Sat.strictly_convex(box(0, 0, 0, 4))) && Bool.not(Sat.strictly_convex(T.reverse(box(0, 0, 4, 4))))
 
+def edge_cases() -> Bool:
+  Edge.point_equal(T.P{4294967295, 0}, T.P{4294967295, 0}) && Bool.not(Edge.point_equal(T.P{4294967295, 0}, T.P{4294967294, 0})) && Bool.not(Edge.point_equal(T.P{0, 0}, T.P{0, 1})) && same(T.shared_edge(box(0, 0, 4, 4), box(4, 0, 8, 4)), Edge.shared_edge(box(0, 0, 4, 4), box(4, 0, 8, 4))) && Edge.shared_edge(box(0, 0, 4, 4), box(4, 0, 8, 4)) && Bool.not(Edge.shared_edge(box(0, 0, 4, 4), box(5, 0, 8, 4))) && Bool.not(Edge.shared_edge(box(0, 0, 4, 4), box(4, 4, 8, 8))) && Bool.not(Edge.shared_edge(box(0, 0, 4, 4), T.reverse(box(4, 0, 8, 4))))
+
 def cases() -> Bool:
-  sat_cases() && classifier_cases() && source_cases() && filtered_cases() && same(T.segment_search(0n, T.P{0, 0}, T.P{8, 8}, inside_box(), inside_box(), inside_box()), False{}) && T.segment_search(1n, T.P{0, 0}, T.P{8, 8}, inside_box(), inside_box(), inside_box()) && T.segment_search(63n, T.P{0, 0}, T.P{8, 8}, inside_box(), inside_box(), inside_box()) && T.pair_search([T.P{8, 8}], T.P{0, 0}, inside_box(), inside_box(), inside_box()) && T.all_pairs([T.P{0, 0}, T.P{8, 8}], inside_box(), inside_box(), inside_box()) && T.vertex_search([T.P{4, 4}], inside_box(), inside_box(), inside_box()) && same(T.triangle_search([], inside_box(), inside_box(), inside_box()), False{}) && T.triangle_witness(inside_box(), inside_box(), inside_box()) && same(T.triangle_witness(box(0, 0, 2, 2), box(10, 0, 12, 2), box(20, 0, 22, 2)), False{}) && M.quad_envelope(12n, inside_box()) && same(U32.is_gt(M.denominator(T.sample(T.P{0, 0}, T.P{8, 8}, 1)), 0), True{}) && U32.is_eq(M.denominator(T.witness(T.P{4, 4})), 1)
+  edge_cases() && sat_cases() && classifier_cases() && source_cases() && filtered_cases() && same(T.segment_search(0n, T.P{0, 0}, T.P{8, 8}, inside_box(), inside_box(), inside_box()), False{}) && T.segment_search(1n, T.P{0, 0}, T.P{8, 8}, inside_box(), inside_box(), inside_box()) && T.segment_search(63n, T.P{0, 0}, T.P{8, 8}, inside_box(), inside_box(), inside_box()) && T.pair_search([T.P{8, 8}], T.P{0, 0}, inside_box(), inside_box(), inside_box()) && T.all_pairs([T.P{0, 0}, T.P{8, 8}], inside_box(), inside_box(), inside_box()) && T.vertex_search([T.P{4, 4}], inside_box(), inside_box(), inside_box()) && same(T.triangle_search([], inside_box(), inside_box(), inside_box()), False{}) && T.triangle_witness(inside_box(), inside_box(), inside_box()) && same(T.triangle_witness(box(0, 0, 2, 2), box(10, 0, 12, 2), box(20, 0, 22, 2)), False{}) && M.quad_envelope(12n, inside_box()) && same(U32.is_gt(M.denominator(T.sample(T.P{0, 0}, T.P{8, 8}, 1)), 0), True{}) && U32.is_eq(M.denominator(T.witness(T.P{4, 4})), 1)
 
 def main() -> IO(Unit):
   do IO<Unit>:
