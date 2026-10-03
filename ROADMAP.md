@@ -77,7 +77,9 @@ are established. Partial milestones do not complete the objective.
   comparison agrees with the exact orientation for every guarded input.
 
 - The production two-product dot expression is exact for all accepted
-  source points. Four-product transverse comparisons still need their bound.
+  source points.
+- The paired four-product sum is strictly below U32 capacity under the
+  coordinate guards. Its production addition bridge remains outstanding.
 
 Still required for stage 1: connect the other production geometric expressions
 (squared widths, centroids, transverse dot comparisons and homogeneous

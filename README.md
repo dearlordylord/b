@@ -30,7 +30,7 @@ python3 check.py
 `generate.bend`, checks the emitted SVG, and replaces `b.svg` only on success.
 The generator itself refuses to emit an SVG if its Bend artwork validation fails.
 
-`check.py` runs the 64-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 65-law proof gate, 200 literal arithmetic checks,
 seven executed validator boundary checks, compiling mutations that must fail
 proofs, invalid artworks that must be rejected before SVG emission, and Bend
 and independent Python topology fixtures. Python checks the output artifact;
@@ -168,7 +168,7 @@ proofs; its original license is retained in `LICENSE.mathlib`. See [NOTICE](NOTI
 ## Arithmetic programme (in progress)
 
 [ROADMAP.md](ROADMAP.md) records the autonomous four-stage programme. The
-current BendTT gate checks **64 public laws**, plus supporting lemmas.
+current BendTT gate checks **65 public laws**, plus supporting lemmas.
 Arithmetic results quantify over all inputs at arbitrary word widths; the U32
 operation laws cover every 32-bit constructor payload.
 
@@ -208,6 +208,9 @@ The proved arithmetic foundations are:
   Nat dot product for every guarded pair of points. Its guard can likewise
   be supplied as acceptance by the production point filter.
   The sums of two dot products used by transversality remain outstanding.
+- Eight coordinates bounded by 16000 imply a strict U32 bound for the paired
+  sum of four products. The bound is universal; connecting it to the actual
+  sum of two production dot expressions remains outstanding.
 
 The `word-*.bend` modules define these models, laws, proofs and fixtures;
 `arithmetic-*-proof.bend` contains supporting order and product algebra.
@@ -224,7 +227,8 @@ less-or-equal is rejected in `guarded_determinant`; bypassing the actual
 point-range filter is rejected in `accepted_points_determinant`. Substituting
 a wrong coordinate in the production dot expression fails `guarded_dot_exact`.
 The coordinate-sum mutant multiplies the sum by eight, making its bound
-false at the maximum coordinates; it fails in `sum_width_bound`.
+false at the maximum coordinates; it fails in `sum_width_bound`. The analogous
+four-product mutant is rejected in `width_bound`.
 These are shared-lemma rejections, rather than
 failures in the public law sections. The U32 sum-wrapper mutant is checked
 against a literal instance of its law, with the premise independently accepted;
