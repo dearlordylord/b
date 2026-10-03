@@ -52,6 +52,8 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ("topology.bend", "def negative(c: Cmp) -> Bool:\n  match c:\n    case LT{}: True{}\n    case EQ{}: False{}\n    case GT{}: False{}", "def negative(c: Cmp) -> Bool:\n  match c:\n    case LT{}: True{}\n    case EQ{}: True{}\n    case GT{}: False{}", "negative_cmp_exact"),
+        ("topology.bend", "def positive(c: Cmp) -> Bool:\n  match c:\n    case LT{}: False{}\n    case EQ{}: False{}\n    case GT{}: True{}", "def positive(c: Cmp) -> Bool:\n  match c:\n    case LT{}: False{}\n    case EQ{}: True{}\n    case GT{}: True{}", "positive_cmp_exact"),
         ("topology.bend", "def nonnegative(c: Cmp) -> Bool:\n  match c:\n    case LT{}: False{}\n    case EQ{}: True{}\n    case GT{}: True{}", "def nonnegative(c: Cmp) -> Bool:\n  match c:\n    case LT{}: False{}\n    case EQ{}: False{}\n    case GT{}: True{}", "nonnegative_exact"),
         ("topology.bend", "nonnegative(side(d, a, w))", "True{}", "inside_bounds"),
         ("topology.bend", "inside(w, a) && inside(w, b) && inside(w, c)", "inside(w, a) && inside(w, b) && True{}", "common_arithmetic_exact"),
@@ -143,6 +145,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif law in {"negative_cmp_exact", "positive_cmp_exact"}:
+                proof_root = "SAT_ARITHMETIC_PROOF.bend"
             elif law in {"nonnegative_exact", "inside_bounds", "common_arithmetic_exact", "natural_ready"}:
                 proof_root = "INSIDE_ARITHMETIC_PROOF.bend"
             elif law in {"raw_cell_envelope", "reversed_fields", "walk_bound", "neighbors_envelope"}:

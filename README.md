@@ -34,7 +34,7 @@ commands; this avoids an expensive combined optimization step on shared
 machines. Other platforms retain Bend's native build command. Proof checks
 use the same five-second BendTT gate on every platform.
 
-`check.py` runs the 120-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 122-law proof gate, 200 literal arithmetic checks,
 seven executed validator boundary checks, three executed transverse cases,
 four executed cell-transverse cases and rejection beyond each source-coordinate limit,
 compiling mutations that must fail
@@ -528,3 +528,20 @@ intersection/search soundness remains part of stage 2. Intersection
 correctness, enumeration correctness and the formal topological bridge in stages 2–4 are also outstanding. Finite artwork
 checks and the externally justified topology certificate remain as described
 above; they are not substitutes for these universal proofs.
+
+Strict-side arithmetic bridge: two additional public laws identify the native
+negative and positive vertex-side predicates with exact natural comparisons
+under the existing coordinate envelopes. Zero determinants are excluded by
+both strict predicates. Two compiling controls change that boundary behavior
+and are rejected in the shared `negative_cmp_exact` and `positive_cmp_exact`
+helpers. This bridge does not yet prove the composed separation or convexity
+checks, or their geometric interpretation.
+
+Validation of the strict-side bridge: `taskset -c 7,11 python3 -u check.py`
+passed 122 unique public laws across eighteen roots, all fixture groups,
+76 compiling mutations and the independent artifact checks.
+`taskset -c 7,11 ./regenerate.sh` passed and preserved `b.svg` byte for byte.
+Implementer self-review covered the new natural comparison owner, its
+existing vertex-side dependency, root registration and mutation routing;
+no weakened preconditions or production changes were found. Composed
+separation/convexity and their geometric meaning remain unproved.
