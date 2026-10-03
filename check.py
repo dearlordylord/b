@@ -144,6 +144,10 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ('candidate-existence.bend', 'S.admit(h,q,r) || any_valid(t,q,r)', 'S.admit(h,q,r) && any_valid(t,q,r)', 'scan_found_exact'),
+        ('candidate-existence.bend', 'S.admit(h,q,r) || any_valid(t,q,r)', 'any_valid(t,q,r)', 'scan_found_exact'),
+        ('candidate-existence.bend', 'case S.Hit{p}: True{}', 'case S.Hit{p}: False{}', 'choice_found'),
+        ('candidate-existence.bend', 'case S.Miss{}: False{}', 'case S.Miss{}: True{}', 'scan_found_exact'),
         ('intersection-search.bend', 'case True{}: Hit{p}', 'case True{}: Miss{}', 'choice_sound'),
         ('intersection-search.bend', 'case False{}: fallback', 'case False{}: Hit{p}', 'choice_sound'),
         ('intersection-search.bend', 'G.positive_denominator(p) && Region.contains(p, q) && Region.contains(p, r)', 'Region.contains(p, q) && Region.contains(p, r)', 'find_hit_common_hull'),
@@ -365,6 +369,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif file == "candidate-existence.bend":
+                proof_root = "CANDIDATE_EXISTENCE_PROOF.bend"
             elif file == "intersection-search.bend":
                 proof_root = "INTERSECTION_SEARCH_PROOF.bend"
             elif file == "segment-cut.bend":
@@ -605,6 +611,8 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        bend(directory, "candidate-existence-tests.bend", "--verdict")
+        print("Candidate existence fixtures accepted: actual witness, empty list, appended hit and invalid denominator")
         bend(directory, "intersection-search-tests.bend", "--verdict")
         print("Exact intersection search fixtures accepted: first hit, denominator validity, exterior skip, reversed cut, disjoint boxes and vertex contact")
         bend(directory, "segment-cut-tests.bend", "--verdict")
@@ -628,7 +636,15 @@ if __name__ == "__main__":
         bend(directory, "homogeneous-combination-tests.bend", "--verdict")
         print("Homogeneous combination fixtures accepted: unequal denominators, boundary, zero weights and affine mean")
         executable = directory / "search-witness-tests"
-        build = subprocess.run(["bend", "search-witness-tests.bend", "-o", str(executable)], cwd=directory, capture_output=True, text=True, timeout=5)
+        # Match regenerate.sh: keep C emission and native compilation bounded
+        # separately, avoiding Bend's default optimizer on this large fixture.
+        if sys.platform.startswith("linux"):
+            source = directory / "search-witness-tests.c"
+            build = subprocess.run(["bend", "search-witness-tests.bend", "-o", str(source)], cwd=directory, capture_output=True, text=True, timeout=5)
+            assert build.returncode == 0, build.stdout + build.stderr
+            build = subprocess.run(["clang", "-O1", "-pthread", str(source), "-lm", "-o", str(executable)], cwd=directory, capture_output=True, text=True, timeout=5)
+        else:
+            build = subprocess.run(["bend", "search-witness-tests.bend", "-o", str(executable)], cwd=directory, capture_output=True, text=True, timeout=5)
         assert build.returncode == 0, build.stdout + build.stderr
         result = subprocess.run([str(executable)], cwd=directory, capture_output=True, text=True, timeout=5)
         assert result.returncode == 0 and "search-witness-tests: True" in result.stdout, result.stdout + result.stderr

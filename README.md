@@ -1684,3 +1684,54 @@ the missing convex-polygon existence theorem.
 `taskset -c 7,11 ./regenerate.sh` passed all 40 real proof roots, native
 generation, and the independent geometry/topology checks with the original
 limits. `git diff --exit-code -- b.svg` confirmed byte-identical output.
+
+### List-level candidate existence (stage 2, incomplete)
+
+`candidate-existence.bend` distinguishes successful search from the independent
+Boolean fold `any_valid` over the input list. Five universal laws prove equality
+of these decisions for every list, construct the actual returned point and its
+acceptance proof from a true fold, lift equality to public `find`, distribute
+existence over list concatenation, and show that an actual `Miss` certifies no
+valid candidate in that list. These laws require no strict-convexity premise;
+that premise belongs to the later hull and geometric-completeness consumers.
+
+Real BendTT accepted the new universal proof and four literal constructions:
+extraction of an actual witness after invalid/exterior entries, empty-list
+absence, an accepted appended candidate, and zero-denominator rejection.
+Four compiling controls replace OR by AND, skip the head candidate, classify
+Hit as false, or classify Miss as true. Their proof failures were checked at
+`scan_found_exact` or shared `choice_found`. These are handwritten controls,
+not bend-falsify. The complete final `taskset -c 7,11 python3 -u check.py` run
+passed 274 public laws across 41 roots, all new and existing fixtures, 198
+compiling mutation controls, and independent artifact checks.
+
+The first full attempt failed because direct native compilation of the existing
+`search-witness-tests.bend` exceeded five seconds. On Linux that fixture now
+uses the same build path as `regenerate.sh`: Bend emits C under a five-second
+limit, then clang compiles it with `-O1` under another five-second limit. This
+keeps the executable tests and their assertions intact, reuses the existing
+clang toolchain, and avoids the default optimizer that caused recurring native
+build timeouts. Each subprocess retains its original limit; proof gates are
+unchanged. The successful full run used this path. The earlier failed run is
+not counted as passing validation.
+
+This closes list traversal completeness, not geometric completeness. The missing
+geometric theorem must establish `any_valid(candidates(q,r),q,r)=true` from
+actual convex-hull intersection (or strict-quad SAT acceptance). Without that
+bridge, `Miss` cannot certify geometric disjointness. Native triple-search
+completeness, independent complex enumeration and actual SVG-fill topology
+remain open. No generator or SVG output was changed.
+
+Implementer self-review: `any_valid` is a fold of the existing domain and
+halfplane predicate, not a renamed `found` result. The recursive equality proof
+covers empty lists and both accepted/rejected heads; witness extraction retains
+actual search equality and invokes the existing universal hit-soundness law.
+Concatenation preserves the OR condition. The later geometric-completeness
+consumer must supply existence in the generated list, which none of these laws
+assumes. Existing geometry owners and the native generator remain unchanged.
+
+`taskset -c 7,11 ./regenerate.sh` passed all 41 proof roots, native generation,
+and independent geometry/topology checks. `git diff --exit-code -- b.svg`
+confirmed byte-identical output. The Linux native-build harness change was
+self-reviewed against the existing regeneration path and passed the actual
+native fixture in the successful complete run.
