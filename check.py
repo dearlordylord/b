@@ -52,6 +52,12 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ('quad-hull.bend', 'Q.embed(d), m, n)', 'Q.embed(d), m, 0n)', 'quad_weighted_fields'),
+        ('quad-hull.bend', 'm, n), 1n, 1n)', 'm, n), 1n, 0n)', 'quad_weighted_fields'),
+        ('quad-hull.bend', 'Q.embed(b), k, l)', 'Q.embed(b), l, k)', 'quad_weighted_fields'),
+        ('quad-hull.bend', 'Nat.add(Nat.add(k, l), Nat.add(m, n))', 'Nat.add(Nat.add(k, l), m)', 'denominator_sum'),
+        ('quad-hull.bend', 'Nat.is_gt(weight_total(k, l, m, n), 0n)', 'True{}', 'hull_point_inside'),
+        ('quad-hull.bend', 'G.positive_denominator(p)', 'True{}', 'hull_point_positive'),
         ('quad-geometry.bend', 'G.P{x, y, 1n}', 'G.P{x, y, 2n}', 'cyclic_fields'),
         ('quad-geometry.bend', '&& turn(d, a, b)', '&& True{}', 'strict_quad_corners_inside'),
         ('quad-geometry.bend', 'Cmp.is_gt(side(a, b, c))', 'Cmp.is_lt(side(a, b, c))', 'edge_turn'),
@@ -210,6 +216,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif law in {"quad_weighted_fields", "denominator_sum", "hull_point_inside", "hull_point_positive"}:
+                proof_root = "QUAD_HULL_PROOF.bend"
             elif law in {"cyclic_fields", "strict_quad_corners_inside", "edge_turn"}:
                 proof_root = "QUAD_GEOMETRY_PROOF.bend"
             elif law in {"weighted_fields", "mixture_denominator_exact"}:
@@ -424,6 +432,8 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        bend(directory, "quad-hull-tests.bend", "--verdict")
+        print("Quad hull fixtures accepted: four weights, zero pairs, positivity and alternate fraction witness")
         bend(directory, "quad-geometry-tests.bend", "--verdict")
         print("Quad geometry fixtures accepted: corners, orientation, missing fourth turn and collinearity")
         bend(directory, "homogeneous-combination-tests.bend", "--verdict")

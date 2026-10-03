@@ -1061,3 +1061,72 @@ mixture closure; reverse inclusion and topology are not assumed here.
 `taskset -c 7,11 ./regenerate.sh` passed with the existing five-second kernel
 limits, and `git diff --exit-code -- b.svg` confirmed byte-identical output.
 Stages 2–4 remain open at the bridges described above.
+
+### Stage 2: rational corner hull is inside the region
+
+[Hull model](quad-hull.bend), [seven laws](quad-hull-laws.bend) and
+[proof root](QUAD_HULL_PROOF.bend) define a rational four-corner hull and prove
+its inclusion in the existing half-plane region. The model reuses natural cover
+vertices, denominator-one embedding and homogeneous combination; it introduces
+no new word-arithmetic, polygon-fill or topological policy.
+
+`weighted(q, k, l, m, n)` combines all four embedded corners, using nonnegative
+Nat weights. An independent polynomial reference in the law module verifies
+both coordinates and the denominator, which is exactly `(k+l)+(m+n)`.
+`InHull(q, p)` is an existential witness of those four weights with positive
+sum, positive denominator of p, and cross-product equivalence between p and
+the generated weighted point. It allows arbitrary unreduced fractional
+representations; it does not admit a zero-denominator point or zero total
+weight. `hull_point_positive` exposes the representation validity directly.
+
+`weighted_quad_inside` derives region membership from corner membership via
+three proved homogeneous joins. It needs no positivity for either intermediate
+pair: one pair may have zero weights. Positivity of the **final** denominator
+is proved from the exact total instead. `hull_point_inside` transports that
+membership to the equivalent fraction p with both denominators proved positive.
+The production theorem obtains corner membership from the validator's accepted
+strict-convexity result under its actual 12-bit envelope. Thus every represented
+rational hull point of a guarded, accepted production quad passes its decoded
+half-plane region. The conclusion uses exact Nat geometry; the guarded
+production bridge supplies the input quad’s corner membership.
+
+[Ten fixture judgments/constructions](quad-hull-tests.bend) cover asymmetric
+four-way weights, fourth-corner-only weights, either zero intermediate pair,
+zero total, and a reconstructed equivalent fraction. For the square with
+corners `(1,1),(3,1),(3,3),(1,3)`, weights `(1,2,3,4)` produce `(20,24,10)`;
+the membership witness for `(10,12,5)` is explicitly constructed and consumed
+by the membership and positivity theorems.
+
+Six compiling mutation controls omit the fourth weight, omit the second pair,
+swap the first pair's weights, omit n from the total, allow zero total weight,
+and allow zero-denominator membership. The first three fail at shared
+`quad_weighted_fields`, the fourth at shared `denominator_sum`, and the last two
+at the public `hull_point_inside` and `hull_point_positive` laws. The last two
+expand the membership domain: their countercases are deliberately excluded by
+the original guards. Allowing all-zero weights admits arbitrary positive
+fraction points because cross-product equivalence with `(0,0,0)` is vacuous;
+allowing zero denominators admits `(0,0,0)` as equivalent to any weighted point.
+These are domain-integrity controls, not claims that those cases were accepted
+by the original `InHull` type.
+
+Only hull-to-region inclusion is proved. Region-to-hull inclusion is still
+required before the two can be identified, and there is no real-number or SVG
+fill equivalence theorem here. Intersection characterization, independent
+complex enumeration and the actual topological bridge remain open in stages
+2–4.
+
+Validation: `taskset -c 7,11 python3 -u check.py` passed all 209 public
+laws across 32 proof roots, ten new fixture judgments/constructions and the
+existing groups, 147 compiling mutation controls and independent artifact
+checks. Implementer self-review found no violations of the stated contracts:
+it traced all four labelled weights, the independent coordinate reference,
+exact total denominator, either zero intermediate pair, positive final sum,
+positive candidate denominator, equivalence transport, existential witness
+unpacking and the guarded production corner theorem. Nat coordinates, quad
+identity and region policies remain in their existing owners. The future
+region-to-hull proof can construct this membership witness directly; no reverse
+inclusion or topology is assumed by the present proof.
+`taskset -c 7,11 ./regenerate.sh` passed with the existing five-second kernel
+limits; `git diff --exit-code -- b.svg` confirmed byte-identical output.
+Stages 2–4 remain unfinished at the reverse-inclusion, intersection, enumeration
+and topology bridges stated above.
