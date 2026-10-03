@@ -1,4 +1,5 @@
 import Base
+import ./coordinate-limit.bend as Limit
 import ./scaled-coordinate.bend as M
 import ./topology.bend as T
 import ./core.bend as Core
@@ -7,7 +8,7 @@ import ./word-arithmetic.bend as W
 import ./coordinate-facts.bend as Coordinates
 import ./coordinate-support.bend as Support
 import ./division-order-proof.bend as Order
-import ./centroid-proof.bend as Quarter
+import ./centroid-model-proof.bend as Quarter
 import ./word-division4-laws.bend as Division
 import ./word-division4-proof.bend as DivisionProof
 import ./word-conversion.bend as C
@@ -24,7 +25,7 @@ def divided_envelope(+width: Nat, +x: Nat, h: {Nat.is_le(x, W.capacity(2n+width)
   %Quarter.quarter_four(W.capacity(width)) : {Nat.is_le(Nat.div(x, 4n), _) == True{} : Bool}
   Order.div_le_div(x, W.capacity(2n+width), 3n, h)
 
-def source_envelope(+width: Nat, hw: {width == 12n : Nat}, +x: Nat, h: {Nat.is_le(x, 16000n) == True{} : Bool}) -> {Nat.is_le(x, W.capacity(2n+width)) == True{} : Bool}:
+def source_envelope(+width: Nat, hw: {width == 12n : Nat}, +x: Nat, h: {Nat.is_le(x, Limit.maximum()) == True{} : Bool}) -> {Nat.is_le(x, W.capacity(2n+width)) == True{} : Bool}:
   %Equal.sym(Nat, 2n+width, 14n, source_width(width, hw)) : {Nat.is_le(x, W.capacity(_)) == True{} : Bool}
   Coordinates.coordinate14(x, h)
 

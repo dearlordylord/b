@@ -15,7 +15,7 @@ Python checker also inspects the resulting SVG.
 
 ## Generate and check
 
-Requirements: Bend **2.0.34**, a C compiler supported by Bend, Python 3, and GNU
+Requirements: Bend **2.0.34**, Clang 14+ for native compilation, Python 3, and GNU
 `timeout`. The proof gate additionally requires Bend's BendTT kernel for
 `--verdict`; this repository does not install toolchains automatically.
 
@@ -29,9 +29,14 @@ python3 check.py
 `regenerate.sh` checks the proofs with BendTT, compiles and executes
 `generate.bend`, checks the emitted SVG, and replaces `b.svg` only on success.
 The generator itself refuses to emit an SVG if its Bend artwork validation fails.
+On Linux, C emission and Clang `-O1` compilation are separate five-second
+commands; this avoids an expensive combined optimization step on shared
+machines. Other platforms retain Bend's native build command. Proof checks
+use the same five-second BendTT gate on every platform.
 
-`check.py` runs the 104-law proof gate, 200 literal arithmetic checks,
+`check.py` runs the 105-law proof gate, 200 literal arithmetic checks,
 seven executed validator boundary checks, three executed transverse cases,
+four executed cell-transverse cases and rejection beyond each source-coordinate limit,
 compiling mutations that must fail
 proofs, invalid artworks that must be rejected before SVG emission, and Bend
 and independent Python topology fixtures. Python checks the output artifact;
@@ -409,6 +414,40 @@ Validation of the side-composition milestone: the ordinary complete
 fixture group, all 56 compiling mutations and independent SVG geometry and
 topology checks. Each kernel invocation retained the five-second limit.
 `regenerate.sh` also passed all thirteen roots and preserved the SVG byte for byte.
+
+The source-corner transverse root adds one public law. The four actual
+`point_bounded` predicates on a cell's source corners imply that production
+`cell_transverse` agrees with the independent natural-number model. The
+control-point envelope is derived from averaging those corners, rather than
+supplied by the caller. The result covers accepted and rejected sections,
+including rounded controls and degenerate sections.
+
+The source-coordinate limit now has one transparent definition in
+`coordinate-limit.bend`; a kernel-checked fixture pins it to 16000. This keeps
+repeated numeral expansions out of BendTT proof signatures. The independent mean and center model
+lives in `centroid-model-laws.bend` and `centroid-model-proof.bend`; shared
+centroid bounds live in `centroid-bounds-proof.bend`. Both centroid validation
+and the new transverse composition consume that proof. Its intermediate
+limit stays symbolic, preventing a large closed division from being executed
+while checking the composition. The public cell law retains only the four
+source-corner guards.
+
+Four native cell fixtures cover forward projection, reversal, a degenerate
+section, and the inclusive coordinate boundary. Two additional native
+checks reject 16001 in either source coordinate. Two compiling model
+mutations replace the seam's ending section or its centroid; each must be
+rejected in the public `source_corners_transverse_exact` proof section.
+
+Validation of the source-corner composition milestone: the complete
+`taskset -c 7,11 python3 -u check.py` passed all 105 unique public laws across
+fourteen roots, every fixture group, all 58 compiling mutations, and the
+independent SVG geometry and topology checks. `taskset -c 7,11 ./regenerate.sh`
+also passed and reproduced `b.svg` byte for byte. Every successful proof
+invocation retained the five-second limit. CPU affinity was used because
+unaffinitized attempts timed out in different existing proof or fixture
+groups on this shared machine. A trial mutation of the limit numeral crashed
+Bend's diagnostic normalization and was discarded; it is not counted among
+the rejected mutations. The new native build path was tested on Linux.
 
 **Stage 1 remains incomplete:** audit and connect every bounded search caller
 and remaining production arithmetic composition. Full

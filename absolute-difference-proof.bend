@@ -1,4 +1,5 @@
 import Base
+import ./coordinate-limit.bend as Limit
 import ./absolute-difference-laws.bend as L
 import ./absolute-difference.bend as D
 import ./absolute-order-proof.bend as O
@@ -46,12 +47,12 @@ def choice_bound(+a: Nat, +b: Nat, +limit: Nat, less: Bool, ha: {Nat.is_le(a, li
 def L.natural_absolute_bounded(a, b, limit, ha, hb):
   choice_bound(a, b, limit, Nat.is_lt(a, b), ha, hb)
 
-def converted_values(+a: Nat, +b: Nat, ha: {Nat.is_le(a, 16000n) == True{} : Bool}, hb: {Nat.is_le(b, 16000n) == True{} : Bool}) -> {D.exact(Word.to_nat(32n, C.from_nat(a, 32n)), Word.to_nat(32n, C.from_nat(b, 32n))) == D.exact(a, b) : Nat}:
+def converted_values(+a: Nat, +b: Nat, ha: {Nat.is_le(a, Limit.maximum()) == True{} : Bool}, hb: {Nat.is_le(b, Limit.maximum()) == True{} : Bool}) -> {D.exact(Word.to_nat(32n, C.from_nat(a, 32n)), Word.to_nat(32n, C.from_nat(b, 32n))) == D.exact(a, b) : Nat}:
   %Equal.sym(Nat, Word.to_nat(32n, C.from_nat(a, 32n)), a, Conversion.bounded_conversion(a, 32n, Coordinate.coordinate32(a, ha))) : {D.exact(_, Word.to_nat(32n, C.from_nat(b, 32n))) == D.exact(a, b) : Nat}
   %Equal.sym(Nat, Word.to_nat(32n, C.from_nat(b, 32n)), b, Conversion.bounded_conversion(b, 32n, Coordinate.coordinate32(b, hb))) : {D.exact(a, _) == D.exact(a, b) : Nat}
   {==}
 
-def converted_absolute(+a: Nat, +b: Nat, ha: {Nat.is_le(a, 16000n) == True{} : Bool}, hb: {Nat.is_le(b, 16000n) == True{} : Bool}) -> {U32.to_nat(V.absolute_difference(U32{C.from_nat(a, 32n)}, U32{C.from_nat(b, 32n)})) == D.exact(a, b) : Nat}:
+def converted_absolute(+a: Nat, +b: Nat, ha: {Nat.is_le(a, Limit.maximum()) == True{} : Bool}, hb: {Nat.is_le(b, Limit.maximum()) == True{} : Bool}) -> {U32.to_nat(V.absolute_difference(U32{C.from_nat(a, 32n)}, U32{C.from_nat(b, 32n)})) == D.exact(a, b) : Nat}:
   Equal.trans(Nat, U32.to_nat(V.absolute_difference(U32{C.from_nat(a, 32n)}, U32{C.from_nat(b, 32n)})), D.exact(Word.to_nat(32n, C.from_nat(a, 32n)), Word.to_nat(32n, C.from_nat(b, 32n))), D.exact(a, b), L.u32_absolute_exact(C.from_nat(a, 32n), C.from_nat(b, 32n)), converted_values(a, b, ha, hb))
 
 def L.guarded_coordinate_absolute(a, b, ha, hb):

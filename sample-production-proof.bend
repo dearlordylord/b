@@ -1,4 +1,5 @@
 import Base
+import ./coordinate-limit.bend as Limit
 import ./capacity-facts.bend as Capacity
 import ./order-facts.bend as O
 import ./coordinate-support.bend as Coordinate
@@ -67,7 +68,7 @@ def L.vertex_witness_envelope(width, p, hp):
 def natural_weight_guard(+n: Nat, +hn: {Nat.is_le(n, 64n) == True{} : Bool}) -> {U32.is_le(U32.from_nat(n), 64) == True{} : Bool}:
   %Equal.sym(U32, U32.from_nat(n), U32{C.from_nat(n, 32n)}, Conversion.u32_conversion_agrees(n)) : {U32.is_le(_, 64) == True{} : Bool}
   %Equal.sym(Bool, U32.is_le(U32{C.from_nat(n, 32n)}, U32{M.sixty_four()}), Nat.is_le(Word.to_nat(32n, C.from_nat(n, 32n)), Word.to_nat(32n, M.sixty_four())), Compare.u32_less_equal_exact(C.from_nat(n, 32n), M.sixty_four())) : {_ == True{} : Bool}
-  %Equal.sym(Nat, Word.to_nat(32n, C.from_nat(n, 32n)), n, Conversion.bounded_conversion(n, 32n, Coordinate.coordinate32(n, O.le_trans(n, 64n, 16000n, hn, {==})))) : {Nat.is_le(_, 64n) == True{} : Bool}
+  %Equal.sym(Nat, Word.to_nat(32n, C.from_nat(n, 32n)), n, Conversion.bounded_conversion(n, 32n, Coordinate.coordinate32(n, O.le_trans(n, 64n, Limit.maximum(), hn, {==})))) : {Nat.is_le(_, 64n) == True{} : Bool}
   hn
 
 def successor_bound(+n: Nat, hn: {Nat.is_le(n, 63n) == True{} : Bool}) -> {Nat.is_le(1n+n, 64n) == True{} : Bool}:

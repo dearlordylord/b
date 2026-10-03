@@ -1,4 +1,5 @@
 import Base
+import ./coordinate-limit.bend as Limit
 import ./validation.bend as V
 import ./absolute-difference.bend as D
 
@@ -24,6 +25,6 @@ law natural_absolute_bounded:
 law guarded_coordinate_absolute:
   for +a: Nat
   for +b: Nat
-  for ha: {Nat.is_le(a, 16000n) == True{} : Bool}
-  for hb: {Nat.is_le(b, 16000n) == True{} : Bool}
+  for ha: {Nat.is_le(a, Limit.maximum()) == True{} : Bool}
+  for hb: {Nat.is_le(b, Limit.maximum()) == True{} : Bool}
   {U32.to_nat(V.absolute_difference(U32.from_nat(a), U32.from_nat(b))) == D.exact(a, b) : Nat}

@@ -1,4 +1,5 @@
 import Base
+import ./coordinate-limit.bend as Limit
 import ./word-arithmetic.bend as W
 import ./word-range-laws.bend as R
 import ./word-range-proof.bend as P
@@ -7,17 +8,17 @@ import ./capacity-facts.bend as Capacity
 import ./arithmetic-product-proof.bend as A
 import ./facts.bend as F
 
-def threshold_value() -> {Word.to_nat(14n, WCon{False{}, WCon{False{}, WCon{False{}, WCon{False{}, WCon{False{}, WCon{False{}, WCon{False{}, WCon{True{}, WCon{False{}, WCon{True{}, WCon{True{}, WCon{True{}, WCon{True{}, WCon{True{}, WNil{}}}}}}}}}}}}}}}) == 16000n : Nat}:
+def threshold_value() -> {Word.to_nat(14n, WCon{False{}, WCon{False{}, WCon{False{}, WCon{False{}, WCon{False{}, WCon{False{}, WCon{False{}, WCon{True{}, WCon{False{}, WCon{True{}, WCon{True{}, WCon{True{}, WCon{True{}, WCon{True{}, WNil{}}}}}}}}}}}}}}}) == Limit.maximum() : Nat}:
   {==}
-def threshold_lt() -> {Nat.is_lt(16000n, W.capacity(14n)) == True{} : Bool}:
+def threshold_lt() -> {Nat.is_lt(Limit.maximum(), W.capacity(14n)) == True{} : Bool}:
   R.word_value_bounded(14n, WCon{False{}, WCon{False{}, WCon{False{}, WCon{False{}, WCon{False{}, WCon{False{}, WCon{False{}, WCon{True{}, WCon{False{}, WCon{True{}, WCon{True{}, WCon{True{}, WCon{True{}, WCon{True{}, WNil{}}}}}}}}}}}}}}})
 
 law coordinate14:
   for +a: Nat
-  for h: {Nat.is_le(a, 16000n) == True{} : Bool}
+  for h: {Nat.is_le(a, Limit.maximum()) == True{} : Bool}
   {Nat.is_le(a, W.capacity(14n)) == True{} : Bool}
 def coordinate14(a, h):
-  O.le_trans(a, 16000n, W.capacity(14n), h, O.le_of_lt(16000n, W.capacity(14n), threshold_lt()))
+  O.le_trans(a, Limit.maximum(), W.capacity(14n), h, O.le_of_lt(Limit.maximum(), W.capacity(14n), threshold_lt()))
 
 law product_from_width:
   for +n: Nat

@@ -52,6 +52,8 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ("cell-transverse.bend", "C.boundary_right(C.cell_start(cell))", "C.boundary_right(C.cell_finish(cell))", "source_corners_transverse_exact"),
+        ("cell-transverse.bend", "M.center(cell)", "C.boundary_left(C.cell_finish(cell))", "source_corners_transverse_exact"),
         ("side-bridge.bend", "case (x, (y, d)): points(a, b, x, y, d)", "case (x, (y, d)): points(a, b, y, x, d)", "accepted_side_exact"),
         ("side-bridge.bend", "A.exact_side(U32.to_nat(ax), U32.to_nat(ay), U32.to_nat(bx), U32.to_nat(by), x, y, d)", "A.exact_side(U32.to_nat(bx), U32.to_nat(by), U32.to_nat(ax), U32.to_nat(ay), x, y, d)", "accepted_side_exact"),
         ("topology.bend", "case P{x, y}: W{x, y, 1}", "case P{x, y}: W{x, y, 0}", "vertex_witness_exact"),
@@ -79,7 +81,7 @@ def negative_controls(directory):
         ("word-sum4.bend", "Word.mul(n, g, h)", "Word.add(n, g, h)", "finish"),
         ("coordinate-sum4.bend", "Nat.add(Nat.add(Nat.mul(a, b), Nat.mul(c, d)), Nat.add(Nat.mul(e, f), Nat.mul(g, h)))", "Nat.mul(8n, Nat.add(Nat.add(Nat.mul(a, b), Nat.mul(c, d)), Nat.add(Nat.mul(e, f), Nat.mul(g, h))))", "width_bound"),
         ("validation.bend", "U32.from_nat(x) * U32.from_nat(z) + U32.from_nat(y) * U32.from_nat(w)", "U32.from_nat(x) * U32.from_nat(w) + U32.from_nat(y) * U32.from_nat(z)", "guarded_dot_exact"),
-        ("validation.bend", "Nat.is_le(x, 16000n) && Nat.is_le(y, 16000n)", "True{}", "accepted_points_determinant"),
+        ("validation.bend", "Nat.is_le(x, Limit.maximum()) && Nat.is_le(y, Limit.maximum())", "True{}", "accepted_points_determinant"),
         ("validation.bend", "U32.is_gt(Arithmetic.u32_sum3(x, v, u, s, r, y), Arithmetic.u32_sum3(y, u, v, r, s, x))", "U32.is_le(Arithmetic.u32_sum3(x, v, u, s, r, y), Arithmetic.u32_sum3(y, u, v, r, s, x))", "guarded_determinant"),
         ("coordinate-sum.bend", "Nat.add(Nat.add(Nat.mul(a, b), Nat.mul(c, d)), Nat.mul(e, f))", "Nat.mul(8n, Nat.add(Nat.add(Nat.mul(a, b), Nat.mul(c, d)), Nat.mul(e, f)))", "sum_width_bound"),
         ("word-sum3.bend", "Word.mul(n, e, f)", "Word.add(n, e, f)", "sum3_finish"),
@@ -125,6 +127,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif law == "source_corners_transverse_exact":
+                proof_root = "CELL_TRANSVERSE_PROOF.bend"
             elif law == "accepted_side_exact":
                 proof_root = "SIDE_BRIDGE_PROOF.bend"
             elif law in {"numerator_limit", "sample_finish", "guarded_sample_exact", "vertex_witness_exact"}:
@@ -153,7 +157,10 @@ def negative_controls(directory):
                 proof_root = "PROOF.bend"
             else:
                 proof_root = "ARITHMETIC_PROOF.bend"
-            output = bend(directory, proof_root, success=False)
+            try:
+                output = bend(directory, proof_root, success=False)
+            except AssertionError as error:
+                raise AssertionError(f"Mutation {file}: {law} did not produce a proof diagnostic\n{error}") from error
             assert law in output, output
             if law == "accepted_side_exact":
                 (directory / "side-counter.bend").write_text(
@@ -300,6 +307,12 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        executable = directory / "cell-transverse-tests"
+        build = subprocess.run(["bend", "cell-transverse-tests.bend", "-o", str(executable)], cwd=directory, capture_output=True, text=True, timeout=5)
+        assert build.returncode == 0, build.stdout + build.stderr
+        result = subprocess.run([str(executable)], cwd=directory, capture_output=True, text=True, timeout=5)
+        assert result.returncode == 0 and "cell-transverse-tests: True" in result.stdout, result.stdout + result.stderr
+        print("Source-corner transverse fixtures accepted: forward, reversal, degenerate and envelope boundary")
         bend(directory, "side-bridge-tests.bend", "--verdict")
         print("Generated-witness side comparison fixtures accepted")
         bend(directory, "sample-arithmetic-tests.bend", "--verdict")

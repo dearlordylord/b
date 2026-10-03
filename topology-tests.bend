@@ -1,4 +1,5 @@
 import Base
+import ./coordinate-limit.bend as Limit
 import ./core.bend as Core
 import ./topology.bend as T
 import ./artwork.bend as Artwork
@@ -27,7 +28,7 @@ def touching() -> Bool:
   +a = box(0, 0, 4, 4)
   T.meets(a, box(4, 4, 8, 8)) && Bool.not(T.meets(a, box(5, 5, 9, 9)))
 def guards() -> Bool:
-  Bool.not(T.point_guard(Core.Pt{1n, 4n})) && Bool.not(T.point_guard(Core.Pt{16004n, 4n})) && T.point_guard(Core.Pt{16000n, 0n})
+  Bool.not(T.point_guard(Core.Pt{1n, 4n})) && Bool.not(T.point_guard(Core.Pt{16004n, 4n})) && T.point_guard(Core.Pt{Limit.maximum(), 0n})
 def bad_ribbons() -> Bool:
   +a = box(0, 0, 8, 8)
   Bool.not(T.ribbon([a, a, a])) && Bool.not(T.ribbon([T.reverse(a)])) && Bool.not(T.ribbon([])) && Bool.not(T.ribbon([a, box(12, 0, 16, 4)])) && T.ribbon([box(0, 0, 4, 4), box(4, 0, 8, 4)])

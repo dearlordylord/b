@@ -1,4 +1,5 @@
 import Base
+import ./coordinate-limit.bend as Limit
 import ./core.bend as Core
 import ./word-sum3.bend as Arithmetic
 
@@ -9,7 +10,7 @@ import ./word-sum3.bend as Arithmetic
 def point_bounded(p: Core.Point) -> Bool:
   match p:
     case Core.Pt{x, y}:
-      Nat.is_le(x, 16000n) && Nat.is_le(y, 16000n)
+      Nat.is_le(x, Limit.maximum()) && Nat.is_le(y, Limit.maximum())
 
 def sections_bounded(sections: List<&2, Core.Section>) -> Bool:
   match sections:

@@ -1,4 +1,5 @@
 import Base
+import ./coordinate-limit.bend as Limit
 import ./word-arithmetic.bend as W
 import ./coordinate-sum.bend as S
 import ./coordinate-sum-laws.bend as L
@@ -42,7 +43,7 @@ law sum_width_fits:
 def sum_width_fits(width, a, b, c, d, e, f, ha, hb, hc, hd, he, hf):
   O.lt_of_le_of_lt(S.exact(a, b, c, d, e, f), W.capacity(2n+Nat.add(width, width)), W.capacity(Nat.add(2n+Nat.add(width, width), 2n)), sum_width_bound(width, a, b, c, d, e, f, ha, hb, hc, hd, he, hf), Capacity.capacity_grows(2n+Nat.add(width, width), 1n))
 
-def coordinate_width(+width: Nat, +a: Nat, hw: {width == 14n : Nat}, h: {Nat.is_le(a, 16000n) == True{} : Bool}) -> {Nat.is_le(a, W.capacity(width)) == True{} : Bool}:
+def coordinate_width(+width: Nat, +a: Nat, hw: {width == 14n : Nat}, h: {Nat.is_le(a, Limit.maximum()) == True{} : Bool}) -> {Nat.is_le(a, W.capacity(width)) == True{} : Bool}:
   %Equal.sym(Nat, width, 14n, hw) : {Nat.is_le(a, W.capacity(_)) == True{} : Bool}
   C.coordinate14(a, h)
 

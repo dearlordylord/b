@@ -1,4 +1,5 @@
 import Base
+import ./coordinate-limit.bend as Limit
 import ./core.bend as Core
 
 # Exact closed convex cover. Homogeneous witnesses have denominator 1 or 64.
@@ -25,7 +26,7 @@ type Counts is Data:
 def point_guard(p: Core.Point) -> Bool:
   match p:
     case Core.Pt{+x, +y}:
-      Nat.is_le(x, 16000n) && Nat.is_le(y, 16000n) && Nat.is_eq(Nat.mod(x, 4n), 0n) && Nat.is_eq(Nat.mod(y, 4n), 0n)
+      Nat.is_le(x, Limit.maximum()) && Nat.is_le(y, Limit.maximum()) && Nat.is_eq(Nat.mod(x, 4n), 0n) && Nat.is_eq(Nat.mod(y, 4n), 0n)
 def sections_guard(xs: List<&2, Core.Section>) -> Bool:
   match xs:
     case Nil{}: True{}

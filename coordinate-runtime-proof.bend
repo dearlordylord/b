@@ -1,4 +1,5 @@
 import Base
+import ./coordinate-limit.bend as Limit
 import ./coordinate-support.bend as Support
 import ./coordinate-runtime-laws.bend as L
 import ./coordinate-sum.bend as S
@@ -12,7 +13,7 @@ import ./word-sum3-laws.bend as A
 import ./word-sum3-proof.bend as SumProof
 import ./boolean-reflection.bend as ValidationProof
 
-def coordinate32(+a: Nat, h: {Nat.is_le(a, 16000n) == True{} : Bool}) -> {Nat.is_lt(a, W.capacity(32n)) == True{} : Bool}:
+def coordinate32(+a: Nat, h: {Nat.is_le(a, Limit.maximum()) == True{} : Bool}) -> {Nat.is_lt(a, W.capacity(32n)) == True{} : Bool}:
   Support.coordinate32(a, h)
 
 law exact_values:
@@ -71,10 +72,10 @@ def L.guarded_determinant(ax, ay, bx, by, cx, cy, hs):
       greater_values(M.u32_sum3(U32.from_nat(ax), U32.from_nat(by), U32.from_nat(bx), U32.from_nat(cy), U32.from_nat(cx), U32.from_nat(ay)), M.u32_sum3(U32.from_nat(ay), U32.from_nat(bx), U32.from_nat(by), U32.from_nat(cx), U32.from_nat(cy), U32.from_nat(ax)), S.exact(ax, by, bx, cy, cx, ay), S.exact(ay, bx, by, cx, cy, ax), L.guarded_runtime_sum(ax, by, bx, cy, cx, ay, S.Bound{hax, hby, hbx, hcy, hcx, hay}), L.guarded_runtime_sum(ay, bx, by, cx, cy, ax, S.Bound{hay, hbx, hby, hcx, hcy, hax}))
 
 def bounds_from_pairs(+ax: Nat, +ay: Nat, +bx: Nat, +by: Nat, +cx: Nat, +cy: Nat,
-  pairs: ({Nat.is_le(ax, 16000n) == True{} : Bool} & {Nat.is_le(ay, 16000n) == True{} : Bool}) &
-  ({Nat.is_le(bx, 16000n) == True{} : Bool} & {Nat.is_le(by, 16000n) == True{} : Bool}) &
-  ({Nat.is_le(cx, 16000n) == True{} : Bool} & {Nat.is_le(cy, 16000n) == True{} : Bool})) -> S.Bounds<ax, ay, bx, by, cx, cy>:
+  pairs: ({Nat.is_le(ax, Limit.maximum()) == True{} : Bool} & {Nat.is_le(ay, Limit.maximum()) == True{} : Bool}) &
+  ({Nat.is_le(bx, Limit.maximum()) == True{} : Bool} & {Nat.is_le(by, Limit.maximum()) == True{} : Bool}) &
+  ({Nat.is_le(cx, Limit.maximum()) == True{} : Bool} & {Nat.is_le(cy, Limit.maximum()) == True{} : Bool})) -> S.Bounds<ax, ay, bx, by, cx, cy>:
   Support.bounds_from_pairs(ax, ay, bx, by, cx, cy, pairs)
 
 def L.accepted_points_determinant(ax, ay, bx, by, cx, cy, ha, hb, hc):
-  L.guarded_determinant(ax, ay, bx, by, cx, cy, bounds_from_pairs(ax, ay, bx, by, cx, cy, (ValidationProof.and_split(Nat.is_le(ax, 16000n), Nat.is_le(ay, 16000n), ha), (ValidationProof.and_split(Nat.is_le(bx, 16000n), Nat.is_le(by, 16000n), hb), ValidationProof.and_split(Nat.is_le(cx, 16000n), Nat.is_le(cy, 16000n), hc)))))
+  L.guarded_determinant(ax, ay, bx, by, cx, cy, bounds_from_pairs(ax, ay, bx, by, cx, cy, (ValidationProof.and_split(Nat.is_le(ax, Limit.maximum()), Nat.is_le(ay, Limit.maximum()), ha), (ValidationProof.and_split(Nat.is_le(bx, Limit.maximum()), Nat.is_le(by, Limit.maximum()), hb), ValidationProof.and_split(Nat.is_le(cx, Limit.maximum()), Nat.is_le(cy, Limit.maximum()), hc)))))

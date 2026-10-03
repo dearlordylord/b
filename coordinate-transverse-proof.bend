@@ -1,4 +1,5 @@
 import Base
+import ./coordinate-limit.bend as Limit
 import ./coordinate-transverse-laws.bend as L
 import ./coordinate-transverse.bend as T
 import ./coordinate-sum.bend as S
@@ -32,4 +33,4 @@ def L.guarded_transverse_exact(lx, ly, cx, cy, rx, ry, hs):
   transverse_finish(lx, ly, cx, cy, rx, ry, hs)
 
 def L.accepted_points_transverse(lx, ly, cx, cy, rx, ry, hleft, hcontrol, hright):
-  L.guarded_transverse_exact(lx, ly, cx, cy, rx, ry, Runtime.bounds_from_pairs(lx, ly, cx, cy, rx, ry, (ValidationProof.and_split(Nat.is_le(lx, 16000n), Nat.is_le(ly, 16000n), hleft), (ValidationProof.and_split(Nat.is_le(cx, 16000n), Nat.is_le(cy, 16000n), hcontrol), ValidationProof.and_split(Nat.is_le(rx, 16000n), Nat.is_le(ry, 16000n), hright)))))
+  L.guarded_transverse_exact(lx, ly, cx, cy, rx, ry, Runtime.bounds_from_pairs(lx, ly, cx, cy, rx, ry, (ValidationProof.and_split(Nat.is_le(lx, Limit.maximum()), Nat.is_le(ly, Limit.maximum()), hleft), (ValidationProof.and_split(Nat.is_le(cx, Limit.maximum()), Nat.is_le(cy, Limit.maximum()), hcontrol), ValidationProof.and_split(Nat.is_le(rx, Limit.maximum()), Nat.is_le(ry, Limit.maximum()), hright)))))
