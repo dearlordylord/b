@@ -4,7 +4,7 @@ import ./homogeneous-geometry-laws.bend as L
 import ./homogeneous.bend as H
 import ./facts.bend as F
 import ./boolean-reflection.bend as B
-import ./validation-proof.bend as Reflection
+import ./boolean-reflection.bend as Reflection
 
 def compare_add_left(+k: Nat, +a: Nat, +b: Nat) -> {Nat.cmp(Nat.add(k, a), Nat.add(k, b)) == Nat.cmp(a, b) : Cmp}:
   match k:

@@ -15,7 +15,7 @@ import ./halfplane-region.bend as Region
 import ./source-cells-proof.bend as Fields
 import ./facts.bend as F
 import ./boolean-reflection.bend as B
-import ./validation-proof.bend as Reflection
+import ./boolean-reflection.bend as Reflection
 
 def sum3(a: Nat, b: Nat, c: Nat) -> Nat:
   Nat.add(Nat.add(a, b), c)

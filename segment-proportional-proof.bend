@@ -7,7 +7,7 @@ import ./homogeneous-combination-laws.bend as CL
 import ./homogeneous-combination-proof.bend as CP
 import ./facts.bend as F
 import ./boolean-reflection.bend as B
-import ./validation-proof.bend as Reflection
+import ./boolean-reflection.bend as Reflection
 import ./halfplane-region.bend as Region
 import ./halfplane-region-laws.bend as RL
 import ./halfplane-region-proof.bend as RP

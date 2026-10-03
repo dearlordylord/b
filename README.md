@@ -2001,7 +2001,7 @@ ratio, replace equality with an inequality, or swap the second pair of join
 weights. Each fails in public `proportional_exact` or `same_point_exact` and
 has a checked literal refutation of that exact public law. The report laws
 have no premises; the swapped-weight example additionally checks a true ratio.
-Integrated validation and generator regeneration are pending at this checkpoint.
+Integrated validation of the subsequent boundary checkpoint passed all 302 public laws across 47 roots, all fixture groups and 223 compiling mutation controls. Regeneration also passed all 47 real proof roots, bounded native compilation and independent artifact checks. The generated SVG is byte-for-byte unchanged.
 
 Implementer self-review: the two pure reporting functions have exact contracts
 for all inputs, so constant acceptance cannot pass unnoticed. The algebraic
@@ -2016,24 +2016,124 @@ computed cut-gap proportion, implement interval clipping, or establish
 complete pair/triple search. Independent enumeration and the actual
 topological bridge remain open; stages 2–4 are unfinished.
 
-Validation checkpoint: the first integrated proportional-representative run
-timed out in unchanged `SOURCE_INSPECTION_PROOF.bend`; it is a failed run.
-Its separate repeat passed at the same five-second proof limit. A complete
-retry is pending with unchanged proof limits.
+Validation checkpoint: seven integrated attempts failed on five-second timeouts
+in existing `SOURCE_INSPECTION_PROOF.bend`, `QUAD_DIAGONAL_PROOF.bend`,
+`INSIDE_ARITHMETIC_PROOF.bend`, `NATURAL_COVER_PROOF.bend`,
+`quad-intersection-native-tests.bend`, `segment-provenance-tests.bend`, or
+`CELL_TRANSVERSE_PROOF.bend`.
+These runs are not passes. Separate repeats of all five timed-out roots passed under
+the same limit. CPU-affinity changes alone did not eliminate whole-run failures.
+The six original native assertions were preserved verbatim and partitioned
+into native and contact files; the six provenance assertions were likewise
+preserved verbatim and partitioned into combination and cut files. All are
+required by `check.py`, exactly once, and both revised groups passed separately.
+The last complete retry used normal affinity with unchanged limits and assertions and timed out in the existing transverse root. These historical failures were not passes. The proportional laws were published separately in `05a0793` with validation recorded as pending; the subsequent boundary checkpoint now passes the complete integrated gate, including both fixture partitions and all proportional laws/controls.
 
-The next integrated retry timed out in unchanged `QUAD_DIAGONAL_PROOF.bend`
-and is also a failed run. A sampled CPU utilization check found one of the
-previous two pinned CPUs busy and CPU 11 idle; the exact separate diagonal
-repeat passed pinned to CPU 11 with the same five-second limit. The next
-complete run uses that CPU without changing limits, statements or assertions.
 
-The CPU-11 integrated attempt also timed out, in unchanged
-`INSIDE_ARITHMETIC_PROOF.bend`; it is not a pass. That root's separate repeat
-passed under the same five-second limit on CPUs 7 and 11. CPU affinity alone
-has not eliminated these transient whole-run failures. The next complete
-retry is pending with the same assertions and proof limits.
+### Boundary-derived source coefficient proportion (stage 2, incomplete)
 
-The CPUs-6/11 complete attempt timed out in unchanged
-`NATURAL_COVER_PROOF.bend` and remains failed. That root's separate repeat
-passed with normal scheduler affinity at the same five-second limit. The
-next complete retry uses normal affinity; no gate is skipped or extended.
+`segment-boundary.bend` uses the actual determinant gaps of the source
+endpoints to classify a weighted point's boundary condition. Three universal
+laws prove exact equivalence between that computed ratio and the actual
+`Cut.on_line` decision, equivalence to the direct cut for a boundary point,
+and identical closed-region membership under valid nonempty point premises.
+The ratio is derived from the boundary, rather than supplied by the caller.
+A closed first endpoint and strictly outside second endpoint are explicit
+geometric premises. The inside gap may be zero; the boundary endpoint branch
+is included. The algebraic theorem allows zero weights, while geometric
+region transport requires positive endpoint denominators and a positive
+old coefficient total.
+
+The proof expands the actual positive and negative determinant sums using
+the existing segment-cut owner, reconstructs the endpoint gaps using the
+existing area/order owners, and cancels their identical common weighted
+terms. It reuses the gap regrouping from the halfplane clipping proof and
+the already checked proportional-representative transport. No numerical
+proportion premise, division, sampling or extra axiom is introduced.
+
+Nine fixture assertions cover a scaled coefficient boundary point, both
+interior and exterior rejection, an all-zero pair's algebraic boundary
+condition, direct-cut equivalence, region transport and zero-gap boundary
+endpoint equivalence. The first combined proof-fixture file exceeded the
+unchanged five-second limit; its five assertions were preserved verbatim
+and partitioned into classification and witness files, both of which passed
+separately. Three handwritten compiling controls always accept the ratio,
+swap the computed gaps, or use the saturated inside-area gap of the outside
+endpoint. Each fails at public `ratio_on_line_exact` and has a checked
+literal refutation with both geometric endpoint premises true. A preliminary
+wrong-endpoint mutation did not compile because it duplicated an affine
+parameter; it was discarded and is not counted as a compiling control.
+Integrated validation passed all 302 public laws across 47 roots, all fixture groups, 223 compiling mutation controls, invalid-artwork controls and independent exact SVG geometry/topology checks. Regeneration also passed all 47 real proof roots, bounded native compilation and independent artifact checks. The generated SVG is byte-for-byte unchanged.
+
+Implementer self-review: the new pure classification owner consumes actual
+source endpoints and shared gap/point calculations. The proof keeps boundary
+classification separate from denominator validity. The region theorem
+inherits the existing region owner's exact membership transport and uses
+the proved positive total of the direct cut. A later clipping iterator can
+now turn an on-boundary original-source representative into the direct
+candidate while preserving membership in both regions. It must still
+prove its selection, iteration, endpoint provenance and boundary-label
+invariants. The generator, native search and SVG are unchanged.
+
+Interval clipping, complete pair/triple search, independent enumeration
+and the actual topological bridge remain open. Stages 2–4 are unfinished.
+
+Validation checkpoint: the first integrated boundary run timed out in unchanged
+`COVER_ARITHMETIC_PROOF.bend`; that run is failed. The exact separate repeat
+passed under the same five-second limit. A complete retry is pending, including
+the previous proportional checkpoint's local fixture partitions and all new
+boundary assertions and controls.
+
+The next full boundary run timed out in unchanged `SEARCH_ARITHMETIC_PROOF.bend`.
+An exact separate attempt also timed out at five seconds (about 5.4 total child
+CPU seconds), so it was not treated as a passed gate. Inspection found that
+search imported the entire cover proof only for generic Boolean `or_two`.
+That checked helper now lives in the existing Boolean-reflection owner;
+cover retains its old entry point as a forwarding proof, and search consumes
+the shared owner directly. All 302 public laws remain in the 47-root manifest.
+The first post-change search attempt printed `ALL PROOFS CHECK` but still exited
+124 at the limit; that attempt is explicitly failed. The separate cover root
+passed, and the next exact search repeat passed under the same five-second
+limit on CPUs 7/11. A full run of this revised dependency graph is pending.
+
+The revised full run timed out in unchanged `INTERSECTION_SEARCH_PROOF.bend`.
+Inspection found another generic reflection dependency: geometric proofs
+imported the full artwork validator only for Nat equality reflection. The
+existing Boolean-reflection owner now supplies reflexivity/completeness;
+the validator retains forwarding entry points, and its public laws remain
+required by the manifest. Four geometric proof owners consume the shared
+reflection directly. Comparing import graphs against the published checkpoint
+reduces the intersection-search root from 129 modules/909 definitions to
+127 modules/866 definitions, without removing any public law from the overall
+47-root/302-law scope. The exact intersection-search and new boundary roots
+passed real BendTT after this change, at the same five-second limit. The subsequent complete integrated run passed all 302 laws, all fixture groups and 223 compiling controls. Regeneration subsequently passed all 47 real proof roots, bounded native compilation and independent artifact checks. The generated SVG is byte-for-byte unchanged.
+
+
+Reflection dependency self-review: the generic Boolean disjunction congruence
+and Nat equality reflection proofs were moved unchanged into their existing
+shared owner. Cover and validator retain forwarding entry points, while search
+and four geometric proof consumers depend directly on reflection. No public
+law, caller premise, mutant, fixture assertion or proof deadline was removed.
+The complete integrated gate validates all affected consumers and the native
+controls, not only the new boundary root. The trusted Base/compiler and the
+arithmetic library subset are unchanged.
+
+Regeneration checkpoint: after the successful complete integrated gate, the
+first regeneration attempt timed out in `INTERSECTION_SEARCH_PROOF.bend` before
+native compilation or SVG replacement. That regeneration attempt is failed;
+the subsequent unchanged-limit full-script retry passed all roots, native compilation and artifact checks.
+
+The CPUs-7/11 regeneration retry also timed out, in unchanged
+`INSIDE_ARITHMETIC_PROOF.bend`, before compilation/replacement. It is another
+failed regeneration run. The normal-affinity same-limit full-script retry passed all 47 roots, native compilation and independent geometry/topology checks. The already passed complete integrated gate is unchanged. Both prior regeneration attempts remain recorded as failed runs.
+
+
+Verified boundary checkpoint: `python3 -u check.py` completed with exit 0:
+302 unique public laws across 47 roots, all fixture groups and 223 compiling
+mutation controls; invalid artwork, SVG and independent topology controls also
+passed. The final `sh -x ./regenerate.sh` run completed with exit 0 at unchanged
+five-second proof/compilation limits. The independent artifact checks report
+3 tubes, 96 convex cells, 24 seams, one fill component and two holes (Euler -1;
+simplex counts [96, 146, 64, 15]). `git diff --exit-code -- b.svg` confirms the
+SVG is byte-for-byte unchanged. This is a verified implementation checkpoint,
+not completion of stages 2–4 or a universal topological bridge.

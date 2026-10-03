@@ -16,7 +16,7 @@ import ./absolute-order-proof.bend as Reflexive
 import ./order-facts.bend as Order
 import ./grid-scaling.bend as G
 import ./search-witness.bend as Search
-import ./cover-arithmetic-proof.bend as Cover
+import ./boolean-reflection.bend as B
 
 def inside_coords_values(+x: U32, +y: U32, +d: U32, q: T.Quad) -> {Inside.inside(T.W{x, y, d}, q) == M.inside_coords(U32.to_nat(x), U32.to_nat(y), U32.to_nat(d), q) : Bool}:
   match q:
@@ -44,23 +44,23 @@ def L.segment_search_arithmetic_exact(width, hw, p, q, fuel, a, b, c, ha, hb, hc
   match fuel:
     case Zero{}: {==}
     case Succ{+n}:
-      Cover.or_two(T.common(T.sample(p, q, U32.from_nat(Succ{n})), a, b, c), T.segment_search(n, p, q, a, b, c), M.common(M.sample(p, q, Succ{n}), a, b, c), M.segment_search(n, p, q, a, b, c), L.sample_common_arithmetic_exact(width, hw, p, q, Succ{n}, a, b, c, ha, hb, hc, hp, hq, SampleProof.successor_bound(n, Order.le_trans(n, Succ{n}, 63n, Reflexive.le_succ(n), hf))), L.segment_search_arithmetic_exact(width, hw, p, q, n, a, b, c, ha, hb, hc, hp, hq, Order.le_trans(n, Succ{n}, 63n, Reflexive.le_succ(n), hf)))
+      B.or_two(T.common(T.sample(p, q, U32.from_nat(Succ{n})), a, b, c), T.segment_search(n, p, q, a, b, c), M.common(M.sample(p, q, Succ{n}), a, b, c), M.segment_search(n, p, q, a, b, c), L.sample_common_arithmetic_exact(width, hw, p, q, Succ{n}, a, b, c, ha, hb, hc, hp, hq, SampleProof.successor_bound(n, Order.le_trans(n, Succ{n}, 63n, Reflexive.le_succ(n), hf))), L.segment_search_arithmetic_exact(width, hw, p, q, n, a, b, c, ha, hb, hc, hp, hq, Order.le_trans(n, Succ{n}, 63n, Reflexive.le_succ(n), hf)))
 def L.pair_search_arithmetic_exact(width, hw, p, xs, a, b, c, ha, hb, hc, hp, hx):
   match xs:
     case Nil{}: {==}
     case Con{+h, +t}:
-      Cover.or_two(T.segment_search(63n, p, h, a, b, c), T.pair_search(t, p, a, b, c), M.segment_search(63n, p, h, a, b, c), M.pair_search(t, p, a, b, c), L.segment_search_arithmetic_exact(width, hw, p, h, 63n, a, b, c, ha, hb, hc, hp, SearchProof.head_bound(width, h, t, hx), {==}), L.pair_search_arithmetic_exact(width, hw, p, t, a, b, c, ha, hb, hc, hp, SearchProof.tail_bound(width, h, t, hx)))
+      B.or_two(T.segment_search(63n, p, h, a, b, c), T.pair_search(t, p, a, b, c), M.segment_search(63n, p, h, a, b, c), M.pair_search(t, p, a, b, c), L.segment_search_arithmetic_exact(width, hw, p, h, 63n, a, b, c, ha, hb, hc, hp, SearchProof.head_bound(width, h, t, hx), {==}), L.pair_search_arithmetic_exact(width, hw, p, t, a, b, c, ha, hb, hc, hp, SearchProof.tail_bound(width, h, t, hx)))
 def L.all_pairs_arithmetic_exact(width, hw, xs, a, b, c, ha, hb, hc, hx):
   match xs:
     case Nil{}: {==}
     case Con{+h, +t}:
-      Cover.or_two(T.pair_search(t, h, a, b, c), T.all_pairs(t, a, b, c), M.pair_search(t, h, a, b, c), M.all_pairs(t, a, b, c), L.pair_search_arithmetic_exact(width, hw, h, t, a, b, c, ha, hb, hc, SearchProof.head_bound(width, h, t, hx), SearchProof.tail_bound(width, h, t, hx)), L.all_pairs_arithmetic_exact(width, hw, t, a, b, c, ha, hb, hc, SearchProof.tail_bound(width, h, t, hx)))
+      B.or_two(T.pair_search(t, h, a, b, c), T.all_pairs(t, a, b, c), M.pair_search(t, h, a, b, c), M.all_pairs(t, a, b, c), L.pair_search_arithmetic_exact(width, hw, h, t, a, b, c, ha, hb, hc, SearchProof.head_bound(width, h, t, hx), SearchProof.tail_bound(width, h, t, hx)), L.all_pairs_arithmetic_exact(width, hw, t, a, b, c, ha, hb, hc, SearchProof.tail_bound(width, h, t, hx)))
 def L.vertex_search_arithmetic_exact(width, hw, xs, a, b, c, ha, hb, hc, hx):
   match xs:
     case Nil{}: {==}
     case Con{+h, +t}:
-      Cover.or_two(T.common(T.witness(h), a, b, c), T.vertex_search(t, a, b, c), M.common(S.vertex_values(h), a, b, c), M.vertex_search(t, a, b, c), L.vertex_common_arithmetic_exact(width, hw, h, a, b, c, ha, hb, hc, SearchProof.head_bound(width, h, t, hx)), L.vertex_search_arithmetic_exact(width, hw, t, a, b, c, ha, hb, hc, SearchProof.tail_bound(width, h, t, hx)))
+      B.or_two(T.common(T.witness(h), a, b, c), T.vertex_search(t, a, b, c), M.common(S.vertex_values(h), a, b, c), M.vertex_search(t, a, b, c), L.vertex_common_arithmetic_exact(width, hw, h, a, b, c, ha, hb, hc, SearchProof.head_bound(width, h, t, hx)), L.vertex_search_arithmetic_exact(width, hw, t, a, b, c, ha, hb, hc, SearchProof.tail_bound(width, h, t, hx)))
 def L.triangle_search_arithmetic_exact(width, hw, xs, a, b, c, ha, hb, hc, hx):
-  Cover.or_two(T.vertex_search(xs, a, b, c), T.all_pairs(xs, a, b, c), M.vertex_search(xs, a, b, c), M.all_pairs(xs, a, b, c), L.vertex_search_arithmetic_exact(width, hw, xs, a, b, c, ha, hb, hc, hx), L.all_pairs_arithmetic_exact(width, hw, xs, a, b, c, ha, hb, hc, hx))
+  B.or_two(T.vertex_search(xs, a, b, c), T.all_pairs(xs, a, b, c), M.vertex_search(xs, a, b, c), M.all_pairs(xs, a, b, c), L.vertex_search_arithmetic_exact(width, hw, xs, a, b, c, ha, hb, hc, hx), L.all_pairs_arithmetic_exact(width, hw, xs, a, b, c, ha, hb, hc, hx))
 def L.triangle_witness_arithmetic_exact(width, hw, a, b, c, ha, hb, hc):
   L.triangle_search_arithmetic_exact(width, hw, List.append(&2, T.Point, T.vertices(a), List.append(&2, T.Point, T.vertices(b), T.vertices(c))), a, b, c, ha, hb, hc, SearchProof.append_bound(width, T.vertices(a), List.append(&2, T.Point, T.vertices(b), T.vertices(c)), ha, SearchProof.append_bound(width, T.vertices(b), T.vertices(c), hb, hc)))

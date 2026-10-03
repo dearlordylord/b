@@ -15,7 +15,7 @@ import ./halfplane-region.bend as Region
 import ./facts.bend as F
 import ./order-facts.bend as O
 import ./homogeneous.bend as Form
-import ./validation-proof.bend as Reflection
+import ./boolean-reflection.bend as Reflection
 import ./boolean-reflection.bend as B
 
 def cut_gt_lt(+a: Nat, +b: Nat) -> {Nat.is_gt(b, a) == Nat.is_lt(a, b) : Bool}:

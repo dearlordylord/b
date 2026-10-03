@@ -204,17 +204,11 @@ def L.closed_bounds_gate(sections):
 def nat_eq_sound(+a: Nat, +b: Nat, h: {Nat.is_eq(a, b) == True{} : Bool}) -> {a == b : Nat}:
   Reflection.nat_eq_sound(a, b, h)
 
+# Compatibility entry points for the shared Boolean/Nat reflection owner.
 def nat_eq_reflexive(+a: Nat) -> {Nat.is_eq(a, a) == True{} : Bool}:
-  match a:
-    case 0n:
-      {==}
-    case 1n+ap:
-      nat_eq_reflexive(ap)
-
+  Reflection.nat_eq_reflexive(a)
 def nat_eq_complete(+a: Nat, +b: Nat, h: {a == b : Nat}) -> {Nat.is_eq(a, b) == True{} : Bool}:
-  %h : {Nat.is_eq(a, _) == True{} : Bool}
-  nat_eq_reflexive(a)
-
+  Reflection.nat_eq_complete(a,b,h)
 
 def L.artwork_gate_sound(sections, accepted):
   pair_map({Nat.is_eq(V.section_count(sections), 33n) == True{} : Bool},

@@ -36,3 +36,19 @@ def nat_eq_sound(+a: Nat, +b: Nat, h: {Nat.is_eq(a, b) == True{} : Bool}) -> {a 
       absurd({1n+ap == 0n : Nat}, false_impossible(h))
     case 1n+ap 1n+bp:
       Equal.cong(Nat, Nat, p => 1n+p, ap, bp, nat_eq_sound(ap, bp, h))
+
+def or_two(+a: Bool, +b: Bool, +p: Bool, +q: Bool, ha: {a == p : Bool}, hb: {b == q : Bool}) -> {a || b == p || q : Bool}:
+  %ha : {a || b == _ || q : Bool}
+  %hb : {a || b == a || _ : Bool}
+  {==}
+
+def nat_eq_reflexive(+a: Nat) -> {Nat.is_eq(a, a) == True{} : Bool}:
+  match a:
+    case 0n:
+      {==}
+    case 1n+ap:
+      nat_eq_reflexive(ap)
+
+def nat_eq_complete(+a: Nat, +b: Nat, h: {a == b : Nat}) -> {Nat.is_eq(a, b) == True{} : Bool}:
+  %h : {Nat.is_eq(a, _) == True{} : Bool}
+  nat_eq_reflexive(a)

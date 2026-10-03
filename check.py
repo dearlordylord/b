@@ -253,6 +253,26 @@ def segment_proportional_counter(directory, original):
     bend(directory, "segment-proportional-counter.bend", "--verdict")
 
 
+def segment_boundary_counter(directory, replacement):
+    """Refute the exact boundary law with both endpoint premises checked."""
+    constant = replacement == "True{}"
+    l = "1n" if constant else "2n"
+    refute = "B.false_impossible(Equal.sym(Bool,True{},False{},h))" if constant else "B.false_impossible(h)"
+    (directory / "segment-boundary-counter.bend").write_text(
+        "import Base\nimport ./segment-boundary.bend as M\n"
+        "import ./natural-cover.bend as N\nimport ./homogeneous-geometry.bend as G\n"
+        "import ./homogeneous-combination.bend as C\nimport ./segment-cut.bend as Cut\n"
+        "import ./halfplane-region.bend as Region\nimport ./strict-halfplane.bend as S\n"
+        "import ./boolean-reflection.bend as B\n"
+        "def a() -> N.Point: N.P{0n,1n}\ndef b() -> N.Point: N.P{1n,1n}\n"
+        "def p() -> G.Point: G.P{0n,3n,1n}\ndef q() -> G.Point: G.P{1n,0n,1n}\n"
+        "def premises() -> {Region.edge(a(),b(),p()) && S.negative(a(),b(),q()) == True{} : Bool}:\n  {==}\n"
+        f"def wrong_ratio() -> {{M.ratio(a(),b(),p(),q(),1n,{l}) == {'True' if constant else 'False'}{{}} : Bool}}:\n  {{==}}\n"
+        f"def boundary_condition() -> {{Cut.on_line(a(),b(),C.join(p(),q(),1n,{l})) == {'False' if constant else 'True'}{{}} : Bool}}:\n  {{==}}\n"
+        f"def refutes_public_exact(h:{{M.ratio(a(),b(),p(),q(),1n,{l}) == Cut.on_line(a(),b(),C.join(p(),q(),1n,{l})) : Bool}}) -> Empty:\n  {refute}\n")
+    bend(directory, "segment-boundary-counter.bend", "--verdict")
+
+
 def negative_controls(directory):
     controls = [
         ("core.bend", "Seam{boundary_left(cell_start(cell)),",
@@ -267,6 +287,9 @@ def negative_controls(directory):
          "Nat.add(F.weight_total(u, v), 1n)", "corner_weights_normalize"),
     ]
     controls += [
+        ('segment-boundary.bend', 'P.proportional(k,l,Cut.first_weight(a,b,q),Cut.second_weight(a,b,p))', 'True{}', 'ratio_on_line_exact'),
+        ('segment-boundary.bend', 'P.proportional(k,l,Cut.first_weight(a,b,q),Cut.second_weight(a,b,p))', 'P.proportional(k,l,Cut.second_weight(a,b,p),Cut.first_weight(a,b,q))', 'ratio_on_line_exact'),
+        ('segment-boundary.bend', 'Cut.first_weight(a,b,q)', 'Cut.second_weight(a,b,q)', 'ratio_on_line_exact'),
         ('segment-proportional.bend', 'Nat.is_eq(Nat.mul(k,w),Nat.mul(l,v))', 'True{}', 'proportional_exact'),
         ('segment-proportional.bend', 'Nat.is_eq(Nat.mul(k,w),Nat.mul(l,v))', 'Nat.is_le(Nat.mul(k,w),Nat.mul(l,v))', 'proportional_exact'),
         ('segment-proportional.bend', 'G.equivalent(C.join(p,q,k,l),C.join(p,q,v,w))', 'G.equivalent(C.join(p,q,k,l),C.join(p,q,w,v))', 'same_point_exact'),
@@ -514,6 +537,8 @@ def negative_controls(directory):
             bend(directory, file, "--check-only")
             if law == "literal_u32_sum3_exact":
                 proof_root = "sum3-counter.bend"
+            elif file == "segment-boundary.bend":
+                proof_root = "SEGMENT_BOUNDARY_PROOF.bend"
             elif file == "segment-proportional.bend":
                 proof_root = "SEGMENT_PROPORTIONAL_PROOF.bend"
             elif file == "segment-provenance.bend":
@@ -613,6 +638,8 @@ def negative_controls(directory):
             except AssertionError as error:
                 raise AssertionError(f"Mutation {file}: {law} did not produce a proof diagnostic\n{error}") from error
             assert law in output, output
+            if file == "segment-boundary.bend":
+                segment_boundary_counter(directory, new)
             if file == "segment-proportional.bend":
                 segment_proportional_counter(directory, old)
             if file == "segment-provenance.bend":
@@ -776,11 +803,16 @@ if __name__ == "__main__":
         for proof_root in proof_roots:
             bend(directory, proof_root, "--verdict")
         print(f"BendTT: all {law_count} unique public laws accepted across {len(proof_roots)} proof roots")
+        bend(directory, "segment-boundary-raw-tests.bend", "--verdict")
+        bend(directory, "segment-boundary-tests.bend", "--verdict")
+        bend(directory, "segment-boundary-witness-tests.bend", "--verdict")
+        print("Boundary coefficient fixtures accepted: exact line classification, rejection, direct-cut equivalence, region transport and zero-gap endpoint")
         bend(directory, "segment-proportional-raw-tests.bend", "--verdict")
         bend(directory, "segment-proportional-tests.bend", "--verdict")
         print("Proportional segment fixtures accepted: exact ratio, unequal denominators, zero weights, validity guards and inside/outside membership")
         bend(directory, "segment-provenance-raw-tests.bend", "--verdict")
         bend(directory, "segment-provenance-tests.bend", "--verdict")
+        bend(directory, "segment-provenance-cut-tests.bend", "--verdict")
         print("Source-segment provenance fixtures accepted: exact coefficients, unequal denominators, zero weights, actual cuts and validity")
         bend(directory, "clip-halfplane-tests.bend", "--verdict")
         bend(directory, "clip-halfplane-boundary-tests.bend", "--verdict")
@@ -806,6 +838,7 @@ if __name__ == "__main__":
         bend(directory, "quad-intersection-tests.bend", "--verdict")
         bend(directory, "quad-intersection-common-tests.bend", "--verdict")
         bend(directory, "quad-intersection-native-tests.bend", "--verdict")
+        bend(directory, "quad-intersection-native-contact-tests.bend", "--verdict")
         print("Global intersection fixtures accepted: one-sided separation, common points, edge/corner contact, native rejection and symmetry")
         bend(directory, "strict-halfplane-tests.bend", "--verdict")
         print("Strict separation fixtures accepted: contact, zero pairs, alternate fractions, hull exclusion and native bridge")

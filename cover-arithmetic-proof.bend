@@ -1,4 +1,5 @@
 import Base
+import ./boolean-reflection.bend as B
 import ./topology.bend as T
 import ./cover-arithmetic.bend as M
 import ./cover-arithmetic-laws.bend as L
@@ -11,10 +12,9 @@ import ./sat-arithmetic-proof.bend as SatProof
 import ./edge-arithmetic-proof.bend as EdgeProof
 import ./edge-arithmetic-laws.bend as Edge
 
+# Compatibility entry point; the generic Boolean proof belongs to reflection.
 def or_two(+a: Bool, +b: Bool, +p: Bool, +q: Bool, ha: {a == p : Bool}, hb: {b == q : Bool}) -> {a || b == p || q : Bool}:
-  %ha : {a || b == _ || q : Bool}
-  %hb : {a || b == a || _ : Bool}
-  {==}
+  B.or_two(a,b,p,q,ha,hb)
 def L.disjoint_all_arithmetic_exact(width, hw, q, xs, hq, hx):
   match xs:
     case Nil{}: {==}

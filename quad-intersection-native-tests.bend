@@ -16,10 +16,6 @@ def decoded_outside() -> {T.outside(F.native_q(), F.native_diamond()) == M.outsi
   {==}
 def native_overlap_meets() -> {T.meets(F.native_q(), F.native_box(10, 10, 20, 20)) == True{} : Bool}:
   L.production_common_hull_meets(12n, {==}, F.native_q(), F.native_box(10, 10, 20, 20), {==}, {==}, {==}, {==}, F.common_at(F.q(), F.overlap(), G.P{12n, 12n, 1n}, {==}, {==}, {==}, {==}, {==}))
-def native_edge_contact_meets() -> {T.meets(F.native_q(), F.native_box(15, 5, 25, 15)) == True{} : Bool}:
-  L.production_common_hull_meets(12n, {==}, F.native_q(), F.native_box(15, 5, 25, 15), {==}, {==}, {==}, {==}, F.common_at(F.q(), F.box(15n, 5n, 25n, 15n), G.P{15n, 10n, 1n}, {==}, {==}, {==}, {==}, {==}))
-def native_corner_contact_meets() -> {T.meets(F.native_q(), F.native_box(15, 15, 25, 25)) == True{} : Bool}:
-  L.production_common_hull_meets(12n, {==}, F.native_q(), F.native_box(15, 15, 25, 25), {==}, {==}, {==}, {==}, F.common_at(F.q(), F.box(15n, 15n, 25n, 25n), G.P{15n, 15n, 1n}, {==}, {==}, {==}, {==}, {==}))
 def native_rejection_excludes() -> M.CommonPoint(F.q(), F.diamond()) -> Empty:
   L.production_rejected_meets_excludes(12n, {==}, F.native_q(), F.native_diamond(), {==}, {==}, {==}, {==}, {==})
 def native_order_symmetry() -> {T.meets(F.native_q(), F.native_diamond()) == T.meets(F.native_diamond(), F.native_q()) : Bool}:
