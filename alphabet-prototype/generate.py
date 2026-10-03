@@ -132,7 +132,7 @@ def merged_tubes(name, arms):
     return '\n'.join(parts)
 
 
-def glyphs():
+def glyph_specs():
     # Each arm is (centerline, thickness, seam spacing, closed).
     cap = lambda p: (p, 22, 25, False)
     small = lambda p: (p, 20, 29, False)
@@ -170,6 +170,11 @@ def glyphs():
         'u': (108, [small(bezier((25, 75), ((25, 111), (22, 132), (53, 132)), ((84, 132), (83, 108), (83, 75)))), small(stem(84, 75))]),
         'l': (61, [small(bezier((25, 30), ((24, 71), (24, 105), (25, 122)), ((26, 133), (32, 135), (46, 131))))]),
     }
+    return forms
+
+
+def glyphs():
+    forms = glyph_specs()
     result = {}
     original = ET.parse(HERE.parent/'b.svg').getroot()
     for path in original.iter():

@@ -8,6 +8,12 @@ A steel-blue **B** made of three segmented arms, generated in [Bend](https://ben
 
 [SVG output](b.svg) · [PNG preview](preview.png) · [Generator](generate.bend) · [Laws](LAWS.bend) · [Proofs](PROOF.bend)
 
+The approved [19-glyph alphabet pilot](alphabet/README.md) now has a separate
+native Bend model and generation gate. It reuses the shared seam laws, checks
+every concrete cell and attachment before SVG emission, and independently
+checks the actual artifacts and their exact intersection topology. Its scope
+and remaining universal/topological proof gaps are documented separately.
+
 The outlines and seam endpoints share the same coordinates. Each curved seam
 stays inside a convex section of its arm. BendTT checks the general algebraic
 proofs; Bend checks the concrete artwork before emitting SVG. An independent
